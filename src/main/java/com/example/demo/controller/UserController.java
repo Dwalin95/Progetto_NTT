@@ -4,11 +4,9 @@ import com.example.demo.configuration.UserSecurityConfiguration;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MongoService;
-
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,5 +50,32 @@ public class UserController {
     public void createUser(@RequestBody User user) throws Exception {
         userSecurityConfiguration.validateSignUp(user);
     }
+
+    @GetMapping(value = "/revelio")
+    public Boolean revelio() {
+
+        User user = new User();
+
+        String pwzInseritaUtente = "Minimo8!ettere#Chioccol@";
+        String pwzDataBase = "$2a$10$rD0xnzlMmChvSoJuViBYueFFHs6UqslyAcJDYMXFtyKTFV9c0Yhr8";
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (passwordEncoder.matches(pwzInseritaUtente, pwzDataBase)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /** @PostMapping(value = "/creazione")
+    public void createUser(@RequestBody User user){
+    String psw = user.getPwz();
+    String email = user.getEmail();
+
+    if (userSecurityConfiguration.validatePassword(psw) && userSecurityConfiguration.validateEmail(email)) {
+    user.setPwz(userSecurityConfiguration.passwordEncoder(psw));
+    mongoService.saveUser(user);
+    }
+
+    }
+     */
 }
 
