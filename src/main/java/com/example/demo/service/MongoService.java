@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.configuration.UserSecurityConfiguration;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,10 @@ public class MongoService {
         return this.userRepository.findByEmail(email);
     }
 
+    public Optional<List<User>> findAllUsers(){
+        return Optional.of(this.userRepository.findAll());
+    }
+
     public User saveUser(User user){
         return this.userRepository.save(user);
     }
@@ -32,9 +37,5 @@ public class MongoService {
 
     public void deleteUserByEmail(String email){
         this.userRepository.deleteByEmail(email);
-    }
-
-    public Optional<List<User>> findAllUsers(){
-        return Optional.of(this.userRepository.findAll());
     }
 }

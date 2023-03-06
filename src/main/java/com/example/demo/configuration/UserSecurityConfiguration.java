@@ -5,7 +5,6 @@ import com.example.demo.service.MongoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -16,34 +15,24 @@ public class UserSecurityConfiguration {
     private MongoService mongoService;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
-    //TODO: sono due modi di criptare la password, devo capire se uno è meglio dell'altro o è uguale
-    public String passwordEncoder(String psw){
-        return passwordEncoder().encode(psw);
-        // BCrypt.hashpw(psw, BCrypt.gensalt());
-    }
-
-    //TODO: anche qua invece del system.out dobbiamo creare una eccezione
-    public boolean checkLogin(User user){
-        String email = user.getEmail();
-        String psw = user.getPwz();
-
+    public User checkLogin(String email, String psw) throws Exception {
         if(emailExists(email)){
-            User foundUser = mongoService.findUserByEmail(email).get();
+            User user = mongoService.findUserByEmail(email).get();
 
-            if(BCrypt.checkpw(foundUser.getPwz(), passwordEncoder(psw))){
+            if(passwordEncoder().matches(psw, user.getPwz())){
                 System.out.println("Login effettuato con successo");
-                return true;
+                return user;
             } else {
                 System.out.println("La password è errata");
-                return false;
+                throw new Exception();
             }
         } else {
             System.out.println("L'email non è presente nel database");
-            return false;
+            throw new Exception();
         }
     }
 
@@ -51,12 +40,25 @@ public class UserSecurityConfiguration {
         return mongoService.findUserByEmail(email).isPresent();
     }
 
+    public void validateSignUp(User user) throws Exception {
+        String psw = user.getPwz();
+        String email = user.getEmail();
 
-    public boolean validateEmail(String email){
+        try{
+            if (validatePassword(psw) && validateEmail(email)) {
+                user.setPwz(passwordEncoder().encode(psw));
+                mongoService.saveUser(user);
+            }
+        } catch (Exception e){
+            throw new Exception();
+        }
+    }
+
+    private boolean validateEmail(String email){
         return email.contains("@");
     }
 
-    public boolean validatePassword(String psw){
+    private boolean validatePassword(String psw){
         //regex: Must be from 8 to 32 characters long, at least 1 special character (only [!, #, %, @]), at least 1 upper-case letter, at least 1 lower-case letter, at least 1 number
         return psw.matches("^(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\\D*\\d)(?=[^!#%@]*[!#%@])[A-Za-z0-9!#%@]{8,32}$");
     }
