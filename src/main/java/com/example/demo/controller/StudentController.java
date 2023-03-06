@@ -22,6 +22,12 @@ public class StudentController {
     private final StudentRepository studentRepository;
     private final StudentService studentService;
 
+    @RequestMapping("/")
+    public String home(){
+        return "La home";
+    }
+
+
     @GetMapping(value = "/ciao")
     public String hello() {
         return "hello World!";
@@ -31,11 +37,6 @@ public class StudentController {
     public Optional<List<Student>> findAll() {
         return Optional.of(studentRepository.findAll());
     }
-
-
-
-
-
 
     @DeleteMapping(value = "delete/{id}")
     public void deleteStudent(@PathVariable String id) {

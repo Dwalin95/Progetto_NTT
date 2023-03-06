@@ -1,0 +1,28 @@
+spring micro servizi, libreria con cose di mongo, 2 micro che usano kafka, + 3za libreria con repository e controller e model, con qualche classe di utilkityt
+
+api
+controller
+business
+pagina di home con la visualizzazione dei dati
+2 microservizi
+kafka microservizi
+query mongo
+email univoca
+
+1 micro e una libreria
+kafka dopo
+criptare la password
+
+
+
+**
+pagina di registrazione e di login email - username e password
+(regiax, controllo della chiocciola, password minimo 8 caratteri, yup e formik)
+utente registrato, richiesta al bk, implementare api e controller
+vedere l'utente nel db
+2 mircro, 1 lato service e l'altro librerie (stile entity jpa), model dto e repository, utility, mapper e conversioni
+servizio o classe statica con elementi statici per metodi che riutilizziamo nel codice
+bk java 11
+l'email deve essere univoca
+criptare la password lato bk, durante la login bisogna decriptarla
+**
