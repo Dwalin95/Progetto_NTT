@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.configuration.UserSecurityConfiguration;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MongoService;
-import com.example.demo.service.StudentService;
+
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,12 +18,12 @@ import java.util.Optional;
 public class UserController {
 
 
-
     private final MongoService mongoService;
-
+    @Autowired
+    UserSecurityConfiguration userSecurityConfiguration;
 
     @RequestMapping("/")
-    public String home(){
+    public String home() {
         return "La Home";
     }
 
@@ -42,9 +44,15 @@ public class UserController {
     }
 
     @PostMapping(value = "/creazione")
-    public void createStudent(@RequestBody User user) {
-        mongoService.saveUser(user);
+    public void createUser(@RequestBody User user){
+        String psw = user.getPwz();
+        String email = user.getEmail();
+
+            if (userSecurityConfiguration.validatePassword(psw) && userSecurityConfiguration.validateEmail(email)) {
+                user.setPwz(userSecurityConfiguration.passwordEncoder(psw));
+                mongoService.saveUser(user);
+            }
+
     }
 }
-
 
