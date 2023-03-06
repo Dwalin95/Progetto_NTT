@@ -22,7 +22,7 @@ public class UserController {
 
     @RequestMapping("/")
     public String home(){
-        return "La home";
+        return "La Home";
     }
 
 
