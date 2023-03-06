@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document (collection = "users" )
-public class Student {
+public class User {
 
     @Id
     private String _id;
