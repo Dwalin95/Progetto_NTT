@@ -1,12 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.configuration.UserSecurityConfiguration;
+import com.example.demo.configuration.UserConfiguration;
 import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MongoService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +18,7 @@ public class UserController {
 
     private final MongoService mongoService;
     @Autowired
-    UserSecurityConfiguration userSecurityConfiguration;
+    private UserConfiguration userConfiguration;
 
     @RequestMapping("/")
     public String home() {
@@ -39,7 +37,7 @@ public class UserController {
 
     @GetMapping(value = "/user", params = {"email", "pwz"})
     public User login(@RequestParam(value = "email") String email, @RequestParam("pwz") String pwz) throws Exception {
-        return userSecurityConfiguration.checkLogin(email, pwz);
+        return userConfiguration.checkLogin(email, pwz);
     }
 
     @DeleteMapping(value = "delete/{id}")
@@ -49,35 +47,31 @@ public class UserController {
 
     @PostMapping(value = "/creazione")
     public void createUser(@RequestBody User user) throws Exception {
-        userSecurityConfiguration.validateSignUp(user);
+        userConfiguration.validateSignUp(user);
     }
 
-    @GetMapping(value = "/revelio")
-    public Boolean revelio() {
+    @GetMapping(value = "/update/{id}")
+    public User updateUser(
+            @PathVariable String id,
+            @RequestParam Optional<String> username,
+            @RequestParam Optional<String> firstName,
+            @RequestParam Optional<String> lastName,
+            @RequestParam Optional<String> email,
+            @RequestParam Optional<String> gender
+    ){
+        //TODO: cambiare orElse
+        User user = mongoService.findUserById(id).orElse(null);
 
-        User user = new User();
+        user.setUsername(username.orElse(user.getUsername()));
+        user.setFirstName(firstName.orElse(user.getFirstName()));
+        user.setLastName(lastName.orElse(user.getLastName()));
+        user.setEmail(email.orElse(user.getEmail()));
 
-        String pwzInseritaUtente = "Minimo8!ettere#Chioccol@";
-        String pwzDataBase = "$2a$10$rD0xnzlMmChvSoJuViBYueFFHs6UqslyAcJDYMXFtyKTFV9c0Yhr8";
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        if (passwordEncoder.matches(pwzInseritaUtente, pwzDataBase)) {
-            return true;
-        } else {
-            return false;
-        }
+        user.setGender(gender.orElse(user.getEmail()));
+
+        mongoService.saveUser(user);
+
+        return user;
     }
-    /** @PostMapping(value = "/creazione")
-    public void createUser(@RequestBody User user){
-    String psw = user.getPwz();
-    String email = user.getEmail();
-
-    if (userSecurityConfiguration.validatePassword(psw) && userSecurityConfiguration.validateEmail(email)) {
-    user.setPwz(userSecurityConfiguration.passwordEncoder(psw));
-    mongoService.saveUser(user);
-    }
-
-    }
-     */
-
 }
 

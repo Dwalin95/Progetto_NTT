@@ -9,7 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-public class UserSecurityConfiguration {
+public class UserConfiguration {
 
     @Autowired
     private MongoService mongoService;
@@ -40,7 +40,7 @@ public class UserSecurityConfiguration {
         return mongoService.findUserByEmail(email).isPresent();
     }
 
-    public void validateSignUp(User user) throws Exception {
+    public void validateSignUp(User user){
         String psw = user.getPwz();
         String email = user.getEmail();
 
@@ -50,7 +50,7 @@ public class UserSecurityConfiguration {
                 mongoService.saveUser(user);
             }
         } catch (Exception e){
-            throw new Exception();
+            throw e;
         }
     }
 

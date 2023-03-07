@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.configuration.UserSecurityConfiguration;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,10 @@ public class MongoService {
 
     public Optional<User> findUserByEmail(String email){
         return this.userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findUserByUsername(String username){
+        return this.userRepository.findByUsername(username);
     }
 
     public Optional<List<User>> findAllUsers(){
