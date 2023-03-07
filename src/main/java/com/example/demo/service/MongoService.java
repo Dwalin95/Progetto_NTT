@@ -26,7 +26,7 @@ public class MongoService {
         return this.userRepository.findByUsername(username);
     }
 
-    public Optional<List<User>> findUserFriendsByUsername(String[] friendsUsernames){
+    public Optional<List<User>> findUserFriendsByUsername(List<String> friendsUsernames){
         return this.userRepository.findFriendsByUsername(friendsUsernames);
     }
 
@@ -48,5 +48,9 @@ public class MongoService {
 
     public List<User> countUsersPerCityAggregation(){
         return this.userRepository.countUsersPerCity();
+    }
+
+    public List<User> countFriendsPerCityAggregation(List<String> friendsUsernames){
+        return this.userRepository.countFriendsPerCity(friendsUsernames);
     }
 }

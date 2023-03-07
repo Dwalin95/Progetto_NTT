@@ -19,11 +19,16 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> deleteByEmail(String email);
 
     @Query("{'username': {$in: ?0}}")
-    Optional<List<User>> findFriendsByUsername(String[] friendsUsernames);
+    Optional<List<User>> findFriendsByUsername(List<String> friendsUsernames);
 
     //TODO: su mongodb da il risultato giusto, da sistemare qua
     @Aggregation(
             pipeline = {"{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
     )
     List<User> countUsersPerCity();
+
+    @Aggregation(
+            pipeline = {"{$match: {'username': {$in: ?0}}}", "{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
+    )
+    List<User> countFriendsPerCity(List<String> friendsUsernames);
 }

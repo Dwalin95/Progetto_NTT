@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,7 +24,9 @@ public class User{
     private String lastName;
     private String pwz;
     private String gender;
-    private String[] friends;
+    private ArrayList<String> friends;
+    private ArrayList<String> receivedFriendRequests;
+    private ArrayList<String> sentFriendRequests;
     private Address address;
 }
 

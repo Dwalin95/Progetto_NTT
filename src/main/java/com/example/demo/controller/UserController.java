@@ -43,13 +43,37 @@ public class UserController {
 
     @GetMapping(value = "/{username}/friends")
     public List<User> findUserFriendsByUsername(@PathVariable String username){
-        User user = mongoService.findUserByUsername(username).orElse(new User());
-        return mongoService.findUserFriendsByUsername(user.getFriends()).orElse(new ArrayList<>());
+        List<String> friends = mongoService.findUserByUsername(username).orElse(new User()).getFriends();
+        return mongoService.findUserFriendsByUsername(friends).orElse(new ArrayList<>());
+    }
+
+    @GetMapping(value = "/{username}/receivedFriendRequests")
+    public List<User> findUserFriendRequestsByUsername(@PathVariable String username){
+        List<String> friendRequests = mongoService.findUserByUsername(username).orElse(new User()).getReceivedFriendRequests();
+        return mongoService.findUserFriendsByUsername(friendRequests).orElse(new ArrayList<>());
+    }
+
+    @GetMapping(value = "/{username}/sendFriendRequest")
+    public void sendFriendRequest(@PathVariable String username, @RequestParam String usernameFriend){
+        User user = mongoService.findUserByUsername(username).orElse(null);
+        User friendToAdd = mongoService.findUserByUsername(usernameFriend).orElse(null);
+
+        user.getSentFriendRequests().add(usernameFriend);
+        friendToAdd.getReceivedFriendRequests().add(username);
+
+        mongoService.saveUser(user);
+        mongoService.saveUser(friendToAdd);
     }
 
     @GetMapping(value = "/userCount")
     public List<User> userCountPerCity(){
         return mongoService.countUsersPerCityAggregation();
+    }
+
+    @GetMapping(value = "/{username}/friendsPerCity")
+    public List<User> friendsCountPerCity(@PathVariable String username){
+        List<String> friends = mongoService.findUserByUsername(username).orElse(new User()).getFriends();
+        return mongoService.countFriendsPerCityAggregation(friends);
     }
 
     @GetMapping(value = "/user", params = {"email", "pwz"})
@@ -78,7 +102,6 @@ public class UserController {
         mongoService.saveUser(user);
 
         return user;
-
     }
 
     @PostMapping(value = "/signup")
