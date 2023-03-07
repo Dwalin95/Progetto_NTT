@@ -5,6 +5,7 @@ import com.example.demo.model.User;
 import com.example.demo.service.MongoService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -42,9 +43,14 @@ public class UserController {
     }
 
     @GetMapping(value = "/{username}/friends")
-    public List<User> findUserFriendsByUsername(@PathVariable String username){
-        List<String> friends = mongoService.findUserByUsername(username).orElse(new User()).getFriends();
-        return mongoService.findUserFriendsByUsername(friends).orElse(new ArrayList<>());
+    public ResponseEntity<List<User>> findUserFriendsByUsername(@PathVariable String username){
+        Optional<User> user = mongoService.findUserByUsername(username);
+        if (user.isPresent()) {
+            List<User> friends = mongoService.findUserFriendsByUsername(user.get().getFriends()).orElse(new ArrayList<>());
+            return ResponseEntity.ok(friends);
+        } else {
+            return ResponseEntity.notFound().build(); //Nel caso in cui {username} fosse inesistente
+        }
     }
 
     @GetMapping(value = "/{username}/receivedFriendRequests")
