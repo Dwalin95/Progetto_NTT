@@ -15,6 +15,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/v1")
 public class UserController {
 
     private final MongoService mongoService;
