@@ -22,6 +22,8 @@ public class UserController {
     @Autowired
     private UserConfiguration userConfiguration;
 
+
+    // Test pagina iniziale
     @RequestMapping("/")
     public String home() {
         return "La Home";
@@ -32,11 +34,7 @@ public class UserController {
         return "Hello World!";
     }
 
-    @GetMapping(value = "/list")
-    public Optional<List<User>> findAllUsers() {
-        return mongoService.findAllUsers();
-    }
-
+    // Visualizzazione contenuto
     @GetMapping(value = "/{username}")
     public User findUserByUsername(@PathVariable String username){
         return mongoService.findUserByUsername(username).orElse(new User());
@@ -53,6 +51,27 @@ public class UserController {
         }
     }
 
+    @GetMapping(value = "/list")
+    public Optional<List<User>> findAllUsers() {
+        return mongoService.findAllUsers();
+    }
+    @GetMapping(value = "/userCount")
+    public List<User> userCountPerCity(){
+        return mongoService.countUsersPerCityAggregation();
+    }
+
+    @GetMapping(value = "/{username}/friendsPerCity")
+    public List<User> friendsCountPerCity(@PathVariable String username){
+        List<String> friends = mongoService.findUserByUsername(username).orElse(new User()).getFriends();
+        return mongoService.countFriendsPerCityAggregation(friends);
+    }
+
+    @GetMapping(value = "/user", params = {"email", "pwz"})
+    public User login(@RequestParam(value = "email") String email, @RequestParam("pwz") String pwz) throws Exception {
+        return userConfiguration.checkLogin(email, pwz);
+    }
+
+    // base perinviare e ricevere richieste di amicizia
     @GetMapping(value = "/{username}/receivedFriendRequests")
     public List<User> findUserFriendRequestsByUsername(@PathVariable String username){
         List<String> friendRequests = mongoService.findUserByUsername(username).orElse(new User()).getReceivedFriendRequests();
@@ -71,23 +90,10 @@ public class UserController {
         mongoService.saveUser(friendToAdd);
     }
 
-    @GetMapping(value = "/userCount")
-    public List<User> userCountPerCity(){
-        return mongoService.countUsersPerCityAggregation();
-    }
 
-    @GetMapping(value = "/{username}/friendsPerCity")
-    public List<User> friendsCountPerCity(@PathVariable String username){
-        List<String> friends = mongoService.findUserByUsername(username).orElse(new User()).getFriends();
-        return mongoService.countFriendsPerCityAggregation(friends);
-    }
+//Update relativo ai campi K,V
 
-    @GetMapping(value = "/user", params = {"email", "pwz"})
-    public User login(@RequestParam(value = "email") String email, @RequestParam("pwz") String pwz) throws Exception {
-        return userConfiguration.checkLogin(email, pwz);
-    }
-
-    @GetMapping(value = "/update/{id}")
+    @PutMapping (value = "/update/{id}")
     public User updateUserById(
             @PathVariable String id,
             @RequestParam Optional<String> username,
@@ -96,19 +102,53 @@ public class UserController {
             @RequestParam Optional<String> email,
             @RequestParam Optional<String> gender
     ){
-        //TODO: cambiare orElse
+
         User user = mongoService.findUserById(id).orElse(null);
 
         user.setUsername(username.orElse(user.getUsername()));
         user.setFirstName(firstName.orElse(user.getFirstName()));
         user.setLastName(lastName.orElse(user.getLastName()));
         user.setEmail(email.orElse(user.getEmail()));
-        user.setGender(gender.orElse(user.getEmail()));
+        user.setGender(gender.orElse(user.getGender()));
 
         mongoService.saveUser(user);
 
         return user;
     }
+
+    /*
+    Con la Response Entity
+
+     @PutMapping(value = "/update/{id}")
+     public ResponseEntity<User> updateUserById(
+     @PathVariable String id,
+     @RequestParam Optional<String> username,
+     @RequestParam Optional<String> firstName,
+     @RequestParam Optional<String> lastName,
+     @RequestParam Optional<String> email,
+     @RequestParam Optional<String> gender
+     ) {
+
+     Optional<User> user = mongoService.findUserById(id);
+
+     if (user.isPresent()) {
+     user.get().setUsername(username.orElse(user.get().getUsername()));
+     user.get().setFirstName(firstName.orElse(user.get().getFirstName()));
+     user.get().setLastName(lastName.orElse(user.get().getLastName()));
+     user.get().setEmail(email.orElse(user.get().getEmail()));
+     user.get().setGender(gender.orElse(user.get().getGender()));
+
+     mongoService.saveUser(user.get());
+
+     return ResponseEntity.ok(user.get());
+     } else {
+     return ResponseEntity.notFound().build();
+     }
+     }
+     */
+
+
+    //Creazione ed Eliminazione
 
     @PostMapping(value = "/signup")
     public void createUser(@RequestBody User user) throws Exception {
