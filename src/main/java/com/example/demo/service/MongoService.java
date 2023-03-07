@@ -26,6 +26,10 @@ public class MongoService {
         return this.userRepository.findByUsername(username);
     }
 
+    public Optional<List<User>> findUserFriendsByUsername(String[] friendsUsernames){
+        return this.userRepository.findFriendsByUsername(friendsUsernames);
+    }
+
     public Optional<List<User>> findAllUsers(){
         return Optional.of(this.userRepository.findAll());
     }
@@ -40,5 +44,9 @@ public class MongoService {
 
     public void deleteUserByEmail(String email){
         this.userRepository.deleteByEmail(email);
+    }
+
+    public List<User> countUsersPerCityAggregation(){
+        return this.userRepository.countUsersPerCity();
     }
 }

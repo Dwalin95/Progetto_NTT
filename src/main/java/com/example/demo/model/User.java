@@ -22,6 +22,7 @@ public class User{
     private String lastName;
     private String pwz;
     private String gender;
+    private String[] friends;
     private Address address;
 }
 
