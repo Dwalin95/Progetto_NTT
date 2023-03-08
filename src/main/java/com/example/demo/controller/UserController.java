@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.configuration.UserConfiguration;
+import com.example.demo.exceptionHandler.ResourceNotFoundException;
 import com.example.demo.model.UserCountPerCity;
 import com.example.demo.model.User;
 import com.example.demo.service.MongoService;
@@ -43,19 +44,17 @@ public class UserController {
 
     @GetMapping(value = "/{username}/friends")
     public ResponseEntity<List<User>> findUserFriendsByUsername(@PathVariable String username){
-        Optional<User> user = mongoService.findUserByUsername(username);
-        if (user.isPresent()) {
-            List<User> friends = mongoService.findUserFriendsByUsername(user.get().getFriends()).orElse(new ArrayList<>());
-            return ResponseEntity.ok(friends);
-        } else {
-            return ResponseEntity.notFound().build(); //Nel caso in cui {username} fosse inesistente
-        }
+        User user = mongoService.findUserByUsername(username)
+                                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with username: %s not found", username)));
+        List<User> friends = mongoService.findUserFriendsByUsername(user.getFriends()).orElse(new ArrayList<>());
+        return ResponseEntity.ok(friends);
     }
 
     @GetMapping(value = "/list")
     public Optional<List<User>> findAllUsers() {
         return mongoService.findAllUsers();
     }
+
     @GetMapping(value = "/userCount")
     public List<UserCountPerCity> userCountPerCity(){
         return mongoService.countUsersPerCityAggregation();
@@ -96,7 +95,6 @@ public class UserController {
         mongoService.saveUser(user);
         mongoService.saveUser(friendToAdd);
     }
-
 
 //Update relativo ai campi K,V
 

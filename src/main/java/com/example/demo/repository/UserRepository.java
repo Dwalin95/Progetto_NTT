@@ -22,7 +22,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query("{'username': {$in: ?0}}")
     Optional<List<User>> findFriendsByUsername(List<String> friendsUsernames);
 
-    //TODO: su mongodb da il risultato giusto, da sistemare qua
     @Aggregation(
             pipeline = {"{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
     )
