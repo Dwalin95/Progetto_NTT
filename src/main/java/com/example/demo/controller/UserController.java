@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.configuration.UserConfiguration;
+import com.example.demo.model.UserCountPerCity;
 import com.example.demo.model.User;
 import com.example.demo.service.MongoService;
 import lombok.AllArgsConstructor;
@@ -56,12 +57,12 @@ public class UserController {
         return mongoService.findAllUsers();
     }
     @GetMapping(value = "/userCount")
-    public List<User> userCountPerCity(){
+    public List<UserCountPerCity> userCountPerCity(){
         return mongoService.countUsersPerCityAggregation();
     }
 
     @GetMapping(value = "/{username}/friendsPerCity")
-    public List<User> friendsCountPerCity(@PathVariable String username){
+    public List<UserCountPerCity> friendsCountPerCity(@PathVariable String username){
         List<String> friends = mongoService.findUserByUsername(username).orElse(new User()).getFriends();
         return mongoService.countFriendsPerCityAggregation(friends);
     }

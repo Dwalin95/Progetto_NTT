@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.model.UserCountPerCity;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +47,11 @@ public class MongoService {
         this.userRepository.deleteByEmail(email);
     }
 
-    public List<User> countUsersPerCityAggregation(){
+    public List<UserCountPerCity> countUsersPerCityAggregation(){
         return this.userRepository.countUsersPerCity();
     }
 
-    public List<User> countFriendsPerCityAggregation(List<String> friendsUsernames){
+    public List<UserCountPerCity> countFriendsPerCityAggregation(List<String> friendsUsernames){
         return this.userRepository.countFriendsPerCity(friendsUsernames);
     }
 }

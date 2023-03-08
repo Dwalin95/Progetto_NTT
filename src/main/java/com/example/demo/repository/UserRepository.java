@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import com.example.demo.model.UserCountPerCity;
 import com.example.demo.model.User;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -25,10 +26,10 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Aggregation(
             pipeline = {"{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
     )
-    List<User> countUsersPerCity();
+    List<UserCountPerCity> countUsersPerCity();
 
     @Aggregation(
             pipeline = {"{$match: {'username': {$in: ?0}}}", "{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
     )
-    List<User> countFriendsPerCity(List<String> friendsUsernames);
+    List<UserCountPerCity> countFriendsPerCity(List<String> friendsUsernames);
 }
