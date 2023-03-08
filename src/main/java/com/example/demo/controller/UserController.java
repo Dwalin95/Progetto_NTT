@@ -118,7 +118,6 @@ public class UserController {
         user.setGender(gender.orElse(user.getGender()));
 
         mongoService.saveUser(user);
-
         return user;
     }
 
