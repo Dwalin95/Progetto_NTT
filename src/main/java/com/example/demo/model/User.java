@@ -29,7 +29,3 @@ public class User{
     private ArrayList<String> sentFriendRequests;
     private Address address;
 }
-
-
-
-

@@ -31,8 +31,8 @@ public class MongoService {
         return this.userRepository.findFriendsByUsername(friendsUsernames);
     }
 
-    public Optional<List<User>> findAllUsers(){
-        return Optional.of(this.userRepository.findAll());
+    public List<User> findAllUsers(){
+        return this.userRepository.findAll();
     }
 
     public User saveUser(User user){
