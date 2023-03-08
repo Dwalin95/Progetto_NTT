@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Message;
 import com.example.demo.model.UserCountPerCity;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
