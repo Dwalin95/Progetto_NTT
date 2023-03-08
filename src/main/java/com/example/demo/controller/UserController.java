@@ -38,8 +38,9 @@ public class UserController {
     }
 
     @GetMapping(value = "/{username}")
-    public User findUserByUsername(@PathVariable String username){
-        return mongoService.findUserByUsername(username).orElse(new User());
+    public ResponseEntity<User> findUserByUsername(@PathVariable String username){
+        Optional<User> user = mongoService.findUserByUsername(username);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping(value = "/{username}/friends")
@@ -54,9 +55,15 @@ public class UserController {
     }
 
     @GetMapping(value = "/{username}/receivedFriendRequests")
-    public List<User> findUserFriendRequestsByUsername(@PathVariable String username){
-        List<String> friendRequests = mongoService.findUserByUsername(username).orElse(new User()).getReceivedFriendRequests();
-        return mongoService.findUserFriendsByUsername(friendRequests).orElse(new ArrayList<>());
+    public ResponseEntity<List<User>> findUserFriendRequestsByUsername(@PathVariable String username){
+        Optional<User> user = mongoService.findUserByUsername(username);
+        if(user.isPresent()){
+            List<String> friendRequestsList = user.get().getReceivedFriendRequests();
+            List<User> friends = mongoService.findUserFriendsByUsername(friendRequestsList).orElse(new ArrayList<>());
+            return ResponseEntity.ok(friends);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping(value = "/{username}/sendFriendRequest")
@@ -71,15 +78,15 @@ public class UserController {
         mongoService.saveUser(friendToAdd);
     }
 
-    @GetMapping(value = "/userCount")
-    public List<User> userCountPerCity(){
-        return mongoService.countUsersPerCityAggregation();
-    }
-
     @GetMapping(value = "/{username}/friendsPerCity")
     public List<User> friendsCountPerCity(@PathVariable String username){
         List<String> friends = mongoService.findUserByUsername(username).orElse(new User()).getFriends();
         return mongoService.countFriendsPerCityAggregation(friends);
+    }
+
+    @GetMapping(value = "/userCount")
+    public List<User> userCountPerCity(){
+        return mongoService.countUsersPerCityAggregation();
     }
 
     @GetMapping(value = "/user", params = {"email", "pwz"})
