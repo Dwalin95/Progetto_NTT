@@ -1,19 +1,16 @@
 package com.example.demo.controller;
 
 import com.example.demo.configuration.UserConfiguration;
-import com.example.demo.exceptionHandler.ResourceNotFoundException;
 import com.example.demo.model.Message;
 import com.example.demo.model.UserCountPerCity;
 import com.example.demo.model.User;
 import com.example.demo.service.MongoService;
 import com.example.demo.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
@@ -23,8 +20,8 @@ public class UserController {
 
     private final MongoService mongoService;
     private final UserService userService;
-    @Autowired
-    private UserConfiguration userConfiguration;
+    private final UserConfiguration userConfiguration;
+
 
     @RequestMapping("/")
     public String home() {
@@ -33,41 +30,32 @@ public class UserController {
 
     @GetMapping(value = "/{username}")
     public ResponseEntity<User> findUserByUsername(@PathVariable String username) {
-        Optional<User> user = mongoService.findUserByUsername(username);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return userService.findUserByUsernameService(username);
     }
 
     @GetMapping(value = "/{username}/friends")
     public ResponseEntity<List<User>> findUserFriendsByUsername(@PathVariable String username) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User with username: %s not found", username)));
-        List<User> friends = mongoService.findUserFriendsByUsername(user.getFriends()).orElse(new ArrayList<>());
-        return ResponseEntity.ok(friends);
+        return userService.findFriendsByUsernameService(username);
     }
 
     @GetMapping(value = "/{username}/messages/{friendUsername}")
     public ResponseEntity<List<Message>> findUserMessagesByFriendUsername(@PathVariable String username, @PathVariable String friendUsername){
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
-        List<Message> messages = user.getMessages();
-        return ResponseEntity.ok(messages.stream()
-                    .sorted(Comparator.comparing(Message::getTimestamp))
-                    .collect(Collectors.toList()));
+        return userService.findMessagesByFriendUsernameService(username,friendUsername);
     }
 
     @GetMapping(value = "/list")
     public ResponseEntity<List<User>> findAllUsers() {
-        Optional<List<User>> userList = Optional.of(mongoService.findAllUsers());
-        return userList.map(ResponseEntity::ok).orElseThrow(() -> new ResourceNotFoundException("No users found"));
+        return userService.findAllUserService();
     }
 
     @GetMapping(value = "/userCount")
     public ResponseEntity<List<UserCountPerCity>> userCountPerCity() {
-        Optional<List<UserCountPerCity>> userCount = Optional.of(mongoService.countUsersPerCityAggregation());
-        return userCount.map(ResponseEntity::ok).orElseThrow(() -> new ResourceNotFoundException("No users found"));
+        return userService.userCountPerCityService();
     }
 
     @GetMapping(value = "/{username}/friendsPerCity")
     public ResponseEntity<List<UserCountPerCity>> friendsCountPerCity(@PathVariable String username) {
-        return userService.friendsCountPerCity(username);
+        return userService.friendsCountPerCityService(username);
     }
 
     @GetMapping(value = "/signin")
@@ -77,22 +65,22 @@ public class UserController {
 
     @GetMapping(value = "/{username}/receivedFriendRequests")
     public ResponseEntity<List<User>> findUserFriendRequestsByUsername(@PathVariable String username) {
-        return userService.findUserFriendRequestsByUsername(username);
+        return userService.findUserFriendRequestsByUsernameService(username);
     }
 
     @GetMapping(value = "/{username}/sentFriendRequests")
     public ResponseEntity<List<User>> findUserSentFriendRequestByUsername(@PathVariable String username){
-        return userService.findUserSentFriendRequestByUsername(username);
+        return userService.findUserSentFriendRequestByUsernameService(username);
     }
 
     @PostMapping(value = "/{username}/sendFriendRequest")
-    public void sendFriendRequest(@PathVariable String username, @RequestParam String friendUsername){
-        userService.sendFriendRequest(username, friendUsername);
+    public void sendFriendRequest(@PathVariable String username, @RequestParam String friendUsername) {
+        userService.sendFriendRequestService(username, friendUsername);
     }
 
     @PostMapping(value = "/{username}/sendMessage/{friendUsername}")
     public void sendMessage(@PathVariable String username, @PathVariable String friendUsername, @RequestParam String body){
-        userService.sendMessage(username, friendUsername, body);
+        userService.sendMessageService(username, friendUsername, body);
     }
 
     @PutMapping(value = "/update/{id}")
@@ -104,7 +92,7 @@ public class UserController {
             @RequestParam Optional<String> email,
             @RequestParam Optional<String> gender
     ) {
-        return userService.updateUserById(id, username, firstName, lastName, email, gender);
+        return userService.updateUserByIdService(id, username, firstName, lastName, email, gender);
     }
 
     @PutMapping(value = "/updatePassword/{id}")
