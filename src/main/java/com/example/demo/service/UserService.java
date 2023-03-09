@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
+import com.example.demo.configuration.UserConfiguration;
 import com.example.demo.exceptionHandler.ResourceNotFoundException;
+import com.example.demo.exceptionHandler.UnauthorizedException;
 import com.example.demo.model.Message;
 import com.example.demo.model.User;
 import com.example.demo.model.UserCountPerCity;
@@ -20,6 +22,23 @@ import java.util.Optional;
 public class UserService {
 
     private final MongoService mongoService;
+    private final UserConfiguration userConfiguration;
+
+    public ResponseEntity<User> updatePasswordById(String id, String oldPassword, String confirmedPassword){
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
+
+        if(userConfiguration.passwordEncoder().matches(oldPassword, user.getPwz())){
+            if(!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPwz())){
+                user.setPwz(userConfiguration.passwordEncoder().encode(confirmedPassword));
+                mongoService.saveUser(user);
+                return ResponseEntity.ok(user);
+            } else {
+                throw new UnauthorizedException("New password can't be equal to the old password");
+            }
+        } else {
+            throw new ResourceNotFoundException("Entered characters do not match the old password");
+        }
+    }
 
     public ResponseEntity<User> updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender){
 

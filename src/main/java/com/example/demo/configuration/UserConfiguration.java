@@ -22,17 +22,17 @@ public class UserConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    public ResponseEntity<User> checkLogin(String email, String psw) throws Exception {
+    public ResponseEntity<User> checkLogin(String email, String psw){
         if (emailExists(email)) {
-            User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("not users found with this email: %s", email)));
+            User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));
 
             if (passwordEncoder().matches(psw, user.getPwz())) {
                 return ResponseEntity.ok(user);
             } else {
-                throw new UnauthorizedException("password not valid");
+                throw new UnauthorizedException("Password not valid");
             }
         } else {
-            throw new ResourceNotFoundException(String.format("email: %s not found", email));
+            throw new ResourceNotFoundException(String.format("Email: %s not found", email));
         }
     }
 

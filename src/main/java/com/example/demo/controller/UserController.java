@@ -70,8 +70,8 @@ public class UserController {
         return userService.friendsCountPerCity(username);
     }
 
-    @GetMapping(value = "/user", params = {"email", "pwz"})
-    public ResponseEntity<User> login(@RequestParam(value = "email") String email, @RequestParam("pwz") String pwz) throws Exception {
+    @GetMapping(value = "/signin")
+    public ResponseEntity<User> login(@RequestParam String email, @RequestParam String pwz){
         return userConfiguration.checkLogin(email, pwz);
     }
 
@@ -86,7 +86,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/{username}/sendFriendRequest")
-    public void sendFriendRequest(@PathVariable String username, @RequestParam String friendUsername) {
+    public void sendFriendRequest(@PathVariable String username, @RequestParam String friendUsername){
         userService.sendFriendRequest(username, friendUsername);
     }
 
@@ -105,6 +105,17 @@ public class UserController {
             @RequestParam Optional<String> gender
     ) {
         return userService.updateUserById(id, username, firstName, lastName, email, gender);
+    }
+
+    @PutMapping(value = "/updatePassword/{id}")
+    public ResponseEntity<User> updatePasswordById(
+            @PathVariable String id,
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword
+    ){
+        //il frontend deve fare il check sul momento se il field "new password" e li field "confirm password sono uguali"
+        return userService.updatePasswordById(id, oldPassword, confirmPassword);
     }
 
     @PostMapping(value = "/signup")
