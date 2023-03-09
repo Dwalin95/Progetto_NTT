@@ -6,6 +6,7 @@ import com.example.demo.model.Message;
 import com.example.demo.model.UserCountPerCity;
 import com.example.demo.model.User;
 import com.example.demo.service.MongoService;
+import com.example.demo.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final MongoService mongoService;
+    private final UserService userService;
     @Autowired
     private UserConfiguration userConfiguration;
 
@@ -65,9 +67,7 @@ public class UserController {
 
     @GetMapping(value = "/{username}/friendsPerCity")
     public ResponseEntity<List<UserCountPerCity>> friendsCountPerCity(@PathVariable String username) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User with username: %s not found", username)));
-        List<String> count = user.getFriends();
-        return ResponseEntity.ok(mongoService.countFriendsPerCityAggregation(count));
+        return userService.friendsCountPerCity(username);
     }
 
     @GetMapping(value = "/user", params = {"email", "pwz"})
@@ -77,44 +77,17 @@ public class UserController {
 
     @GetMapping(value = "/{username}/receivedFriendRequests")
     public ResponseEntity<List<User>> findUserFriendRequestsByUsername(@PathVariable String username) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
-        List<String> friendRequestsList = user.getReceivedFriendRequests();
-        List<User> friends = mongoService.findUserFriendsByUsername(friendRequestsList).orElse(new ArrayList<>());
-        return ResponseEntity.ok(friends);
-
+        return userService.findUserFriendRequestsByUsername(username);
     }
 
-    @GetMapping(value = "/{username}/sendFriendRequest")
+    @PostMapping(value = "/{username}/sendFriendRequest")
     public void sendFriendRequest(@PathVariable String username, @RequestParam String friendUsername) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
-        User friendToAdd = mongoService.findUserByUsername(friendUsername).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendUsername)));
-
-        user.getSentFriendRequests().add(friendUsername);
-        friendToAdd.getReceivedFriendRequests().add(username);
-
-        mongoService.saveUser(user);
-        mongoService.saveUser(friendToAdd);
+        userService.sendFriendRequest(username, friendUsername);
     }
 
     @PostMapping(value = "/{username}/sendMessage/{friendUsername}")
     public void sendMessage(@PathVariable String username, @PathVariable String friendUsername, @RequestParam String body){
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
-        User messageReceiver = mongoService.findUserByUsername(friendUsername).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendUsername)));
-
-        Message message = Message.builder()
-                .body(body)
-                .senderUsername(username)
-                .receiverUsername(friendUsername)
-                .timestamp(new Date())
-                .build();
-
-        if(user.getMessages() == null){
-            user.setMessages(new ArrayList<>());
-        }
-        user.getMessages().add(message);
-        messageReceiver.getMessages().add(message);
-        mongoService.saveUser(user);
-        mongoService.saveUser(messageReceiver);
+        userService.sendMessage(username, friendUsername, body);
     }
 
     @PutMapping(value = "/update/{id}")
@@ -126,18 +99,7 @@ public class UserController {
             @RequestParam Optional<String> email,
             @RequestParam Optional<String> gender
     ) {
-
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
-
-        user.setUsername(username.orElse(user.getUsername()));
-        user.setFirstName(firstName.orElse(user.getFirstName()));
-        user.setLastName(lastName.orElse(user.getLastName()));
-        user.setEmail(email.orElse(user.getEmail()));
-        user.setGender(gender.orElse(user.getGender()));
-
-        mongoService.saveUser(user);
-
-        return ResponseEntity.ok(user);
+        return userService.updateUserById(id, username, firstName, lastName, email, gender);
     }
 
     @PostMapping(value = "/signup")

@@ -25,9 +25,9 @@ public class User{
     private String lastName;
     private String pwz;
     private String gender;
-    private List<String> friends;
-    private List<String> receivedFriendRequests;
-    private List<String> sentFriendRequests;
+    private List<String> friends = new ArrayList<>();
+    private List<String> receivedFriendRequests = new ArrayList<>();
+    private List<String> sentFriendRequests = new ArrayList<>();
     private List<Message> messages = new ArrayList<>();
     private Address address;
 }
