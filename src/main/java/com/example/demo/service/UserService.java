@@ -67,8 +67,15 @@ public class UserService {
     public ResponseEntity<List<User>> findUserFriendRequestsByUsername(String username){
         User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
         List<String> friendRequestsList = user.getReceivedFriendRequests();
-        List<User> friends = mongoService.findUserFriendsByUsername(friendRequestsList).orElse(new ArrayList<>());
-        return ResponseEntity.ok(friends);
+        List<User> users = mongoService.findUserFriendsByUsername(friendRequestsList).orElse(new ArrayList<>());
+        return ResponseEntity.ok(users);
+    }
+
+    public ResponseEntity<List<User>> findUserSentFriendRequestByUsername(String username){
+        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
+        List<String> sentFriendRequestsList = user.getSentFriendRequests();
+        List<User> users = mongoService.findUserFriendsByUsername(sentFriendRequestsList).orElse(new ArrayList<>());
+        return ResponseEntity.ok(users);
     }
 
     public ResponseEntity<List<UserCountPerCity>> friendsCountPerCity(String username){

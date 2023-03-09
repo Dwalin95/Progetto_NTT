@@ -80,6 +80,11 @@ public class UserController {
         return userService.findUserFriendRequestsByUsername(username);
     }
 
+    @GetMapping(value = "/{username}/sentFriendRequests")
+    public ResponseEntity<List<User>> findUserSentFriendRequestByUsername(@PathVariable String username){
+        return userService.findUserSentFriendRequestByUsername(username);
+    }
+
     @PostMapping(value = "/{username}/sendFriendRequest")
     public void sendFriendRequest(@PathVariable String username, @RequestParam String friendUsername) {
         userService.sendFriendRequest(username, friendUsername);
