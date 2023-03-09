@@ -116,4 +116,3 @@ public class UserController {
         mongoService.deleteUserById(id);
     }
 }
-
