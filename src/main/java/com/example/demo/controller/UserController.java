@@ -103,7 +103,7 @@ public class UserController {
             @RequestParam String confirmPassword
     ){
         //il frontend deve fare il check sul momento se il field "new password" e li field "confirm password sono uguali"
-        return userService.updatePasswordById(id, oldPassword, confirmPassword);
+        return userService.updatePasswordByIdService(id, oldPassword, confirmPassword);
     }
 
     @PostMapping(value = "/signup")
