@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class MongoService {
         return this.userRepository.findByUsername(username);
     }
 
-    public Optional<List<User>> findUserFriendsById(List<String> friendsIds){
+    public Optional<Set<User>> findUserFriendsById(Set<String> friendsIds){
         return this.userRepository.findFriendsById(friendsIds);
     }
 
@@ -48,6 +49,10 @@ public class MongoService {
         this.userRepository.deleteByEmail(email);
     }
 
+    public List<Message> findAllMessageAggregations(String id){
+        return this.userRepository.findAllMessage(id);
+    }
+
     public List<Message> findMessagesByFriendIdAggregation(String username, String friendId){
         return this.userRepository.findMessagesByFriendId(username, friendId);
     }
@@ -56,7 +61,7 @@ public class MongoService {
         return this.userRepository.countUsersPerCity();
     }
 
-    public List<UserCountPerCity> countFriendsPerCityAggregation(List<String> friendsUsernames){
+    public Set<UserCountPerCity> countFriendsPerCityAggregation(Set<String> friendsUsernames){
         return this.userRepository.countFriendsPerCity(friendsUsernames);
     }
 }

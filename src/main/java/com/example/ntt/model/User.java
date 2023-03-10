@@ -6,7 +6,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -26,9 +28,9 @@ public class User{
     private String lastName;
     private String pwz;
     private String gender;
-    private List<String> friends = new ArrayList<>();
-    private List<String> receivedFriendRequests = new ArrayList<>();
-    private List<String> sentFriendRequests = new ArrayList<>();
+    private Set<String> friends = new HashSet<>();
+    private Set<String> receivedFriendRequests = new HashSet<>();
+    private Set<String> sentFriendRequests = new HashSet<>();
     private List<Message> messages = new ArrayList<>();
     private Address address;
 }

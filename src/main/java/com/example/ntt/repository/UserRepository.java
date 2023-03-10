@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
@@ -21,7 +22,12 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> deleteByEmail(String email);
 
     @Query("{'_id': {$in: ?0}}")
-    Optional<List<User>> findFriendsById(List<String> friendsIds);
+    Optional<Set<User>> findFriendsById(Set<String> friendsIds);
+
+    @Aggregation(
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}"}
+    )
+    List<Message> findAllMessage(String id);
 
     @Aggregation(
             pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {\"messages.senderId\": ?1}}"}
@@ -36,5 +42,5 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Aggregation(
             pipeline = {"{$match: {'_id': {$in: ?0}}}", "{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
     )
-    List<UserCountPerCity> countFriendsPerCity(List<String> friendsIds);
+    Set<UserCountPerCity> countFriendsPerCity(Set<String> friendsIds);
 }

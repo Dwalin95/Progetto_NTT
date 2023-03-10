@@ -34,8 +34,13 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/friends")
-    public ResponseEntity<List<User>> findUserFriendsById(@PathVariable String id) {
+    public ResponseEntity<Set<User>> findUserFriendsById(@PathVariable String id) {
         return userService.findFriendsByIdService(id);
+    }
+
+    @GetMapping(value = "/{id}/messages")
+    public ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String id){
+        return userService.findAllMessageSendersService(id);
     }
 
     @GetMapping(value = "/{id}/messages/{friendId}")
@@ -54,7 +59,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/friendsPerCity")
-    public ResponseEntity<List<UserCountPerCity>> friendsCountPerCity(@PathVariable String id) {
+    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@PathVariable String id) {
         return userService.friendsCountPerCityService(id);
     }
 
@@ -64,12 +69,12 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/receivedFriendRequests")
-    public ResponseEntity<List<User>> findUserFriendRequestsById(@PathVariable String id) {
+    public ResponseEntity<Set<User>> findUserFriendRequestsById(@PathVariable String id) {
         return userService.findUserFriendRequestsByIdService(id);
     }
 
     @GetMapping(value = "/{id}/sentFriendRequests")
-    public ResponseEntity<List<User>> findUserSentFriendRequestById(@PathVariable String id){
+    public ResponseEntity<Set<User>> findUserSentFriendRequestById(@PathVariable String id){
         return userService.findUserSentFriendRequestByIdService(id);
     }
 
@@ -95,6 +100,16 @@ public class UserController {
         return userService.updateUserByIdService(id, username, firstName, lastName, email, gender);
     }
 
+    @PutMapping(value = "/{id}/manageFriendRequest/{friendId}")
+    public void manageFriendRequest(@PathVariable String id, @PathVariable String friendId, @RequestParam boolean accept){
+        userService.manageFriendRequest(id, friendId, accept);
+    }
+
+    @PutMapping(value = "{id}/removeFriend/{friendId}")
+    public void removeFriend(@PathVariable String id, @PathVariable String friendId){
+        userService.removeFriend(id, friendId);
+    }
+
     @PutMapping(value = "/updatePassword/{id}")
     public ResponseEntity<User> updatePasswordById(
             @PathVariable String id,
@@ -102,7 +117,7 @@ public class UserController {
             @RequestParam String newPassword,
             @RequestParam String confirmPassword
     ){
-        //il frontend deve fare il check sul momento se il field "new password" e li field "confirm password sono uguali"
+        //il frontend deve fare il check sul momento se il field "new password" e il field "confirm password sono uguali"
         return userService.updatePasswordByIdService(id, oldPassword, confirmPassword);
     }
 
@@ -111,7 +126,7 @@ public class UserController {
         userConfiguration.validateSignUp(user);
     }
 
-    @DeleteMapping(value = "delete/{id}")
+    @DeleteMapping(value = "/delete/{id}")
     public void deleteUserById(@PathVariable String id) {
         mongoService.deleteUserById(id);
     }
