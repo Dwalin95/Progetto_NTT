@@ -20,11 +20,11 @@ public class UserService {
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
 
-    public ResponseEntity<User> updatePasswordById(String id, String oldPassword, String confirmedPassword){
+    public ResponseEntity<User> updatePasswordByIdService(String id, String oldPassword, String confirmedPassword) {
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
 
-        if(userConfiguration.passwordEncoder().matches(oldPassword, user.getPwz())){
-            if(!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPwz())){
+        if (userConfiguration.passwordEncoder().matches(oldPassword, user.getPwz())) {
+            if (!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPwz())) {
                 user.setPwz(userConfiguration.passwordEncoder().encode(confirmedPassword));
                 mongoService.saveUser(user);
                 return ResponseEntity.ok(user);
@@ -39,8 +39,9 @@ public class UserService {
     public ResponseEntity<User> findUserByIdService(String id) {
         Optional<User> user = mongoService.findUserById(id);
         return user.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", username)));
     }
+
     public ResponseEntity<List<User>> findFriendsByIdService(String id) {
         User user = mongoService.findUserById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String
@@ -66,7 +67,8 @@ public class UserService {
         Optional<List<User>> userList = Optional.of(mongoService.findAllUsers());
         return userList.map(ResponseEntity::ok).orElseThrow(() -> new ResourceNotFoundException("No users found"));
     }
-    public  ResponseEntity<List<UserCountPerCity>> userCountPerCityService(){
+
+    public ResponseEntity<List<UserCountPerCity>> userCountPerCityService() {
         Optional<List<UserCountPerCity>> userCount = Optional.of(mongoService.countUsersPerCityAggregation());
         return userCount.map(ResponseEntity::ok).orElseThrow(()->new ResourceNotFoundException("No users found"));
     }
@@ -94,15 +96,13 @@ public class UserService {
 
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
 
-        user.setUsername(username.orElse(user.getUsername()));
-        user.setFirstName(firstName.orElse(user.getFirstName()));
-        user.setLastName(lastName.orElse(user.getLastName()));
-        user.setEmail(email.orElse(user.getEmail()));
-        user.setGender(gender.orElse(user.getGender()));
+        User updatedUser = mongoService.saveUser(user.withUsername(username.orElse(user.getUsername()))
+                .withFirstName(firstName.orElse(user.getFirstName()))
+                .withLastName(lastName.orElse(user.getLastName()))
+                .withEmail(email.orElse(user.getEmail()))
+                .withGender(gender.orElse(user.getGender())));
 
-        mongoService.saveUser(user);
-
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(updatedUser);
     }
 
     public void sendFriendRequestService(String id, String friendId) {
@@ -130,9 +130,4 @@ public class UserService {
         mongoService.saveUser(user);
         mongoService.saveUser(messageReceiver);
     }
-
-
-
-
-
 }
