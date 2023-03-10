@@ -39,7 +39,7 @@ public class UserService {
     public ResponseEntity<User> findUserByIdService(String id) {
         Optional<User> user = mongoService.findUserById(id);
         return user.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", username)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
     }
 
     public ResponseEntity<List<User>> findFriendsByIdService(String id) {
