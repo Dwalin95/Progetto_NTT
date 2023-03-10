@@ -1,9 +1,9 @@
-package com.example.demo.configuration;
+package com.example.ntt.configuration;
 
-import com.example.demo.exceptionHandler.ResourceNotFoundException;
-import com.example.demo.exceptionHandler.UnauthorizedException;
-import com.example.demo.model.User;
-import com.example.demo.service.MongoService;
+import com.example.ntt.exceptionHandler.ResourceNotFoundException;
+import com.example.ntt.exceptionHandler.UnauthorizedException;
+import com.example.ntt.model.User;
+import com.example.ntt.service.MongoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

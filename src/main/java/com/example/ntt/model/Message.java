@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.example.ntt.model;
 
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,6 +15,6 @@ public class Message {
 
     private String body;
     private Date timestamp;
-    private String senderUsername;
-    private String receiverUsername;
+    private String senderId;
+    private String receiverId;
 }

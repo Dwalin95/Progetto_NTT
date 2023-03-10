@@ -1,9 +1,9 @@
-package com.example.demo.service;
+package com.example.ntt.service;
 
-import com.example.demo.model.Message;
-import com.example.demo.model.UserCountPerCity;
-import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
+import com.example.ntt.model.Message;
+import com.example.ntt.model.UserCountPerCity;
+import com.example.ntt.model.User;
+import com.example.ntt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +28,8 @@ public class MongoService {
         return this.userRepository.findByUsername(username);
     }
 
-    public Optional<List<User>> findUserFriendsByUsername(List<String> friendsUsernames){
-        return this.userRepository.findFriendsByUsername(friendsUsernames);
+    public Optional<List<User>> findUserFriendsById(List<String> friendsIds){
+        return this.userRepository.findFriendsById(friendsIds);
     }
 
     public List<User> findAllUsers(){
@@ -46,6 +46,10 @@ public class MongoService {
 
     public void deleteUserByEmail(String email){
         this.userRepository.deleteByEmail(email);
+    }
+
+    public List<Message> findMessagesByFriendIdAggregation(String username, String friendId){
+        return this.userRepository.findMessagesByFriendId(username, friendId);
     }
 
     public List<UserCountPerCity> countUsersPerCityAggregation(){

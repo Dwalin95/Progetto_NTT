@@ -1,11 +1,11 @@
-package com.example.demo.service;
+package com.example.ntt.service;
 
-import com.example.demo.configuration.UserConfiguration;
-import com.example.demo.exceptionHandler.ResourceNotFoundException;
-import com.example.demo.exceptionHandler.UnauthorizedException;
-import com.example.demo.model.Message;
-import com.example.demo.model.User;
-import com.example.demo.model.UserCountPerCity;
+import com.example.ntt.configuration.UserConfiguration;
+import com.example.ntt.exceptionHandler.ResourceNotFoundException;
+import com.example.ntt.exceptionHandler.UnauthorizedException;
+import com.example.ntt.model.Message;
+import com.example.ntt.model.User;
+import com.example.ntt.model.UserCountPerCity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,25 +36,28 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<User> findUserByUsernameService(String username) {
-        Optional<User> user = mongoService.findUserByUsername(username);
+    public ResponseEntity<User> findUserByIdService(String id) {
+        Optional<User> user = mongoService.findUserById(id);
         return user.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with username: %s not found", username)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
     }
-    public ResponseEntity<List<User>> findFriendsByUsernameService(String username) {
-        User user = mongoService.findUserByUsername(username)
+    public ResponseEntity<List<User>> findFriendsByIdService(String id) {
+        User user = mongoService.findUserById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("User with username: %s not found", username)));
-        List<User> friends = mongoService.findUserFriendsByUsername(user.getFriends()).orElse(new ArrayList<>());
+                        .format("User with id: %s not found", id)));
+        List<User> friends = mongoService.findUserFriendsById(user.getFriends()).orElse(new ArrayList<>());
         return ResponseEntity.ok(friends);
     }
 
-    public ResponseEntity<List<Message>> findMessagesByFriendUsernameService(String username, String frinedUsername) {
-        User user = mongoService.findUserByUsername(username)
+    public ResponseEntity<List<Message>> findMessagesByFriendIdsService(String id, String friendId) {
+        User user = mongoService.findUserById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("User with username: %s not found", username)));
-        List<Message> messages = user.getMessages();
-        return ResponseEntity.ok(messages.stream()
+                        .format("User with id: %s not found", id)));
+        User friend = mongoService.findUserById(friendId)
+                .orElseThrow(() -> new ResourceNotFoundException(String
+                        .format("User with id: %s not found", id)));
+        List<Message> friendMessages = mongoService.findMessagesByFriendIdAggregation(user.getUsername(), friend.get_id());
+        return ResponseEntity.ok(friendMessages.stream()
                 .sorted(Comparator.comparing(Message::getTimestamp))
                 .collect(Collectors.toList()));
     }
@@ -66,25 +69,24 @@ public class UserService {
     public  ResponseEntity<List<UserCountPerCity>> userCountPerCityService(){
         Optional<List<UserCountPerCity>> userCount = Optional.of(mongoService.countUsersPerCityAggregation());
         return userCount.map(ResponseEntity::ok).orElseThrow(()->new ResourceNotFoundException("No users found"));
-
     }
 
-    public ResponseEntity<List<UserCountPerCity>> friendsCountPerCityService(String username) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User with username: %s not found", username)));
+    public ResponseEntity<List<UserCountPerCity>> friendsCountPerCityService(String id) {
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
         List<String> count = user.getFriends();
         return ResponseEntity.ok(mongoService.countFriendsPerCityAggregation(count));
     }
-    public ResponseEntity<List<User>> findUserFriendRequestsByUsernameService(String username) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
+    public ResponseEntity<List<User>> findUserFriendRequestsByIdService(String id) {
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         List<String> friendRequestsList = user.getReceivedFriendRequests();
-        List<User> users = mongoService.findUserFriendsByUsername(friendRequestsList).orElse(new ArrayList<>());
+        List<User> users = mongoService.findUserFriendsById(friendRequestsList).orElse(new ArrayList<>());
         return ResponseEntity.ok(users);
     }
 
-    public ResponseEntity<List<User>> findUserSentFriendRequestByUsernameService(String username) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
+    public ResponseEntity<List<User>> findUserSentFriendRequestByIdService(String id) {
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         List<String> sentFriendRequestsList = user.getSentFriendRequests();
-        List<User> users = mongoService.findUserFriendsByUsername(sentFriendRequestsList).orElse(new ArrayList<>());
+        List<User> users = mongoService.findUserFriendsById(sentFriendRequestsList).orElse(new ArrayList<>());
         return ResponseEntity.ok(users);
     }
 
@@ -103,23 +105,23 @@ public class UserService {
         return ResponseEntity.ok(user);
     }
 
-    public void sendFriendRequestService(String username, String friendUsername) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
-        User friendToAdd = mongoService.findUserByUsername(friendUsername).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendUsername)));
+    public void sendFriendRequestService(String id, String friendId) {
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
+        User friendToAdd = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
 
-        user.getSentFriendRequests().add(friendUsername);
-        friendToAdd.getReceivedFriendRequests().add(username);
+        user.getSentFriendRequests().add(friendId);
+        friendToAdd.getReceivedFriendRequests().add(id);
 
     }
 
-    public void sendMessageService(String username, String friendUsername, String body) {
-        User user = mongoService.findUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", username)));
-        User messageReceiver = mongoService.findUserByUsername(friendUsername).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendUsername)));
+    public void sendMessageService(String id, String friendId, String body) {
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
+        User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
 
         Message message = Message.builder()
                 .body(body)
-                .senderUsername(username)
-                .receiverUsername(friendUsername)
+                .senderId(id)
+                .receiverId(friendId)
                 .timestamp(new Date())
                 .build();
 
