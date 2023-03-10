@@ -22,7 +22,7 @@ public class UserConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    public ResponseEntity<User> checkLogin(String email, String psw){
+    public ResponseEntity<User> checkLogin(String email, String psw) {
         if (emailExists(email)) {
             User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));
 

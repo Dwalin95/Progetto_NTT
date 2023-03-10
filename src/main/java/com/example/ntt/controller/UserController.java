@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/messages/{friendId}")
-    public ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId){
+    public ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
         return userService.findMessagesByFriendIdsService(id, friendId);
     }
 
@@ -64,7 +64,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/signin")
-    public ResponseEntity<User> login(@RequestParam String email, @RequestParam String pwz){
+    public ResponseEntity<User> login(@RequestParam String email, @RequestParam String pwz) {
         return userConfiguration.checkLogin(email, pwz);
     }
 
@@ -74,7 +74,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/sentFriendRequests")
-    public ResponseEntity<Set<User>> findUserSentFriendRequestById(@PathVariable String id){
+    public ResponseEntity<Set<User>> findUserSentFriendRequestById(@PathVariable String id) {
         return userService.findUserSentFriendRequestByIdService(id);
     }
 
@@ -84,7 +84,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/{id}/sendMessage/{friendId}")
-    public void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String body){
+    public void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String body) {
         userService.sendMessageService(id, friendId, body);
     }
 
@@ -116,13 +116,13 @@ public class UserController {
             @RequestParam String oldPassword,
             @RequestParam String newPassword,
             @RequestParam String confirmPassword
-    ){
-        //il frontend deve fare il check sul momento se il field "new password" e il field "confirm password sono uguali"
+    ) {
+        //il frontend deve fare il check sul momento se il field "new password" e li field "confirm password sono uguali"
         return userService.updatePasswordByIdService(id, oldPassword, confirmPassword);
     }
 
     @PostMapping(value = "/signup")
-    public void createUser(@RequestBody User user){
+    public void createUser(@RequestBody User user) {
         userConfiguration.validateSignUp(user);
     }
 
