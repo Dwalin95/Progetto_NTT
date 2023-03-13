@@ -90,12 +90,12 @@ public class UserController {
 
     @PutMapping(value = "/{id}/deleteMessage/{friendId}")
     public void deleteMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId){
-        userService.deleteMessage(id, friendId, messageId);
+        userService.deleteMessageService(id, friendId, messageId);
     }
 
     @PutMapping(value = "/{id}/deleteChat")
     public void deleteChat(@PathVariable String id, @RequestParam String friendId){
-        userService.deleteChat(id, friendId);
+        userService.deleteChatService(id, friendId);
     }
 
     @PutMapping(value = "/update/{id}")
@@ -112,12 +112,12 @@ public class UserController {
 
     @PutMapping(value = "/{id}/manageFriendRequest/{friendId}")
     public void manageFriendRequest(@PathVariable String id, @PathVariable String friendId, @RequestParam boolean accept){
-        userService.manageFriendRequest(id, friendId, accept);
+        userService.manageFriendRequestService(id, friendId, accept);
     }
 
     @PutMapping(value = "{id}/removeFriend/{friendId}")
     public void removeFriend(@PathVariable String id, @PathVariable String friendId){
-        userService.removeFriend(id, friendId);
+        userService.removeFriendService(id, friendId);
     }
 
     @PutMapping(value = "/updatePassword/{id}")

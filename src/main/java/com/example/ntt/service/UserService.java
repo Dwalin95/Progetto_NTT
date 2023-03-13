@@ -127,7 +127,7 @@ public class UserService {
         mongoService.saveUser(friendToAdd);
     }
 
-    public void manageFriendRequest(String id, String friendId, boolean accept){
+    public void manageFriendRequestService(String id, String friendId, boolean accept){
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
 
@@ -146,7 +146,7 @@ public class UserService {
 
     //TODO: aggiungere un id ai messaggi per cancellarli
     //da decidere se cancellarli a tutti e due o solo chi li vuole cancellare, la chat intera viene rimossa solo a chi fa l'azione non a tutti e due
-    public void deleteMessage(String id, String friendId, String messageId){
+    public void deleteMessageService(String id, String friendId, String messageId){
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
 
@@ -158,15 +158,19 @@ public class UserService {
         mongoService.saveUser(friend);
     }
 
-    public void deleteChat(String id, String friendId){
+    //TODO: perchè non cancella le chat???
+    public void deleteChatService(String id, String friendId){
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
 
         List<Message> chatFriendSide = mongoService.findChatAggregation(user.getUsername(), friendId, user.get_id());
+        List<Message> chatUserSide = mongoService.findChatAggregation(user.getUsername(), friendId, user.get_id());
+
         user.getMessages().removeAll(chatFriendSide);
+        user.getMessages().removeAll(chatUserSide);
         mongoService.saveUser(user);
     }
 
-    public void removeFriend(String id, String friendId){
+    public void removeFriendService(String id, String friendId){
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
 
@@ -176,7 +180,7 @@ public class UserService {
         mongoService.saveUser(friend);
     }
 
-    //TODO; da capire perché non aggiunge l'id
+    //TODO: da capire perché non aggiunge l'id
     public void sendMessageService(String id, String friendId, String body) {
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
