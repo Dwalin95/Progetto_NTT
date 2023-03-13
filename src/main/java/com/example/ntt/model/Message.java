@@ -1,6 +1,7 @@
 package com.example.ntt.model;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
@@ -14,6 +15,8 @@ import java.util.Date;
 @Builder
 public class Message {
 
+    @Id
+    private String _id;
     private String body;
     private Date timestamp;
     private String senderId;

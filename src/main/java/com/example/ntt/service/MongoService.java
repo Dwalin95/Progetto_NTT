@@ -49,6 +49,14 @@ public class MongoService {
         this.userRepository.deleteByEmail(email);
     }
 
+    public Message findMessageAggregation(String username, String messageId){
+        return this.userRepository.findMessage(username, messageId);
+    }
+
+    public List<Message> findChatAggregation(String username, String friendId){
+        return this.userRepository.findChat(username, friendId);
+    }
+
     public List<Message> findAllMessageAggregations(String id){
         return this.userRepository.findAllMessage(id);
     }

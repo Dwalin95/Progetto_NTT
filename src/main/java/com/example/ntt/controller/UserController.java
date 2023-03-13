@@ -84,8 +84,18 @@ public class UserController {
     }
 
     @PostMapping(value = "/{id}/sendMessage/{friendId}")
-    public void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String body) {
-        userService.sendMessageService(id, friendId, body);
+    public void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestBody Message message) {
+        userService.sendMessageService(id, friendId, message);
+    }
+
+    @PutMapping(value = "/{id}/deleteMessage/{friendId}")
+    public void deleteMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId){
+        userService.deleteMessage(id, friendId, messageId);
+    }
+
+    @PutMapping(value = "/{id}/deleteChat")
+    public void deleteChat(@PathVariable String id, @RequestParam String friendId){
+        userService.deleteChat(id, friendId);
     }
 
     @PutMapping(value = "/update/{id}")

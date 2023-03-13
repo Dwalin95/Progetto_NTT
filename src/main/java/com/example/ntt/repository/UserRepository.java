@@ -25,6 +25,16 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<Set<User>> findFriendsById(Set<String> friendsIds);
 
     @Aggregation(
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {\"messages.senderId\": ?1}}"}
+    )
+    List<Message> findChat(String username, String friendId);
+
+    @Aggregation(
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {_id: ?1}}"}
+    )
+    Message findMessage(String username, String messageId);
+
+    @Aggregation(
             pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}"}
     )
     List<Message> findAllMessage(String id);
