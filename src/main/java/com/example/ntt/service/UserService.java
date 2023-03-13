@@ -177,7 +177,7 @@ public class UserService {
     }
 
     //TODO; da capire perché non aggiunge l'id
-    public void sendMessageService(String id, String friendId, Message message) {
+    public void sendMessageService(String id, String friendId, String body) {
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
 
@@ -185,10 +185,14 @@ public class UserService {
 
         if(friends.contains(user.get_id())){
 
-            user.getMessages().add(message.withSenderId(id)
-                                        .withReceiverId(friendId)
-                                        .withTimestamp(new Date()));
+            Message message = Message.builder()
+                    .body(body)
+                    .receiverId(friendId)
+                    .senderId(id)
+                    .timestamp(new Date())
+                    .build();
 
+            user.getMessages().add(message);
             messageReceiver.getMessages().add(message);
             mongoService.saveUser(user);
             mongoService.saveUser(messageReceiver);
