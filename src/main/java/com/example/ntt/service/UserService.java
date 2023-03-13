@@ -161,8 +161,8 @@ public class UserService {
     public void deleteChat(String id, String friendId){
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
 
-        List<Message> chat = mongoService.findChatAggregation(user.getUsername(), friendId);
-        user.getMessages().removeAll(chat);
+        List<Message> chatFriendSide = mongoService.findChatAggregation(user.getUsername(), friendId, user.get_id());
+        user.getMessages().removeAll(chatFriendSide);
         mongoService.saveUser(user);
     }
 

@@ -53,8 +53,8 @@ public class MongoService {
         return this.userRepository.findMessage(username, messageId);
     }
 
-    public List<Message> findChatAggregation(String username, String friendId){
-        return this.userRepository.findChat(username, friendId);
+    public List<Message> findChatAggregation(String username, String senderId, String receiverId){
+        return this.userRepository.findChat(username, senderId, receiverId);
     }
 
     public List<Message> findAllMessageAggregations(String id){
