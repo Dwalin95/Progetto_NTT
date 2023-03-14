@@ -90,7 +90,7 @@ public class UserController {
 
     @PutMapping(value = "/{id}/deleteMessage/{friendId}")
     public void deleteMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId){
-        userService.deleteMessageService(id, friendId, messageId);
+        userService.deleteMessage(id, friendId, messageId);
     }
 
     @PutMapping(value = "/{id}/deleteChat")
@@ -98,6 +98,7 @@ public class UserController {
         userService.deleteChatService(id, friendId);
     }
 
+    //TODO: cambiare con il body/DTO
     @PutMapping(value = "/update/{id}")
     public ResponseEntity<User> updateUserById(
             @PathVariable String id,
@@ -111,8 +112,8 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}/manageFriendRequest/{friendId}")
-    public void manageFriendRequest(@PathVariable String id, @PathVariable String friendId, @RequestParam boolean accept){
-        userService.manageFriendRequestService(id, friendId, accept);
+    public void handleFriendRequest(@PathVariable String id, @PathVariable String friendId, @RequestParam boolean accepted){
+        userService.handleFriendRequest(id, friendId, accepted);
     }
 
     @PutMapping(value = "{id}/removeFriend/{friendId}")

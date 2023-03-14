@@ -7,6 +7,7 @@ import com.example.ntt.model.Message;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +45,7 @@ public class UserService {
 
     public ResponseEntity<Set<User>> findFriendsByIdService(String id) {
         User user = mongoService.findUserById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("User with id: %s not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
         Set<User> friends = mongoService.findUserFriendsById(user.getFriends()).orElse(new HashSet<User>());
         return ResponseEntity.ok(friends);
     }
@@ -127,26 +127,29 @@ public class UserService {
         mongoService.saveUser(friendToAdd);
     }
 
-    public void manageFriendRequestService(String id, String friendId, boolean accept){
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
-        User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
+    public void handleFriendRequest(String id, String friendId, boolean accepted){
 
-        if(accept){
-            user.getReceivedFriendRequests().remove(friendId);
-            friend.getSentFriendRequests().remove(id);
-            user.getFriends().add(friendId);
-            friend.getFriends().add(id);
-            mongoService.saveUser(user);
-            mongoService.saveUser(friend);
-        } else {
-            user.getReceivedFriendRequests().remove(friendId);
-            friend.getSentFriendRequests().remove(id);
-        }
+        this.handleSingleFriendRequest(id, friendId, accepted);
+        this.handleSingleFriendRequest(friendId, id, accepted);
     }
 
-    //TODO: aggiungere un id ai messaggi per cancellarli
+    private void handleSingleFriendRequest(String id, String friendId, boolean accepted) {
+        Optional<User> user = mongoService.findUserById(id);
+
+        user.map(u -> this.removeRequest(friendId, u))
+            .filter(u -> accepted)
+            .ifPresent(u -> u.getFriends().add(friendId));
+        user.map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
+    }
+
+    private User removeRequest(String friendId, User u) {
+        u.getReceivedFriendRequests().remove(friendId);
+        return u;
+    }
+
     //da decidere se cancellarli a tutti e due o solo chi li vuole cancellare, la chat intera viene rimossa solo a chi fa l'azione non a tutti e due
-    public void deleteMessageService(String id, String friendId, String messageId){
+    public void deleteMessage(String id, String friendId, String messageId){
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
 
@@ -180,7 +183,6 @@ public class UserService {
         mongoService.saveUser(friend);
     }
 
-    //TODO: da capire perché non aggiunge l'id
     public void sendMessageService(String id, String friendId, String body) {
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
         User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
