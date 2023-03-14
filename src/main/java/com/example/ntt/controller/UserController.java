@@ -80,7 +80,7 @@ public class UserController {
 
     @PostMapping(value = "/{id}/sendFriendRequest")
     public void sendFriendRequest(@PathVariable String id, @RequestParam String friendId) {
-        userService.sendFriendRequestService(id, friendId);
+        userService.sendFriendRequest(id, friendId);
     }
 
     @PostMapping(value = "/{id}/sendMessage/{friendId}")

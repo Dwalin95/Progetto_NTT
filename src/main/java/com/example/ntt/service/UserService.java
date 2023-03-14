@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class UserService {
 
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
+    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
     public ResponseEntity<User> updatePasswordByIdService(String id, String oldPassword, String confirmedPassword) {
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
@@ -117,14 +119,48 @@ public class UserService {
         return ResponseEntity.ok(updatedUser);
     }
 
-    public void sendFriendRequestService(String id, String friendId) {
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
-        User friendToAdd = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
+    /**
+     * Invia una richiesta di amicizia ad un altro utente
+     * [currentUserid] -> [friendId]
+     * @param currentUserId
+     * @param friendUserId
+     */
+    public void sendFriendRequest(String currentUserId, String friendUserId) {
 
-        user.getSentFriendRequests().add(friendId);
-        friendToAdd.getReceivedFriendRequests().add(id);
-        mongoService.saveUser(user);
-        mongoService.saveUser(friendToAdd);
+        //currentUser :: send friend request
+        mongoService.findUserById(currentUserId)
+                .map(currentUser -> this.addSentFriendRequest(friendUserId, currentUser))
+                .map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+
+        //friendUser :: receive friend request
+        mongoService.findUserById(friendUserId)
+                .map(friendUser -> this.addReceivedFriendRequest(currentUserId, friendUser))
+                .map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendUserId)));
+
+    }
+
+    /**
+     * Aggiunge nella lista delle richieste di amicizia inviate l'id dell'utente destinatario
+     * @param friendUserId
+     * @param currentUser
+     * @return
+     */
+    private User addSentFriendRequest(String friendUserId, User currentUser) {
+        currentUser.getSentFriendRequests().add(friendUserId);
+        return currentUser;
+    }
+
+    /**
+     * Aggiunge nella lista delle richieste di amicizia ricevute l'id dell'utente di provenienza
+     * @param currentUserId
+     * @param friendUser
+     * @return
+     */
+    private User addReceivedFriendRequest(String currentUserId, User friendUser) {
+        friendUser.getReceivedFriendRequests().add(currentUserId);
+        return friendUser;
     }
 
     public void handleFriendRequest(String id, String friendId, boolean accepted){
