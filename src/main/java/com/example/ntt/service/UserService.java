@@ -121,7 +121,7 @@ public class UserService {
 
     /**
      * Invia una richiesta di amicizia ad un altro utente
-     * [currentUserid] -> [friendId]
+     * [currentUserid] -> [friendUserId]
      * @param currentUserId
      * @param friendUserId
      */
