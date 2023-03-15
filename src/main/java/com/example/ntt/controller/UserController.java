@@ -118,7 +118,7 @@ public class UserController {
 
     @PutMapping(value = "{id}/removeFriend/{friendId}")
     public void removeFriend(@PathVariable String id, @PathVariable String friendId){
-        userService.removeFriendService(id, friendId);
+        userService.removeFriend(id, friendId);
     }
 
     @PutMapping(value = "/updatePassword/{id}")

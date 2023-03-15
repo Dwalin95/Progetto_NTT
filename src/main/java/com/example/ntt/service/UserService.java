@@ -185,15 +185,23 @@ public class UserService {
         u.getMessages().removeAll(chat);
     }
 
-    public void removeFriendService(String id, String friendId){
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
-        User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendId)));
-
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
-        mongoService.saveUser(user);
-        mongoService.saveUser(friend);
+    public void removeFriend(String currentUserId, String friendUserId){
+        this.handleRemoveFriend(currentUserId, friendUserId);
+        this.handleRemoveFriend(friendUserId, currentUserId);
     }
+
+    private void handleRemoveFriend(String currentUserId, String friendUserId) {
+        mongoService.findUserById(currentUserId)
+                        .map(currentUser -> this.removeFriendFromList(friendUserId, currentUser))
+                                .map(mongoService::saveUser)
+                                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+    }
+
+    private User removeFriendFromList(String friendUserId, User user) {
+        user.getFriends().remove(friendUserId);
+        return user;
+    }
+
 
     //TODO: da trasformare con la funzionale
     public void sendMessage(String id, String friendId, String body) {
