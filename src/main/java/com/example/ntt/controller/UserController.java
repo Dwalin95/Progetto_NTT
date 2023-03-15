@@ -29,38 +29,38 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<User> findUserById(@PathVariable String id) {
-        return userService.findUserByIdService(id);
+    public User findUserById(@PathVariable String id) {
+        return userService.findUserById(id);
     }
 
     @GetMapping(value = "/{id}/friends")
-    public ResponseEntity<Set<User>> findUserFriendsById(@PathVariable String id) {
-        return userService.findFriendsByIdService(id);
+    public Set<User> findUserFriendsById(@PathVariable String id) {
+        return userService.findFriendsById(id);
     }
 
-    @GetMapping(value = "/{id}/messages")
-    public ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String id){
+    @GetMapping(value = "/{id}/chats")
+    public Set<String> findAllMessageSenders(@PathVariable String id){
         return userService.findAllMessageSendersService(id);
     }
 
     @GetMapping(value = "/{id}/messages/{friendId}")
-    public ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
+    public List<Message> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
         return userService.findMessagesByFriendIdsService(id, friendId);
     }
 
     @GetMapping(value = "/list")
-    public ResponseEntity<List<User>> findAllUsers() {
-        return userService.findAllUserService();
+    public List<User> findAllUsers() {
+        return mongoService.findAllUsers();
     }
 
     @GetMapping(value = "/userCount")
-    public ResponseEntity<List<UserCountPerCity>> userCountPerCity() {
-        return userService.userCountPerCityService();
+    public Set<UserCountPerCity> userCountPerCity() {
+        return mongoService.countUsersPerCityAggregation();
     }
 
     @GetMapping(value = "/{id}/friendsPerCity")
-    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@PathVariable String id) {
-        return userService.friendsCountPerCityService(id);
+    public Set<UserCountPerCity> friendsCountPerCity(@PathVariable String id) {
+        return userService.friendsCountPerCity(id);
     }
 
     @GetMapping(value = "/signin")
@@ -69,8 +69,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/receivedFriendRequests")
-    public ResponseEntity<Set<User>> findUserFriendRequestsById(@PathVariable String id) {
-        return userService.findUserFriendRequestsByIdService(id);
+    public Set<User> findUserFriendRequestsById(@PathVariable String id) {
+        return userService.findUserReceivedFriendRequestsById(id);
     }
 
     @GetMapping(value = "/{id}/sentFriendRequests")
@@ -85,7 +85,7 @@ public class UserController {
 
     @PostMapping(value = "/{id}/sendMessage/{friendId}")
     public void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String body) {
-        userService.sendMessageService(id, friendId, body);
+        userService.sendMessage(id, friendId, body);
     }
 
     @PutMapping(value = "/{id}/deleteMessage/{friendId}")
@@ -95,12 +95,12 @@ public class UserController {
 
     @PutMapping(value = "/{id}/deleteChat")
     public void deleteChat(@PathVariable String id, @RequestParam String friendId){
-        userService.deleteChatService(id, friendId);
+        userService.deleteChat(id, friendId);
     }
 
     //TODO: cambiare con il body/DTO
     @PutMapping(value = "/update/{id}")
-    public ResponseEntity<User> updateUserById(
+    public User updateUserById(
             @PathVariable String id,
             @RequestParam Optional<String> username,
             @RequestParam Optional<String> firstName,
@@ -108,7 +108,7 @@ public class UserController {
             @RequestParam Optional<String> email,
             @RequestParam Optional<String> gender
     ) {
-        return userService.updateUserByIdService(id, username, firstName, lastName, email, gender);
+        return userService.updateUserById(id, username, firstName, lastName, email, gender);
     }
 
     @PutMapping(value = "/{id}/manageFriendRequest/{friendId}")
@@ -139,6 +139,6 @@ public class UserController {
 
     @DeleteMapping(value = "/delete/{id}")
     public void deleteUserById(@PathVariable String id) {
-        mongoService.deleteUserById(id);
+        mongoService.deleteById(id);
     }
 }

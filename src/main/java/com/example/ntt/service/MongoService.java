@@ -41,7 +41,7 @@ public class MongoService {
         return this.userRepository.save(user);
     }
 
-    public void deleteUserById(String id){
+    public void deleteById(String id){
         this.userRepository.deleteById(id);
     }
 
@@ -57,15 +57,15 @@ public class MongoService {
         return this.userRepository.findChat(username, senderId, receiverId);
     }
 
-    public List<Message> findAllMessageAggregations(String id){
-        return this.userRepository.findAllMessage(id);
+    public List<Message> findAllMessagesAggregation(String id){
+        return this.userRepository.findAllMessages(id);
     }
 
-    public List<Message> findMessagesByFriendIdAggregation(String username, String friendId){
-        return this.userRepository.findMessagesByFriendId(username, friendId);
+    public List<Message> findMessagesByFriendIdAggregation(String username, String senderId, String receiverId){
+        return this.userRepository.findChat(username, senderId, receiverId);
     }
 
-    public List<UserCountPerCity> countUsersPerCityAggregation(){
+    public Set<UserCountPerCity> countUsersPerCityAggregation(){
         return this.userRepository.countUsersPerCity();
     }
 

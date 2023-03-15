@@ -30,25 +30,21 @@ public interface UserRepository extends MongoRepository<User, String> {
     List<Message> findChat(String username, String senderId, String receiverId);
 
     @Aggregation(
-            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {_id: ?1}}"}
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {\"messages._id\": ObjectId(?1)}}"}
     )
     Message findMessage(String username, String messageId);
 
     @Aggregation(
             pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}"}
     )
-    List<Message> findAllMessage(String id);
-
-    @Aggregation(
-            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {\"messages.senderId\": ?1}}"}
-    )
-    List<Message> findMessagesByFriendId(String username, String friendId);
+    List<Message> findAllMessages(String id);
 
     @Aggregation(
             pipeline = {"{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
     )
-    List<UserCountPerCity> countUsersPerCity();
+    Set<UserCountPerCity> countUsersPerCity();
 
+    //TODO da ricontrollare
     @Aggregation(
             pipeline = {"{$match: {'_id': {$in: ?0}}}", "{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
     )

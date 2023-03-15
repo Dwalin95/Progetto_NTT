@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,7 +24,7 @@ public class UserService {
     private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
     public ResponseEntity<User> updatePasswordByIdService(String id, String oldPassword, String confirmedPassword) {
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
 
         if (userConfiguration.passwordEncoder().matches(oldPassword, user.getPwz())) {
             if (!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPwz())) {
@@ -38,84 +39,78 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<User> findUserByIdService(String id) {
-        Optional<User> user = mongoService.findUserById(id);
-        return user.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
+    public User findUserById(String id) {
+        return mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
     }
 
-    public ResponseEntity<Set<User>> findFriendsByIdService(String id) {
-        User user = mongoService.findUserById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
-        Set<User> friends = mongoService.findUserFriendsById(user.getFriends()).orElse(new HashSet<User>());
-        return ResponseEntity.ok(friends);
+    public Set<User> findFriendsById(String id) {
+        Optional<User> user = mongoService.findUserById(id);
+        return user.map(u -> mongoService.findUserFriendsById(u.getFriends()))
+                    .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)))
+                    .orElse(new HashSet<User>());
     }
 
     //TODO: vedere perché torna un set vuoto
-    public ResponseEntity<Set<String>> findAllMessageSendersService(String id){
-        User user = mongoService.findUserById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("User with id: %s not found", id)));
-        List<Message> messages = mongoService.findAllMessageAggregations(user.get_id());
-        return ResponseEntity.ok(messages.stream()
+    public Set<String> findAllMessageSendersService(String id){
+        Optional<User> user = mongoService.findUserById(id);
+        user.map(u -> mongoService.findAllMessagesAggregation(u.get_id()));
+        List<Message> messages = mongoService.findAllMessagesAggregation(user.get_id());
+        return messages.stream()
                                     .map(Message::getSenderId)
-                                    .collect(Collectors.toSet()));
+                                    .collect(Collectors.toSet());
     }
 
     //TODO: vedere perché ritorna tutto null
-    public ResponseEntity<List<Message>> findMessagesByFriendIdsService(String id, String friendId) {
+    public List<Message> findMessagesByFriendIdsService(String id, String friendId) {
         User user = mongoService.findUserById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("User with id: %s not found", id)));
+                        .format(USER_NOT_FOUND, id)));
         User friend = mongoService.findUserById(friendId)
                 .orElseThrow(() -> new ResourceNotFoundException(String
-                        .format("User with id: %s not found", id)));
-        List<Message> friendMessages = mongoService.findMessagesByFriendIdAggregation(user.getUsername(), friend.get_id());
-        return ResponseEntity.ok(friendMessages.stream()
+                        .format(USER_NOT_FOUND, id)));
+        List<Message> messagesToUser = mongoService.findMessagesByFriendIdAggregation(user.getUsername(), friend.get_id(), user.get_id());
+        List<Message> messagesFromUser = mongoService.findMessagesByFriendIdAggregation(user.getUsername(), user.get_id(), friendId);
+        List<Message> chat = new ArrayList<>();
+        chat.addAll(messagesToUser);
+        chat.addAll(messagesFromUser);
+        /*return ResponseEntity.ok(friendMessages.stream()
                 .sorted(Comparator.comparing(Message::getTimestamp))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()));*/
+        return chat;
     }
 
-    public ResponseEntity<List<User>> findAllUserService() {
-        Optional<List<User>> userList = Optional.of(mongoService.findAllUsers());
-        return userList.map(ResponseEntity::ok).orElseThrow(() -> new ResourceNotFoundException("No users found"));
+    public Set<UserCountPerCity> friendsCountPerCity(String id) {
+        Optional<User> user = mongoService.findUserById(id);
+        return user.map(User::getFriends)
+                    .map(mongoService::countFriendsPerCityAggregation)
+                    .orElseThrow(() -> new ResourceNotFoundException("No friends found"));
     }
 
-    public ResponseEntity<List<UserCountPerCity>> userCountPerCityService() {
-        Optional<List<UserCountPerCity>> userCount = Optional.of(mongoService.countUsersPerCityAggregation());
-        return userCount.map(ResponseEntity::ok).orElseThrow(()->new ResourceNotFoundException("No users found"));
-    }
-
-    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCityService(String id) {
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
-        Set<String> count = user.getFriends();
-        return ResponseEntity.ok(mongoService.countFriendsPerCityAggregation(count));
-    }
-    public ResponseEntity<Set<User>> findUserFriendRequestsByIdService(String id) {
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
-        Set<String> friendRequestsList = user.getReceivedFriendRequests();
-        Set<User> users = mongoService.findUserFriendsById(friendRequestsList).orElse(new HashSet<>());
-        return ResponseEntity.ok(users);
+    public Set<User> findUserReceivedFriendRequestsById(String id) {
+        Optional<User> user = mongoService.findUserById(id);
+        return user.map(User::getReceivedFriendRequests)
+                    .map(mongoService::findUserFriendsById)
+                    .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)))
+                    .orElse(new HashSet<>());
     }
 
     public ResponseEntity<Set<User>> findUserSentFriendRequestByIdService(String id) {
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
         Set<String> sentFriendRequestsList = user.getSentFriendRequests();
         Set<User> users = mongoService.findUserFriendsById(sentFriendRequestsList).orElse(new HashSet<>());
         return ResponseEntity.ok(users);
     }
 
-    public ResponseEntity<User> updateUserByIdService(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
-
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
-
-        User updatedUser = mongoService.saveUser(user.withUsername(username.orElse(user.getUsername()))
-                .withFirstName(firstName.orElse(user.getFirstName()))
-                .withLastName(lastName.orElse(user.getLastName()))
-                .withEmail(email.orElse(user.getEmail()))
-                .withGender(gender.orElse(user.getGender())));
-
-        return ResponseEntity.ok(updatedUser);
+    public User updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
+        Optional<User> user = mongoService.findUserById(id);
+        return user.map(u -> {
+                mongoService.saveUser(u.withUsername(username.orElse(u.getUsername()))
+                        .withFirstName(firstName.orElse(u.getFirstName()))
+                        .withLastName(lastName.orElse(u.getLastName()))
+                        .withEmail(email.orElse(u.getEmail()))
+                        .withGender(gender.orElse(u.getGender())));
+                return u;
+            }).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
     }
 
     /**
@@ -137,7 +132,6 @@ public class UserService {
                 .map(friendUser -> this.addReceivedFriendRequest(currentUserId, friendUser))
                 .map(mongoService::saveUser)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendUserId)));
-
     }
 
     /**
@@ -163,19 +157,17 @@ public class UserService {
     }
 
     public void handleFriendRequest(String id, String friendId, boolean accepted){
-
         this.handleSingleFriendRequest(id, friendId, accepted);
         this.handleSingleFriendRequest(friendId, id, accepted);
     }
 
     private void handleSingleFriendRequest(String id, String friendId, boolean accepted) {
         Optional<User> user = mongoService.findUserById(id);
-
         user.map(u -> this.removeRequest(friendId, u))
             .filter(u -> accepted)
             .ifPresent(u -> u.getFriends().add(friendId));
         user.map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
     }
 
     private User removeRequest(String friendId, User u) {
@@ -184,33 +176,47 @@ public class UserService {
     }
 
     //da decidere se cancellarli a tutti e due o solo chi li vuole cancellare, la chat intera viene rimossa solo a chi fa l'azione non a tutti e due
+    //TODO: controllare se cancella il messaggio
     public void deleteMessage(String id, String friendId, String messageId){
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
-        User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
+        this.handleDeleteMessage(id, messageId);
+        this.handleDeleteMessage(friendId, messageId);
+    }
 
-        Message userMessage = mongoService.findMessageAggregation(user.getUsername(), messageId);
-        Message friendMessage = mongoService.findMessageAggregation(friend.getUsername(), messageId);
-        user.getMessages().remove(userMessage);
-        friend.getMessages().remove(friendMessage);
-        mongoService.saveUser(user);
-        mongoService.saveUser(friend);
+    private void handleDeleteMessage(String id, String messageId) {
+        Optional<User> user = mongoService.findUserById(id);
+        user.map(u -> this.removeMessage(u, messageId))
+                .map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
+    }
+
+    private User removeMessage(User u, String messageId){
+        Message userMessage = mongoService.findMessageAggregation(u.getUsername(), messageId);
+        u.getMessages().remove(userMessage);
+        return u;
     }
 
     //TODO: perchè non cancella le chat???
-    public void deleteChatService(String id, String friendId){
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
+    public void deleteChat(String id, String friendId){
+        Optional<User> user = mongoService.findUserById(id);
+        user.map(u -> this.handleRemoveChat(friendId, u))
+                .map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
+    }
 
-        List<Message> chatFriendSide = mongoService.findChatAggregation(user.getUsername(), friendId, user.get_id());
-        List<Message> chatUserSide = mongoService.findChatAggregation(user.getUsername(), friendId, user.get_id());
+    private User handleRemoveChat(String friendId, User u) {
+        this.removeChatBySide(u, friendId, u.get_id());
+        this.removeChatBySide(u, u.get_id(), friendId);
+        return u;
+    }
 
-        user.getMessages().removeAll(chatFriendSide);
-        user.getMessages().removeAll(chatUserSide);
-        mongoService.saveUser(user);
+    private void removeChatBySide(User u, String senderId, String receiverId) {
+        List<Message> chat = mongoService.findChatAggregation(u.getUsername(), senderId, receiverId);
+        u.getMessages().removeAll(chat);
     }
 
     public void removeFriendService(String id, String friendId){
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
-        User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
+        User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, friendId)));
 
         user.getFriends().remove(friendId);
         friend.getFriends().remove(id);
@@ -218,9 +224,10 @@ public class UserService {
         mongoService.saveUser(friend);
     }
 
-    public void sendMessageService(String id, String friendId, String body) {
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", id)));
-        User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format("User: %s not found", friendId)));
+    //TODO: da trasformare con la funzionale
+    public void sendMessage(String id, String friendId, String body) {
+        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
+        User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, friendId)));
 
         Set<String> friends = messageReceiver.getFriends();
 
