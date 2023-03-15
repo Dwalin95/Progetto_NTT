@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -95,11 +96,12 @@ public class UserService {
                     .orElse(new HashSet<>());
     }
 
-    public ResponseEntity<Set<User>> findUserSentFriendRequestByIdService(String id) {
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
-        Set<String> sentFriendRequestsList = user.getSentFriendRequests();
-        Set<User> users = mongoService.findUserFriendsById(sentFriendRequestsList).orElse(new HashSet<>());
-        return ResponseEntity.ok(users);
+    public Set<User> findUserSentFriendRequestById(String currentUserId) {
+        return mongoService.findUserById(currentUserId)
+                .map(User::getSentFriendRequests)
+                .map(mongoService::findUserFriendsById)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)))
+                .orElse(new HashSet<>());
     }
 
     public User updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
@@ -197,7 +199,7 @@ public class UserService {
                                         .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
     }
 
-    private User removeFriendFromList(String friendUserId, User user) {
+    private static User removeFriendFromList(String friendUserId, User user) {
         user.getFriends().remove(friendUserId);
         return user;
     }
