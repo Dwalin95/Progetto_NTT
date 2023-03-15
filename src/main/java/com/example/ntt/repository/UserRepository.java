@@ -24,6 +24,7 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query("{'_id': {$in: ?0}}")
     Optional<Set<User>> findFriendsById(Set<String> friendsIds);
 
+    //TODO: dto
     @Aggregation(
             pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {\"messages.senderId\": ?1, \"messages.receiverId\": ?2}}"}
     )
