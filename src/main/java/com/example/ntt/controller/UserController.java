@@ -1,5 +1,6 @@
 package com.example.ntt.controller;
 
+import com.example.api.UserApi;
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.UserCountPerCity;
@@ -14,26 +15,27 @@ import java.util.*;
 
 @AllArgsConstructor
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+//annotazioni lasciate per passaggio non del tutto definitivo tra Controller ed interfaccie
 @RequestMapping("/api/v1")
-public class UserController {
+@CrossOrigin(origins = "*")
+public class UserController implements UserApi {
 
     private final MongoService mongoService;
     private final UserService userService;
     private final UserConfiguration userConfiguration;
 
 
-    @RequestMapping("/")
+    @Override
     public String home() {
         return "La Home";
     }
 
-    @GetMapping(value = "/{id}")
+    @Override
     public User findUserById(@PathVariable String id) {
         return userService.findUserById(id);
     }
 
-    @GetMapping(value = "/{id}/friends")
+    @Override
     public Set<User> findUserFriendsById(@PathVariable String id) {
         return userService.findFriendsById(id);
     }
@@ -43,17 +45,17 @@ public class UserController {
         return userService.findAllMessageSendersService(id);
     }
 
-    @GetMapping(value = "/{id}/messages/{friendId}")
+    @Override
     public List<Message> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
         return userService.findMessagesByFriendIdsService(id, friendId);
     }
 
-    @GetMapping(value = "/list")
+    @Override
     public List<User> findAllUsers() {
         return mongoService.findAllUsers();
     }
 
-    @GetMapping(value = "/userCount")
+    @Override
     public Set<UserCountPerCity> userCountPerCity() {
         return mongoService.countUsersPerCityAggregation();
     }
@@ -64,16 +66,16 @@ public class UserController {
     }
 
     @GetMapping(value = "/signin")
-    public ResponseEntity<User> login(@RequestParam String email, @RequestParam String pwz) {
-        return userConfiguration.checkLogin(email, pwz);
+    public ResponseEntity<User> login(@RequestParam String email, @RequestParam String password) {
+        return userConfiguration.checkLogin(email, password);
     }
 
-    @GetMapping(value = "/{id}/receivedFriendRequests")
+    @Override
     public Set<User> findUserFriendRequestsById(@PathVariable String id) {
         return userService.findUserReceivedFriendRequestsById(id);
     }
 
-    @GetMapping(value = "/{id}/sentFriendRequests")
+    @Override
     public ResponseEntity<Set<User>> findUserSentFriendRequestById(@PathVariable String id) {
         return userService.findUserSentFriendRequestByIdService(id);
     }
@@ -99,7 +101,7 @@ public class UserController {
     }
 
     //TODO: cambiare con il body/DTO
-    @PutMapping(value = "/update/{id}")
+    @Override
     public User updateUserById(
             @PathVariable String id,
             @RequestParam Optional<String> username,
@@ -121,7 +123,7 @@ public class UserController {
         userService.removeFriendService(id, friendId);
     }
 
-    @PutMapping(value = "/updatePassword/{id}")
+    @Override
     public ResponseEntity<User> updatePasswordById(
             @PathVariable String id,
             @RequestParam String oldPassword,
@@ -132,13 +134,14 @@ public class UserController {
         return userService.updatePasswordByIdService(id, oldPassword, confirmPassword);
     }
 
-    @PostMapping(value = "/signup")
+    @Override
     public void createUser(@RequestBody User user) {
         userConfiguration.validateSignUp(user);
     }
 
-    @DeleteMapping(value = "/delete/{id}")
+    @Override
     public void deleteUserById(@PathVariable String id) {
         mongoService.deleteById(id);
     }
 }
+

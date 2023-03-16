@@ -26,7 +26,7 @@ public class UserConfiguration {
         if (emailExists(email)) {
             User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));
 
-            if (passwordEncoder().matches(psw, user.getPwz())) {
+            if (passwordEncoder().matches(psw, user.getPassword())) {
                 return ResponseEntity.ok(user);
             } else {
                 throw new UnauthorizedException("Password not valid");
@@ -41,16 +41,16 @@ public class UserConfiguration {
     }
 
     public void validateSignUp(User user) {
-        String psw = user.getPwz();
+        String psw = user.getPassword();
         String email = user.getEmail();
 
         try {
             if (validatePassword(psw) && validateEmail(email)) {
-                user.setPwz(passwordEncoder().encode(psw));
+                user.setPassword(passwordEncoder().encode(psw));
                 mongoService.saveUser(user);
             }
         } catch (Exception e) {
-            throw new UnauthorizedException("");
+            throw new UnauthorizedException("Access denied");
         }
     }
 

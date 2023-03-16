@@ -26,7 +26,7 @@ public class User{
     private String email;
     private String firstName;
     private String lastName;
-    private String pwz;
+    private String password;
     private String gender;
     private Set<String> friends = new HashSet<>();
     private Set<String> receivedFriendRequests = new HashSet<>();
