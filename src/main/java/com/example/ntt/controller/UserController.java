@@ -2,10 +2,11 @@ package com.example.ntt.controller;
 
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.model.Message;
+import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
+import com.example.ntt.service.ApplicationService;
 import com.example.ntt.service.MongoService;
-import com.example.ntt.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ import java.util.*;
 public class UserController {
 
     private final MongoService mongoService;
-    private final UserService userService;
+    private final ApplicationService applicationService;
     private final UserConfiguration userConfiguration;
 
 
@@ -29,78 +30,78 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public User findUserById(@PathVariable String id) {
-        return userService.findUserById(id);
+    public ResponseEntity<User> findUserById(@PathVariable String id) {
+        return ResponseEntity.ok(applicationService.findUserById(id));
     }
 
     @GetMapping(value = "/{id}/friends")
-    public Set<User> findUserFriendsById(@PathVariable String id) {
-        return userService.findFriendsById(id);
+    public ResponseEntity<Set<User>> findUserFriendsById(@PathVariable String id) {
+        return ResponseEntity.ok(applicationService.findFriendsById(id));
     }
 
     @GetMapping(value = "/{id}/chats")
-    public Set<String> findAllMessageSenders(@PathVariable String id){
-        return userService.findAllMessageSendersService(id);
+    public ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String id){
+        return ResponseEntity.ok(applicationService.findAllMessageSenders(id));
     }
 
     @GetMapping(value = "/{id}/messages/{friendId}")
-    public List<Message> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
-        return userService.findMessagesByFriendIdsService(id, friendId);
+    public ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
+        return ResponseEntity.ok(applicationService.findMessagesByFriendIds(id, friendId));
     }
 
     @GetMapping(value = "/list")
-    public List<User> findAllUsers() {
-        return mongoService.findAllUsers();
+    public ResponseEntity<List<User>> findAllUsers() {
+        return ResponseEntity.ok(mongoService.findAllUsers());
     }
 
     @GetMapping(value = "/userCount")
-    public Set<UserCountPerCity> userCountPerCity() {
-        return mongoService.countUsersPerCityAggregation();
+    public ResponseEntity<Set<UserCountPerCity>> userCountPerCity() {
+        return ResponseEntity.ok(mongoService.countUsersPerCityAggregation());
     }
 
     @GetMapping(value = "/{id}/friendsPerCity")
-    public Set<UserCountPerCity> friendsCountPerCity(@PathVariable String id) {
-        return userService.friendsCountPerCity(id);
+    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@PathVariable String id) {
+        return ResponseEntity.ok(applicationService.friendsCountPerCity(id));
     }
 
     @GetMapping(value = "/signin")
     public ResponseEntity<User> login(@RequestParam String email, @RequestParam String pwz) {
-        return userConfiguration.checkLogin(email, pwz);
+        return ResponseEntity.ok(userConfiguration.checkLogin(email, pwz));
     }
 
     @GetMapping(value = "/{id}/receivedFriendRequests")
-    public Set<User> findUserFriendRequestsById(@PathVariable String id) {
-        return userService.findUserReceivedFriendRequestsById(id);
+    public ResponseEntity<Set<User>> findUserFriendRequestsById(@PathVariable String id) {
+        return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(id));
     }
 
     @GetMapping(value = "/{id}/sentFriendRequests")
     public ResponseEntity<Set<User>> findUserSentFriendRequestById(@PathVariable String id) {
-        return userService.findUserSentFriendRequestByIdService(id);
+        return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(id));
     }
 
     @PostMapping(value = "/{id}/sendFriendRequest")
     public void sendFriendRequest(@PathVariable String id, @RequestParam String friendId) {
-        userService.sendFriendRequest(id, friendId);
+        applicationService.sendFriendRequest(id, friendId);
     }
 
     @PostMapping(value = "/{id}/sendMessage/{friendId}")
     public void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String body) {
-        userService.sendMessage(id, friendId, body);
+        applicationService.sendMessage(id, friendId, body);
     }
 
     @PutMapping(value = "/{id}/deleteMessage/{friendId}")
     public void deleteMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId){
-        userService.deleteMessage(id, friendId, messageId);
+        applicationService.deleteMessage(id, friendId, messageId);
     }
 
     @PutMapping(value = "/{id}/deleteChat")
     public void deleteChat(@PathVariable String id, @RequestParam String friendId){
-        userService.deleteChat(id, friendId);
+        applicationService.deleteChat(id, friendId);
     }
 
     //TODO: cambiare con il body/DTO
     @PutMapping(value = "/update/{id}")
-    public User updateUserById(
+    public ResponseEntity<User> updateUserById(
             @PathVariable String id,
             @RequestParam Optional<String> username,
             @RequestParam Optional<String> firstName,
@@ -108,17 +109,17 @@ public class UserController {
             @RequestParam Optional<String> email,
             @RequestParam Optional<String> gender
     ) {
-        return userService.updateUserById(id, username, firstName, lastName, email, gender);
+        return ResponseEntity.ok(applicationService.updateUserById(id, username, firstName, lastName, email, gender));
     }
 
     @PutMapping(value = "/{id}/manageFriendRequest/{friendId}")
     public void handleFriendRequest(@PathVariable String id, @PathVariable String friendId, @RequestParam boolean accepted){
-        userService.handleFriendRequest(id, friendId, accepted);
+        applicationService.handleFriendRequest(id, friendId, accepted);
     }
 
     @PutMapping(value = "{id}/removeFriend/{friendId}")
     public void removeFriend(@PathVariable String id, @PathVariable String friendId){
-        userService.removeFriend(id, friendId);
+        applicationService.removeFriend(id, friendId);
     }
 
     @PutMapping(value = "/updatePassword/{id}")
@@ -129,7 +130,12 @@ public class UserController {
             @RequestParam String confirmPassword
     ) {
         //il frontend deve fare il check sul momento se il field "new password" e li field "confirm password sono uguali"
-        return userService.updatePasswordByIdService(id, oldPassword, confirmPassword);
+        return ResponseEntity.ok(applicationService.updatePasswordById(id, oldPassword, confirmPassword));
+    }
+
+    @PostMapping(value = "/{id}/posts")
+    public void createPost(@RequestBody Post post){
+
     }
 
     @PostMapping(value = "/signup")
