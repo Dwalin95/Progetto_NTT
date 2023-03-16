@@ -7,9 +7,10 @@ import com.example.ntt.service.MongoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 @Configuration
 public class UserConfiguration {
@@ -22,7 +23,8 @@ public class UserConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    public ResponseEntity<User> checkLogin(String email, String psw) {
+    //TODO: da trasformare in funzionale
+    public User checkLogin(String email, String psw) {
         if (emailExists(email)) {
             User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));
 
@@ -41,15 +43,16 @@ public class UserConfiguration {
     }
 
     public void validateSignUp(User user) {
-        String psw = user.getPassword();
-        String email = user.getEmail();
+        Optional.of(user)
+                .map(this::validatePasswordAndEmail)
+                .map(mongoService::saveUser);
+    }
 
-        try {
-            if (validatePassword(psw) && validateEmail(email)) {
-                user.setPassword(passwordEncoder().encode(psw));
-                mongoService.saveUser(user);
-            }
-        } catch (Exception e) {
+    private User validatePasswordAndEmail(User user) {
+        if(validatePassword(user.getPassword()) && validateEmail(user.getEmail())){
+            user.setPassword(passwordEncoder().encode(user.getPassword()));
+            return user;
+        } else {
             throw new UnauthorizedException("Access denied");
         }
     }

@@ -19,7 +19,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     Optional<User> findByUsername(String username);
 
-    Optional<User> deleteByEmail(String email);
+    void deleteByEmail(String email);
 
     @Query("{'_id': {$in: ?0}}")
     Optional<Set<User>> findFriendsById(Set<String> friendsIds);
@@ -31,12 +31,14 @@ public interface UserRepository extends MongoRepository<User, String> {
     List<Message> findChat(String username, String senderId, String receiverId);
 
     @Aggregation(
-            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {\"messages._id\": ObjectId(?1)}}"}
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {_id: ObjectId(?1)}}"}
     )
     Message findMessage(String username, String messageId);
 
+    //findMessageByText
+
     @Aggregation(
-            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}"}
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}"}
     )
     List<Message> findAllMessages(String id);
 

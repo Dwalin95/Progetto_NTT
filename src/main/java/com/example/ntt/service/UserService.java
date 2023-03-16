@@ -3,7 +3,7 @@ package com.example.ntt.service;
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
-import com.example.ntt.model.Message;
+import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,12 @@ public class UserService {
     private final UserConfiguration userConfiguration;
     private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
-    public ResponseEntity<User> updatePasswordByIdService(String id, String oldPassword, String confirmedPassword) {
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+    public User updatePasswordById(String id, String oldPassword, String confirmedPassword) {
+        return mongoService.findUserById(id)
+                        .map(u -> this.doesNotMatch(oldPassword, u))
+                        .map(u -> this.match(confirmedPassword, u))
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+    }
 
         if (userConfiguration.passwordEncoder().matches(oldPassword, user.getPassword())) {
             if (!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPassword())) {
@@ -139,9 +143,9 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
     }
 
-    private User removeRequest(String friendId, User u) {
-        u.getReceivedFriendRequests().remove(friendId);
-        return u;
+    private User removeFriendFromList(String friendUserId, User user) {
+        user.getFriends().remove(friendUserId);
+        return user;
     }
 
     //da decidere se cancellarli a tutti e due o solo chi li vuole cancellare, la chat intera viene rimossa solo a chi fa l'azione non a tutti e due
@@ -216,5 +220,7 @@ public class UserService {
         } else {
             throw new UnauthorizedException("You can only send messages between friends");
         }
+    public void createPost(Post post){
+
     }
 }
