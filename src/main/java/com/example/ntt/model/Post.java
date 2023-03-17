@@ -5,10 +5,11 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-//@With
+@With
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,5 +23,5 @@ public class Post {
     private String title;
     private String body;
     private Date timestamp;
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 }

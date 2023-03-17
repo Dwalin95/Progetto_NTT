@@ -1,6 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.model.Message;
+import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class ApplicationService {
     private final UserService userService;
     private final MessageService messageService;
     private final RequestService requestService;
+    private final PostService postService;
 
     public User updatePasswordById(String id, String oldPassword, String confirmedPassword){
         return userService.updatePasswordById(id, oldPassword, confirmedPassword);
@@ -76,5 +78,17 @@ public class ApplicationService {
 
     public void handleFriendRequest(String id, String friendId, boolean accepted){
         requestService.handleFriendRequest(id, friendId, accepted);
+    }
+
+    public void createPost(String id, Post post){
+        postService.createPost(id, post);
+    }
+
+    public void removePost(String id, String postId){
+        postService.removePost(id, postId);
+    }
+
+    public List<Post> findAllFriendsPosts(String id){
+        return postService.findAllFriendsPosts(id);
     }
 }

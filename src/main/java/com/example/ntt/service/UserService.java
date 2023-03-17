@@ -3,7 +3,6 @@ package com.example.ntt.service;
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
-import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import lombok.RequiredArgsConstructor;
@@ -90,8 +89,5 @@ public class UserService {
         user.getFriends().remove(friendUserId);
         return user;
     }
-
-    public void createPost(Post post){
-
-    }
 }
+

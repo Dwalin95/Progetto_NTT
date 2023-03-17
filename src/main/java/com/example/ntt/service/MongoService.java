@@ -1,11 +1,11 @@
 package com.example.ntt.service;
 
 import com.example.ntt.model.Message;
+import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
 import com.example.ntt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.bson.Document;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,11 +51,19 @@ public class MongoService {
     }
 
     public Message findMessageAggregation(String username, String messageId){
-        return this.userRepository.findMessage(username, messageId);
+        return this.userRepository.findSingleMessage(username, messageId);
+    }
+
+    public Post findSinglePostAggregation(String id, String postId){
+        return userRepository.findSinglePost(id, postId);
     }
 
     public List<Message> findChatAggregation(String username, String senderId, String receiverId){
         return this.userRepository.findChat(username, senderId, receiverId);
+    }
+
+    public List<Post> findAllPostsByArrayPostsAggregation(Set<User> friends){
+        return userRepository.findAllPostsByArray(friends);
     }
 
     public List<Message> findAllMessagesAggregation(String id){
