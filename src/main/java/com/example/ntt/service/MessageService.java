@@ -84,7 +84,7 @@ public class MessageService {
         u.getMessages().removeAll(chat);
     }
 
-    //TODO: da trasformare con la funzionale
+    //TODO: da trasformare in funzionale
     public void sendMessage(String id, String friendId, String body) {
         User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
         User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendId)));

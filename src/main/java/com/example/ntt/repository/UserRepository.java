@@ -1,6 +1,7 @@
 package com.example.ntt.repository;
 
 import com.example.ntt.model.Message;
+import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -33,9 +34,19 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Aggregation(
             pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {_id: ObjectId(?1)}}"}
     )
-    Message findMessage(String username, String messageId);
+    Message findSingleMessage(String username, String messageId);
 
     //findMessageByText
+
+    @Aggregation(
+            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$posts\"}}", "{$match: {\"posts._id\": ObjectId(?1)}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}"}
+    )
+    Post findSinglePost(String id, String postId);
+
+    @Aggregation(
+            pipeline = {"\"_id\": {$in: [?0]}", "{$unwind: {path: \"$posts\"}}", "{$match: {\"posts._id\": ObjectId(?1)}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}"}
+    )
+    List<Post> findAllPostsByArray(Set<User> friends);
 
     @Aggregation(
             pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}"}

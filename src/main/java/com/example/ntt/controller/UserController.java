@@ -79,6 +79,11 @@ public class UserController {
         return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(id));
     }
 
+    @GetMapping(value = "/{id}/friendsPost")
+    public ResponseEntity<List<Post>> findAllFriendsPost(@PathVariable String id){
+        return ResponseEntity.ok(applicationService.findAllFriendsPosts(id));
+    }
+
     @PostMapping(value = "/{id}/sendFriendRequest")
     public void sendFriendRequest(@PathVariable String id, @RequestParam String friendId) {
         applicationService.sendFriendRequest(id, friendId);
@@ -122,7 +127,12 @@ public class UserController {
         applicationService.removeFriend(id, friendId);
     }
 
-    @PutMapping(value = "/updatePassword/{id}")
+    @PutMapping(value = "{id}/removePost")
+    public void removePost(@PathVariable String id, String postId){
+        applicationService.removePost(id, postId);
+    }
+
+    @PutMapping(value = "{id}/updatePassword")
     public ResponseEntity<User> updatePasswordById(
             @PathVariable String id,
             @RequestParam String oldPassword,
@@ -133,9 +143,9 @@ public class UserController {
         return ResponseEntity.ok(applicationService.updatePasswordById(id, oldPassword, confirmPassword));
     }
 
-    @PostMapping(value = "/{id}/posts")
-    public void createPost(@RequestBody Post post){
-
+    @PostMapping(value = "/{id}/createPost")
+    public void createPost(@PathVariable String id, @RequestBody Post post){
+        applicationService.createPost(id, post);
     }
 
     @PostMapping(value = "/signup")
