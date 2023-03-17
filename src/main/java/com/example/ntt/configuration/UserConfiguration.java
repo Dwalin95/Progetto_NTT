@@ -29,7 +29,7 @@ public class UserConfiguration {
             User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));
 
             if (passwordEncoder().matches(psw, user.getPassword())) {
-                return user;
+                return ResponseEntity.ok(user);
             } else {
                 throw new UnauthorizedException("Password not valid");
             }
