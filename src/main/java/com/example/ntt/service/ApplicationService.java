@@ -4,6 +4,7 @@ import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
+import com.example.ntt.projections.UserContactInfoProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,11 @@ public class ApplicationService {
     private final MessageService messageService;
     private final RequestService requestService;
     private final PostService postService;
+
+    //Projections
+    public UserContactInfoProjection getUserContactInfo(String username) {
+        return userService.getUserContactInfo(username);
+    }
 
     public User updatePasswordById(String id, String oldPassword, String confirmedPassword){
         return userService.updatePasswordById(id, oldPassword, confirmedPassword);
@@ -40,9 +46,11 @@ public class ApplicationService {
         return userService.updateUserById(id, username, firstName, lastName, email, gender);
     }
 
+
     public void removeFriend(String currentUserId, String friendUserId){
         userService.removeFriend(currentUserId, friendUserId);
     }
+
 
     public Set<String> findAllMessageSenders(String id){
         return messageService.findAllMessageSenders(id);

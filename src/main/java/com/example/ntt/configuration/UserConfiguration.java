@@ -7,6 +7,7 @@ import com.example.ntt.service.MongoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -29,7 +30,7 @@ public class UserConfiguration {
             User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));
 
             if (passwordEncoder().matches(psw, user.getPassword())) {
-                return ResponseEntity.ok(user);
+                return user;
             } else {
                 throw new UnauthorizedException("Password not valid");
             }

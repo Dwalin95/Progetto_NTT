@@ -1,10 +1,12 @@
 package com.example.ntt.controller;
 
 import com.example.ntt.configuration.UserConfiguration;
+import com.example.ntt.dto.NamesOnlyDTO;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
+import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.service.ApplicationService;
 import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
@@ -69,6 +71,21 @@ public class UserController {
         return ResponseEntity.ok(userConfiguration.checkLogin(email, pwz));
     }
 
+    @PostMapping(value = "/userInfo")
+    public ResponseEntity<UserContactInfoProjection> getContactInformation(@RequestBody NamesOnlyDTO username) { //TODO: check
+        return ResponseEntity.ok(applicationService.getUserContactInfo(username.getUsername()));
+    }
+
+    /**
+     * Post
+     * Passi come Body
+     * DTO all'andata [Username]
+     * 1. Interfaccia di ritorno [Nome, Cognome, Email, Gender]
+     * 2. DTO di ritorno in un secondo metodo [Email e Gender]
+     * 3. Interfaccia di ritorno [friends - receivedFriendRequests]
+     */
+
+
     @GetMapping(value = "/{id}/receivedFriendRequests")
     public ResponseEntity<Set<User>> findUserFriendRequestsById(@PathVariable String id) {
         return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(id));
@@ -104,7 +121,7 @@ public class UserController {
         applicationService.deleteChat(id, friendId);
     }
 
-    //TODO: cambiare con il body/DTO
+    //TODO: cambiare con il body/DTO - usa requestbody
     @PutMapping(value = "/update/{id}")
     public ResponseEntity<User> updateUserById(
             @PathVariable String id,
