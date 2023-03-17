@@ -1,5 +1,6 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
@@ -24,6 +25,10 @@ public class ApplicationService {
     //Projections
     public UserContactInfoProjection getUserContactInfo(String username) {
         return userService.getUserContactInfo(username);
+    }
+    //DTO
+    public EmailGenderOnlyDTO getEmailGenderOnly(String username) {
+        return userService.getUserEmailGender(username);
     }
 
     public User updatePasswordById(String id, String oldPassword, String confirmedPassword){
@@ -99,4 +104,6 @@ public class ApplicationService {
     public List<Post> findAllFriendsPosts(String id){
         return postService.findAllFriendsPosts(id);
     }
+
+
 }

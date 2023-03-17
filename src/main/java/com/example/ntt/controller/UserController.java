@@ -1,6 +1,7 @@
 package com.example.ntt.controller;
 
 import com.example.ntt.configuration.UserConfiguration;
+import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.dto.NamesOnlyDTO;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
@@ -13,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.util.*;
 
 @AllArgsConstructor
@@ -75,6 +77,12 @@ public class UserController {
     public ResponseEntity<UserContactInfoProjection> getContactInformation(@RequestBody NamesOnlyDTO username) { //TODO: check
         return ResponseEntity.ok(applicationService.getUserContactInfo(username.getUsername()));
     }
+
+    @PostMapping(value = "/userEmailAndGender")
+    public ResponseEntity<EmailGenderOnlyDTO> getEmailGenderOnly(@RequestBody EmailGenderOnlyDTO username) {
+        return ResponseEntity.ok(applicationService.getEmailGenderOnly(username.getUsername()));
+    }
+
 
     /**
      * Post

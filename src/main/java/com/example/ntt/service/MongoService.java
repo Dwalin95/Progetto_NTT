@@ -1,5 +1,6 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
@@ -24,6 +25,10 @@ public class MongoService {
     }
     public Optional<UserContactInfoProjection> getUserContactInfoByUsernameProjection(String username){
         return this.userRepository.findByUsername(username, UserContactInfoProjection.class);
+    }
+
+    public Optional<EmailGenderOnlyDTO> getUserEmailGender(String username) {
+        return this.userRepository.findByUsername(username, EmailGenderOnlyDTO.class);
     }
 
     public Optional<User> findUserByEmail(String email){

@@ -1,6 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
+import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
@@ -23,6 +24,11 @@ public class UserService {
     public UserContactInfoProjection getUserContactInfo(String username) {
         return mongoService.getUserContactInfoByUsernameProjection(username)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, username)));
+    }
+
+    public EmailGenderOnlyDTO getUserEmailGender(String username) {
+        return mongoService.getUserEmailGender(username)
+                .orElseThrow(() -> new ResourceNotFoundException((String.format(USER_NOT_FOUND_ERROR_MSG, username))));
     }
 
     public User updatePasswordById(String id, String oldPassword, String confirmedPassword) {
@@ -96,6 +102,7 @@ public class UserService {
         user.getFriends().remove(friendUserId);
         return user;
     }
+
 
 }
 
