@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 @Service
 @RequiredArgsConstructor
@@ -33,13 +34,23 @@ public class RequestService {
     }
 
     public void sendFriendRequest(String id, String friendId){
-        this.handleRequest(friendId, user -> user.getReceivedFriendRequests().add(id));
-        this.handleRequest(id, user -> user.getSentFriendRequests().add(friendId));
+        this.handleRequest(friendId, user -> this.addReceivedFriendRequestToFriendUser(id, user));
+        this.handleRequest(id, user -> this.addFriendRequestToCurrentUser(friendId, user));
     }
 
-    private void handleRequest(String id, Predicate<User> isRequestAdded){
-        mongoService.findUserById(id)
-                .filter(isRequestAdded)
+    private User addFriendRequestToCurrentUser(String friendId, User user) {
+        user.getSentFriendRequests().add(friendId);
+        return user;
+    }
+
+    private User addReceivedFriendRequestToFriendUser(String id, User user) {
+        user.getReceivedFriendRequests().add(id);
+        return user;
+    }
+
+    private void handleRequest(String id, UnaryOperator<User> isRequestAdded){
+        User user = mongoService.findUserById(id)
+                .map(isRequestAdded)
                 .map(mongoService::saveUser)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
     }

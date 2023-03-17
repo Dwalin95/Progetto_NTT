@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final MongoService mongoService;
-    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
+    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found"; //TODO: spostare in un ENUM
 
     public Set<String> findAllMessageSenders(String id){
         List<Message> messages = mongoService.findUserById(id)
