@@ -75,7 +75,6 @@ public class UserController implements UserApi {
     */
     }
 
-
     @Override
     public void createUser(User user) {
         userConfiguration.validateSignUp(user);
