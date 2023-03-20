@@ -16,7 +16,7 @@ import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
@@ -44,26 +44,26 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(applicationService.findUserById(id));
     }
 
-    @Override
-    public ResponseEntity<User> updatePasswordById(String id, String oldPassword, String newPassword, String confirmPassword) {
-        return ResponseEntity.ok(applicationService.updatePasswordById(id, oldPassword, confirmPassword));
+//    @Override
+//    public ResponseEntity<User> updatePasswordById(String id, String oldPassword, String newPassword, String confirmPassword) {
+//        return ResponseEntity.ok(applicationService.updatePasswordById(id, oldPassword, confirmPassword));
+//
+//    }
 
-    }
+//    @Override
+//    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(String id) {
+//        return ResponseEntity.ok(applicationService.friendsCountPerCity(id));
+//    }
 
-    @Override
-    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(String id) {
-        return ResponseEntity.ok(applicationService.friendsCountPerCity(id));
-    }
+//    @Override
+//    public ResponseEntity<User> updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
+//        return ResponseEntity.ok(applicationService.updateUserById(id, username, firstName, lastName, email, gender));
+//    }
 
-    @Override
-    public ResponseEntity<User> updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
-        return ResponseEntity.ok(applicationService.updateUserById(id, username, firstName, lastName, email, gender));
-    }
-
-    @Override
-    public void removeFriend(String id, String friendId) {
-        applicationService.removeFriend(id, friendId);
-    }
+//    @Override
+//    public void removeFriend(String id, String friendId) {
+//        applicationService.removeFriend(id, friendId);
+//    }
 
     @Override
     public ResponseEntity<List<User>> findAllUsers() {
@@ -77,22 +77,19 @@ public class UserController implements UserApi {
         return ResponseEntity.created(uri)
                 .header("Access-Control-Allow-Origin","http://localhost:3000")
                 .body(userConfiguration.checkLogin(email, password));
-       /*
-        return ResponseEntity.ok(userConfiguration.checkLogin(email, password))
-                .getHeaders()
-                .add("Access-Control-Allow-Origin","http://localhost:3000");
-    */
     }
 
+    @Override
     @GetMapping(value = "/{id}/friendsPerCity")
     public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@PathVariable String id) {
         return ResponseEntity.ok(applicationService.friendsCountPerCity(id));
     }
 
-    @GetMapping(value = "/signin")
-    public ResponseEntity<User> login(@RequestParam String email, @RequestParam String pwz) {
-        return ResponseEntity.ok(userConfiguration.checkLogin(email, pwz));
-    }
+//    @Override
+//    @GetMapping(value = "/signin")
+//    public ResponseEntity<User> login(@RequestParam String email, @RequestParam String pwz) {
+//        return ResponseEntity.ok(userConfiguration.checkLogin(email, pwz));
+//    }
 
     //-- [INIZIO] Interfaccia di proiezione e utilizzo dei DTO --//
     @PostMapping(value = "/userInfo")
@@ -153,7 +150,7 @@ public class UserController implements UserApi {
 
     @PutMapping(value = "/{id}/deleteMessage/{friendId}")
     public void deleteMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId){
-        applicationService.deleteMessage(id, friendId, messageId);
+//        applicationService.deleteMessage(id, friendId, messageId);
     }
 
     @PutMapping(value = "/{id}/deleteChat")
@@ -162,6 +159,7 @@ public class UserController implements UserApi {
     }
 
     //TODO: cambiare con il body/DTO - usa requestbody
+    @Override
     @PutMapping(value = "/update/{id}")
     public ResponseEntity<User> updateUserById(
             @PathVariable String id,
@@ -179,6 +177,7 @@ public class UserController implements UserApi {
         applicationService.handleFriendRequest(id, friendId, accepted);
     }
 
+    @Override
     @PutMapping(value = "{id}/removeFriend/{friendId}")
     public void removeFriend(@PathVariable String id, @PathVariable String friendId){
         applicationService.removeFriend(id, friendId);
@@ -186,9 +185,10 @@ public class UserController implements UserApi {
 
     @PutMapping(value = "{id}/removePost")
     public void removePost(@PathVariable String id, String postId){
-        applicationService.removePost(id, postId);
+//        applicationService.removePost(id, postId);
     }
 
+    @Override
     @PutMapping(value = "{id}/updatePassword")
     public ResponseEntity<User> updatePasswordById(
             @PathVariable String id,
@@ -205,10 +205,8 @@ public class UserController implements UserApi {
         applicationService.createPost(id, post);
     }
 
-    @PostMapping(value = "/signup")
-    public void createUser(@RequestBody User user) {
     @Override
-    public void createUser(User user) {
+    public void createUser(@RequestBody User user) {
         userConfiguration.validateSignUp(user);
     }
 
