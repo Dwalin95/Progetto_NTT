@@ -2,19 +2,21 @@ package com.example.ntt.controller;
 
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
+import com.example.ntt.dto.UsernameOnlyDTO;
 import com.example.ntt.dto.NamesOnlyDTO;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
 import com.example.ntt.projections.UserContactInfoProjection;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import com.example.ntt.service.ApplicationService;
 import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.ws.Response;
 import java.util.*;
 
 @AllArgsConstructor
@@ -73,16 +75,21 @@ public class UserController {
         return ResponseEntity.ok(userConfiguration.checkLogin(email, pwz));
     }
 
+    //-- [INIZIO] Interfaccia di proiezione e utilizzo dei DTO --//
     @PostMapping(value = "/userInfo")
-    public ResponseEntity<UserContactInfoProjection> getContactInformation(@RequestBody NamesOnlyDTO username) { //TODO: check
+    public ResponseEntity<UserContactInfoProjection> getContactInformation(@RequestBody UsernameOnlyDTO username) {
         return ResponseEntity.ok(applicationService.getUserContactInfo(username.getUsername()));
     }
 
     @PostMapping(value = "/userEmailAndGender")
-    public ResponseEntity<EmailGenderOnlyDTO> getEmailGenderOnly(@RequestBody EmailGenderOnlyDTO username) {
+    public ResponseEntity<EmailGenderOnlyDTO> getEmailGenderOnly(@RequestBody UsernameOnlyDTO username) {
         return ResponseEntity.ok(applicationService.getEmailGenderOnly(username.getUsername()));
     }
-
+    //TODO: approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
+    @PostMapping(value = "/friendListAndRequestReceived")
+    public ResponseEntity<UserFriendsAndRequestReceivedList> getFriendListAndRequestReceived(@RequestBody UsernameOnlyDTO username) {
+        return ResponseEntity.ok(applicationService.getFriendsAndRequestReceived(username.getUsername()));
+    }
 
     /**
      * Post
@@ -90,9 +97,15 @@ public class UserController {
      * DTO all'andata [Username]
      * 1. Interfaccia di ritorno [Nome, Cognome, Email, Gender]
      * 2. DTO di ritorno in un secondo metodo [Email e Gender]
-     * 3. Interfaccia di ritorno [friends - receivedFriendRequests]
+     * 3. Interfaccia di ritorno [friends e receivedFriendRequests]
      */
 
+    //-- [FINE] Interfaccia di proiezione e utilizzo dei DTO --//
+    //-- [Inizio] Aggiungi commento --//
+
+//    @PostMapping(value="/{id}")
+
+    //-- [FINE] Aggiungi commento --//
 
     @GetMapping(value = "/{id}/receivedFriendRequests")
     public ResponseEntity<Set<User>> findUserFriendRequestsById(@PathVariable String id) {

@@ -6,6 +6,7 @@ import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
 import com.example.ntt.projections.UserContactInfoProjection;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import com.example.ntt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,10 @@ public class MongoService {
 
     public Optional<EmailGenderOnlyDTO> getUserEmailGender(String username) {
         return this.userRepository.findByUsername(username, EmailGenderOnlyDTO.class);
+    }
+
+    public Optional<UserFriendsAndRequestReceivedList> getFriendsAndRequestReceived(String username) {
+        return this.userRepository.findByUsername(username, UserFriendsAndRequestReceivedList.class);
     }
 
     public Optional<User> findUserByEmail(String email){
