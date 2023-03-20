@@ -1,10 +1,12 @@
 package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
+import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
+import com.example.ntt.projections.UserContactInfoProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,17 @@ public class UserService {
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
     private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
+
+
+    public UserContactInfoProjection getUserContactInfo(String username) {
+        return mongoService.getUserContactInfoByUsernameProjection(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, username)));
+    }
+
+    public EmailGenderOnlyDTO getUserEmailGender(String username) {
+        return mongoService.getUserEmailGender(username)
+                .orElseThrow(() -> new ResourceNotFoundException((String.format(USER_NOT_FOUND_ERROR_MSG, username))));
+    }
 
     public User updatePasswordById(String id, String oldPassword, String confirmedPassword) {
         return mongoService.findUserById(id)
@@ -89,5 +102,7 @@ public class UserService {
         user.getFriends().remove(friendUserId);
         return user;
     }
+
+
 }
 

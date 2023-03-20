@@ -1,9 +1,11 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
+import com.example.ntt.projections.UserContactInfoProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,15 @@ public class ApplicationService {
     private final MessageService messageService;
     private final RequestService requestService;
     private final PostService postService;
+
+    //Projections
+    public UserContactInfoProjection getUserContactInfo(String username) {
+        return userService.getUserContactInfo(username);
+    }
+    //DTO
+    public EmailGenderOnlyDTO getEmailGenderOnly(String username) {
+        return userService.getUserEmailGender(username);
+    }
 
     public User updatePasswordById(String id, String oldPassword, String confirmedPassword){
         return userService.updatePasswordById(id, oldPassword, confirmedPassword);
@@ -40,9 +51,11 @@ public class ApplicationService {
         return userService.updateUserById(id, username, firstName, lastName, email, gender);
     }
 
+
     public void removeFriend(String currentUserId, String friendUserId){
         userService.removeFriend(currentUserId, friendUserId);
     }
+
 
     public Set<String> findAllMessageSenders(String id){
         return messageService.findAllMessageSenders(id);
@@ -52,8 +65,12 @@ public class ApplicationService {
         return messageService.findMessagesByFriendIds(id, friendId);
     }
 
-    public void deleteMessage(String id, String friendId, String messageId){
-        messageService.deleteMessage(id, friendId, messageId);
+    public void deleteSentMessage(String id, String friendId, String messageId){
+        messageService.deleteSentMessage(id, friendId, messageId);
+    }
+
+    public void deleteReceivedMessage(String id, String messageId){
+        messageService.deleteReceivedMessage(id, messageId);
     }
 
     public void deleteChat(String id, String friendId){
@@ -84,11 +101,13 @@ public class ApplicationService {
         postService.createPost(id, post);
     }
 
-    public void removePost(String id, String postId){
-        postService.removePost(id, postId);
+    public void deletePost(String id, String postId){
+        postService.deletePost(id, postId);
     }
 
     public List<Post> findAllFriendsPosts(String id){
         return postService.findAllFriendsPosts(id);
     }
+
+
 }
