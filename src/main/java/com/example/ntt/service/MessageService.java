@@ -4,7 +4,12 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.User;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import lombok.RequiredArgsConstructor;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +21,7 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final MongoService mongoService;
+    private final MongoClient mongoClient;
     private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found"; //TODO: spostare in un ENUM
 
     public Set<String> findAllMessageSenders(String currentUserId){
@@ -66,6 +72,9 @@ public class MessageService {
 
     private User removeMessage(User u, String messageId){
         Message userMessage = mongoService.findSingleMessageAggregation(u.getUsername(), messageId);
+        MongoDatabase database = mongoClient.getDatabase("Task_Force");
+        MongoCollection<Document> collection = database.getCollection("users");
+        collection.deleteOne((Bson) userMessage);
         u.getMessages().remove(userMessage);
         return u;
     }
