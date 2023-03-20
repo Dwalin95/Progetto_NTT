@@ -65,8 +65,12 @@ public class ApplicationService {
         return messageService.findMessagesByFriendIds(id, friendId);
     }
 
-    public void deleteMessage(String id, String friendId, String messageId){
-        messageService.deleteMessage(id, friendId, messageId);
+    public void deleteSentMessage(String id, String friendId, String messageId){
+        messageService.deleteSentMessage(id, friendId, messageId);
+    }
+
+    public void deleteReceivedMessage(String id, String messageId){
+        messageService.deleteReceivedMessage(id, messageId);
     }
 
     public void deleteChat(String id, String friendId){
@@ -97,8 +101,8 @@ public class ApplicationService {
         postService.createPost(id, post);
     }
 
-    public void removePost(String id, String postId){
-        postService.removePost(id, postId);
+    public void deletePost(String id, String postId){
+        postService.deletePost(id, postId);
     }
 
     public List<Post> findAllFriendsPosts(String id){

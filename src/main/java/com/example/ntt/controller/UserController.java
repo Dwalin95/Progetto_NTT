@@ -119,9 +119,14 @@ public class UserController {
         applicationService.sendMessage(id, friendId, body);
     }
 
-    @PutMapping(value = "/{id}/deleteMessage/{friendId}")
-    public void deleteMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId){
-        applicationService.deleteMessage(id, friendId, messageId);
+    @PutMapping(value = "/{id}/deleteSentMessage/{friendId}")
+    public void deleteSentMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId){
+        applicationService.deleteSentMessage(id, friendId, messageId);
+    }
+
+    @PutMapping(value = "/{id}/deleteReceivedMessage")
+    public void deleteReceivedMessage(@PathVariable String id, @RequestParam String messageId){
+        applicationService.deleteReceivedMessage(id, messageId);
     }
 
     @PutMapping(value = "/{id}/deleteChat")
@@ -153,8 +158,8 @@ public class UserController {
     }
 
     @PutMapping(value = "{id}/removePost")
-    public void removePost(@PathVariable String id, String postId){
-        applicationService.removePost(id, postId);
+    public void removePost(@PathVariable String id, @RequestParam String postId){
+        applicationService.deletePost(id, postId);
     }
 
     @PutMapping(value = "{id}/updatePassword")
@@ -180,6 +185,6 @@ public class UserController {
 
     @DeleteMapping(value = "/delete/{id}")
     public void deleteUserById(@PathVariable String id) {
-        mongoService.deleteById(id);
+        mongoService.deleteUserById(id);
     }
 }
