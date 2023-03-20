@@ -22,7 +22,7 @@ public class MongoService {
     private final UserRepository userRepository;
 
     public Optional<User> findUserById(String id){
-        return userRepository.findById(id);
+        return this.userRepository.findById(id);
     }
     public Optional<UserContactInfoProjection> getUserContactInfoByUsernameProjection(String username){
         return this.userRepository.findByUsername(username, UserContactInfoProjection.class);
@@ -37,35 +37,35 @@ public class MongoService {
     }
 
     public Optional<User> findUserByEmail(String email){
-        return userRepository.findByEmail(email);
+        return this.userRepository.findByEmail(email);
     }
 
     public Optional<User> findUserByUsername(String username){
-        return userRepository.findByUsername(username);
+        return this.userRepository.findByUsername(username);
     }
 
     public Optional<Set<User>> findUserFriendsById(Set<String> friendsIds){
-        return userRepository.findFriendsById(friendsIds);
+        return this.userRepository.findFriendsById(friendsIds);
     }
 
     public List<User> findAllUsers(){
-        return userRepository.findAll();
+        return this.userRepository.findAll();
     }
 
     public User saveUser(User user){
-        return userRepository.save(user);
+        return this.userRepository.save(user);
     }
 
-    public void deleteUserById(String id){
-        userRepository.deleteById(id);
+    public void deleteById(String id){
+        this.userRepository.deleteById(id);
     }
 
     public void deleteUserByEmail(String email){
-        userRepository.deleteByEmail(email);
+        this.userRepository.deleteByEmail(email);
     }
 
-    public Message findSingleMessageAggregation(String username, String messageId){
-        return userRepository.findSingleMessage(username, messageId);
+    public Message findMessageAggregation(String username, String messageId){
+        return this.userRepository.findSingleMessage(username, messageId);
     }
 
     public Post findSinglePostAggregation(String id, String postId){
@@ -73,22 +73,26 @@ public class MongoService {
     }
 
     public List<Message> findChatAggregation(String username, String senderId, String receiverId){
-        return userRepository.findChat(username, senderId, receiverId);
+        return this.userRepository.findChat(username, senderId, receiverId);
     }
 
-    public List<Post> findAllPostsByArrayAggregation(Set<User> friends){
+    public List<Post> findAllPostsByArrayPostsAggregation(Set<User> friends){
         return userRepository.findAllPostsByArray(friends);
     }
 
     public List<Message> findAllMessagesAggregation(String id){
-        return userRepository.findAllMessages(id);
+        return this.userRepository.findAllMessages(id);
+    }
+
+    public List<Message> findMessagesByFriendIdAggregation(String username, String senderId, String receiverId){
+        return this.userRepository.findChat(username, senderId, receiverId);
     }
 
     public Set<UserCountPerCity> countUsersPerCityAggregation(){
-        return userRepository.countUsersPerCity();
+        return this.userRepository.countUsersPerCity();
     }
 
     public Set<UserCountPerCity> countFriendsPerCityAggregation(Set<String> friendsUsernames){
-        return userRepository.countFriendsPerCity(friendsUsernames);
+        return this.userRepository.countFriendsPerCity(friendsUsernames);
     }
 }

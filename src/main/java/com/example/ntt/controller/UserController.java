@@ -1,6 +1,5 @@
 package com.example.ntt.controller;
 
-import com.example.api.UserApi;
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.dto.UsernameOnlyDTO;
@@ -16,72 +15,54 @@ import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @AllArgsConstructor
 @RestController
-public class UserController implements UserApi {
+@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/v1")
+public class UserController {
 
-    private final ApplicationService applicationService;
     private final MongoService mongoService;
-
+    private final ApplicationService applicationService;
     private final UserConfiguration userConfiguration;
 
-    @Override
-    public ResponseEntity<Set<User>> findUserFriendsById(String id) {
-        return ResponseEntity.ok(applicationService.findFriendsById(id));
+
+    @RequestMapping("/")
+    public String home() {
+        return "La Home";
     }
 
-    @Override
-    public ResponseEntity<User> findUserById(String id) {
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<User> findUserById(@PathVariable String id) {
         return ResponseEntity.ok(applicationService.findUserById(id));
     }
 
-    @Override
-    public ResponseEntity<User> updatePasswordById(String id, String oldPassword, String newPassword, String confirmPassword) {
-        return ResponseEntity.ok(applicationService.updatePasswordById(id, oldPassword, confirmPassword));
-
+    @GetMapping(value = "/{id}/friends")
+    public ResponseEntity<Set<User>> findUserFriendsById(@PathVariable String id) {
+        return ResponseEntity.ok(applicationService.findFriendsById(id));
     }
 
-    @Override
-    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(String id) {
-        return ResponseEntity.ok(applicationService.friendsCountPerCity(id));
+    @GetMapping(value = "/{id}/chats")
+    public ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String id){
+        return ResponseEntity.ok(applicationService.findAllMessageSenders(id));
     }
 
-    @Override
-    public ResponseEntity<User> updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
-        return ResponseEntity.ok(applicationService.updateUserById(id, username, firstName, lastName, email, gender));
+    @GetMapping(value = "/{id}/messages/{friendId}")
+    public ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
+        return ResponseEntity.ok(applicationService.findMessagesByFriendIds(id, friendId));
     }
 
-    @Override
-    public void removeFriend(String id, String friendId) {
-        applicationService.removeFriend(id, friendId);
-    }
-
-    @Override
+    @GetMapping(value = "/list")
     public ResponseEntity<List<User>> findAllUsers() {
         return ResponseEntity.ok(mongoService.findAllUsers());
     }
 
-    @Override
-    public ResponseEntity<User> login(String email, String password) {
-
-        URI uri = URI.create("http://localhost:3000");
-        return ResponseEntity.created(uri)
-                .header("Access-Control-Allow-Origin","http://localhost:3000")
-                .body(userConfiguration.checkLogin(email, password));
-       /*
-        return ResponseEntity.ok(userConfiguration.checkLogin(email, password))
-                .getHeaders()
-                .add("Access-Control-Allow-Origin","http://localhost:3000");
-    */
+    @GetMapping(value = "/userCount")
+    public ResponseEntity<Set<UserCountPerCity>> userCountPerCity() {
+        return ResponseEntity.ok(mongoService.countUsersPerCityAggregation());
     }
 
     @GetMapping(value = "/{id}/friendsPerCity")
@@ -207,13 +188,11 @@ public class UserController implements UserApi {
 
     @PostMapping(value = "/signup")
     public void createUser(@RequestBody User user) {
-    @Override
-    public void createUser(User user) {
         userConfiguration.validateSignUp(user);
     }
 
-    @Override
-    public void deleteUserById(String id) {
-        mongoService.deleteUserById(id);
+    @DeleteMapping(value = "/delete/{id}")
+    public void deleteUserById(@PathVariable String id) {
+        mongoService.deleteById(id);
     }
 }

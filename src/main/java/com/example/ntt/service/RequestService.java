@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 @Service
@@ -47,32 +48,14 @@ public class RequestService {
         return user;
     }
 
-    private void handleRequest(String id, UnaryOperator<User> addRequest){
-        mongoService.findUserById(id)
-                .map(addRequest)
+    private void handleRequest(String id, UnaryOperator<User> isRequestAdded){
+        User user = mongoService.findUserById(id)
+                .map(isRequestAdded)
                 .map(mongoService::saveUser)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
     }
 
-    //TODO: da ritrasformare perchè l'altro non funzionava
     public void handleFriendRequest(String id, String friendId, boolean accepted){
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
-        User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
-
-        if(accepted){
-            user.getReceivedFriendRequests().remove(friendId);
-            friend.getSentFriendRequests().remove(id);
-            user.getFriends().add(friendId);
-            friend.getFriends().add(id);
-        } else {
-            user.getSentFriendRequests().remove(friendId);
-            friend.getReceivedFriendRequests().remove(id);
-        }
-        mongoService.saveUser(user);
-        mongoService.saveUser(friend);
-    }
-
-    /*public void handleFriendRequest(String id, String friendId, boolean accepted){
         this.handleSingleFriendRequest(id, friendId, accepted);
         this.handleSingleFriendRequest(friendId, id, accepted);
     }
@@ -90,5 +73,5 @@ public class RequestService {
     private User removeRequest(String friendId, User u) {
         u.getReceivedFriendRequests().remove(friendId);
         return u;
-    }*/
+    }
 }
