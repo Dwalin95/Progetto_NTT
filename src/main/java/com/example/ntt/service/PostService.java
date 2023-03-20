@@ -25,14 +25,14 @@ public class PostService {
     }
 
     private User addPost(Post post, User user) {
-        post.set_id(new ObjectId());
-        post.setTimestamp(new Date());
+        post.with_id(new ObjectId())
+            .withTimestamp(new Date());
         user.getPosts().add(post);
         return user;
     }
 
-    //TODO: da testare
-    public void removePost(String id, String postId){
+    //TODO: non cancella il post
+    public void deletePost(String id, String postId){
         mongoService.findUserById(id)
                 .map(user -> removePost(id, postId, user))
                 .map(mongoService::saveUser)
@@ -46,7 +46,6 @@ public class PostService {
     }
 
     public void updatePost(String id, String postId, Optional<String> title, Optional<String> body){
-
         //TODO: in progress
     }
 
@@ -56,7 +55,7 @@ public class PostService {
                         .map(u -> mongoService.findUserFriendsById(u.getFriends()))
                         .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)))
                         .orElseThrow(() -> new ResourceNotFoundException(String.format("No friends found", id)));
-        return mongoService.findAllPostsByArrayPostsAggregation(friends).stream()
+        return mongoService.findAllPostsByArrayAggregation(friends).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());
     }
