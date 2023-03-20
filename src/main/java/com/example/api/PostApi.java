@@ -13,9 +13,10 @@ public interface PostApi {
     @PostMapping(value = "/{id}/createPost")
     void createPost(@PathVariable String id, @RequestBody Post post);
 
+    /** in sviluppo
     @PutMapping(value = "{id}/removePost")
     void removePost(@PathVariable String id, String postId);
-
+*/
     @GetMapping(value = "/{id}/friendsPost")
     ResponseEntity<List<Post>> findAllFriendsPost(@PathVariable String id);
 

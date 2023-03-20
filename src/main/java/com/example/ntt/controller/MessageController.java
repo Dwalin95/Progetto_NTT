@@ -25,11 +25,12 @@ public class MessageController implements MessageApi {
         return ResponseEntity.ok(applicationService.findMessagesByFriendIds(id, friendId));
     }
 
+    /** in sviluppo
     @Override
     public void deleteMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId) {
         applicationService.deleteMessage(id, friendId, messageId);
     }
-
+*/
     @Override
     public void deleteChat(@PathVariable String id, @RequestParam String friendId) {
         applicationService.deleteChat(id, friendId);

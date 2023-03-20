@@ -21,11 +21,12 @@ public class PostController implements PostApi {
         applicationService.createPost(id, post);
     }
 
+    /**  in sviluppo
     @Override
     public void removePost(String id, String postId) {
         applicationService.removePost(id, postId);
     }
-
+*/
     @Override
     public ResponseEntity<List<Post>> findAllFriendsPost(@PathVariable String id) {
         return ResponseEntity.ok(applicationService.findAllFriendsPosts(id));

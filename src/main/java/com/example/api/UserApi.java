@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/v1")
 public interface UserApi {
 
@@ -42,13 +42,15 @@ public interface UserApi {
 
     @PutMapping(value = "{id}/removeFriend/{friendId}")
     void removeFriend(@PathVariable String id, @PathVariable String friendId);
+
     @GetMapping(value = "/list")
     ResponseEntity<List<User>> findAllUsers();
+
     @GetMapping(value = "/signin")
-    ResponseEntity<User> login(@RequestParam String email, @RequestParam String pwz);
+    ResponseEntity<User> login(@RequestParam String email, @RequestParam String password);
 
     @PostMapping(value = "/signup")
-void createUser(@RequestBody User user);
+    void createUser(@RequestBody User user);
 
     @DeleteMapping(value = "/delete/{id}")
     public void deleteUserById(@PathVariable String id);

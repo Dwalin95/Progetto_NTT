@@ -10,9 +10,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 
 @AllArgsConstructor
 @RestController
@@ -60,9 +62,19 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<User> login(String email, String pwz) {
-        return ResponseEntity.ok(userConfiguration.checkLogin(email, pwz));
+    public ResponseEntity<User> login(String email, String password) {
+
+        URI uri = URI.create("http://localhost:3000");
+        return ResponseEntity.created(uri)
+                .header("Access-Control-Allow-Origin","http://localhost:3000")
+                .body(userConfiguration.checkLogin(email, password));
+       /*
+        return ResponseEntity.ok(userConfiguration.checkLogin(email, password))
+                .getHeaders()
+                .add("Access-Control-Allow-Origin","http://localhost:3000");
+    */
     }
+
 
     @Override
     public void createUser(User user) {
@@ -71,6 +83,6 @@ public class UserController implements UserApi {
 
     @Override
     public void deleteUserById(String id) {
-        mongoService.deleteById(id);
+        mongoService.deleteUserById(id);
     }
 }
