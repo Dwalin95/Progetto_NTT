@@ -72,10 +72,26 @@ public class MessageService {
 
     private User removeMessage(User u, String messageId){
         Message userMessage = mongoService.findSingleMessageAggregation(u.getUsername(), messageId);
+
+        List<Document> userMessages = Arrays.asList(new Document("$match",
+                        new Document("_id", new ObjectId(u.get_id()))),
+                new Document("$unwind",
+                        new Document("path", "$messages")),
+                new Document("$project",
+                        new Document("_id", "$messages._id")
+                                .append("body", "$messages.body")
+                                .append("timestamp", "$messages.timestamp")
+                                .append("senderId", "$messages.senderId")
+                                .append("receiverId", "$messages.receiverId")),
+                new Document("$match",
+                        new Document("_id",
+                                new ObjectId(messageId))));
+
         MongoDatabase database = mongoClient.getDatabase("Task_Force");
         MongoCollection<Document> collection = database.getCollection("users");
-        collection.deleteOne((Bson) userMessage);
-        u.getMessages().remove(userMessage);
+
+        //collection.deleteOne(userMessage);
+        //u.getMessages().remove(userMessage);
         return u;
     }
 
