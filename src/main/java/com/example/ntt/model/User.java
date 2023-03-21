@@ -28,6 +28,7 @@ public class User{
     private String lastName;
     private String password;
     private String gender;
+    private String profilePicUrl;
     private Set<String> friends = new HashSet<>();
     private Set<String> receivedFriendRequests = new HashSet<>();
     private Set<String> sentFriendRequests = new HashSet<>();

@@ -2,6 +2,7 @@ package com.example.ntt.controller;
 
 import com.example.api.UserApi;
 import com.example.ntt.configuration.UserConfiguration;
+import com.example.ntt.model.UpdatedUser;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.service.ApplicationService;
@@ -47,8 +48,8 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<User> updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
-        return ResponseEntity.ok(applicationService.updateUserById(id, username, firstName, lastName, email, gender));
+    public ResponseEntity<User> updateUserById(String id, UpdatedUser updatedUser) {
+        return ResponseEntity.ok(applicationService.updateUserById(id, updatedUser));
     }
 
     @Override

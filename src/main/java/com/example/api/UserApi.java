@@ -1,5 +1,6 @@
 package com.example.api;
 
+import com.example.ntt.model.UpdatedUser;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import org.springframework.http.ResponseEntity;
@@ -31,14 +32,7 @@ public interface UserApi {
     ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@PathVariable String id);
 
     @PutMapping(value = "/update/{id}")
-    ResponseEntity<User> updateUserById(
-            @PathVariable String id,
-            @RequestParam Optional<String> username,
-            @RequestParam Optional<String> firstName,
-            @RequestParam Optional<String> lastName,
-            @RequestParam Optional<String> email,
-            @RequestParam Optional<String> gender
-    );
+    ResponseEntity<User> updateUserById(@PathVariable String id, @RequestBody UpdatedUser updatedUser);
 
     @PutMapping(value = "{id}/removeFriend/{friendId}")
     void removeFriend(@PathVariable String id, @PathVariable String friendId);
@@ -54,5 +48,4 @@ public interface UserApi {
 
     @DeleteMapping(value = "/delete/{id}")
     public void deleteUserById(@PathVariable String id);
-
 }

@@ -59,24 +59,36 @@ public class MongoService {
         userRepository.deleteByEmail(email);
     }
 
-    public Message findSingleMessageAggregation(String username, String messageId){
+    public List<Message> findSingleMessageAggregation(String username, String messageId){
         return userRepository.findSingleMessage(username, messageId);
     }
 
-    public Post findSinglePostAggregation(String id, String postId){
-        return userRepository.findSinglePost(id, postId);
+    public List<Post> getPostListWithoutSpecifiedMessageAggregation(String id, String postId){
+        return userRepository.getPostListWithoutSpecifiedMessage(id, postId);
+    }
+
+    public List<Message> findMessagesWithoutSpecifiedInteraction(String username, String senderId, String receiverId){
+        return userRepository.findMessagesWithoutSpecifiedInteraction(username, senderId, receiverId);
+    }
+
+    public List<Post> getPostListWithoutSpecifiedPost(String currentUserId, String postId){
+        return userRepository.getPostListWithoutSpecifiedPost(currentUserId, postId);
+    }
+
+    public Post updatedPost(String currentUserId, String postId, String title, String body){
+        return userRepository.updatedPost(currentUserId, postId, title, body);
     }
 
     public List<Message> findChatAggregation(String username, String senderId, String receiverId){
-        return userRepository.findChat(username, senderId, receiverId);
+        return userRepository.findChatBySide(username, senderId, receiverId);
     }
 
     public List<Post> findAllPostsByArrayAggregation(Set<User> friends){
-        return userRepository.findAllPostsByArray(friends);
+        return userRepository.findAllPostsByFriendIdsArr(friends);
     }
 
     public List<Message> findAllMessagesAggregation(String id){
-        return userRepository.findAllMessages(id);
+        return userRepository.findAllMessagesBetweenUserAndFriendBySide(id);
     }
 
     public Set<UserCountPerCity> countUsersPerCityAggregation(){

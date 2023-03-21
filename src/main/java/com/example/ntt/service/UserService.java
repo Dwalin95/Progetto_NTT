@@ -4,6 +4,7 @@ import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
+import com.example.ntt.model.UpdatedUser;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
@@ -74,14 +75,15 @@ public class UserService {
                         .orElseThrow(() -> new ResourceNotFoundException("No friends found"));
     }
 
-    public User updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
+    //TODO: capire perchè email e lastname non gli piacciono
+    public User updateUserById(String id, UpdatedUser updatedUser) {
         return mongoService.findUserById(id)
                 .map(u -> {
-                    mongoService.saveUser(u.withUsername(username.orElse(u.getUsername()))
-                            .withFirstName(firstName.orElse(u.getFirstName()))
-                            .withLastName(lastName.orElse(u.getLastName()))
-                            .withEmail(email.orElse(u.getEmail()))
-                            .withGender(gender.orElse(u.getGender())));
+                    mongoService.saveUser(u.withUsername(updatedUser.getUsername().orElse(u.getUsername()))
+                            .withFirstName(updatedUser.getFirstName().orElse(u.getFirstName()))
+                            //.withLastName(updatedUser.getLastName()).orElse(u.getLastName()))
+                            //.withEmail(updatedUser.getEmail()).orElse(u.getEmail())
+                            .withGender(updatedUser.getGender().orElse(u.getGender())));
                     return u;
                 }).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
     }

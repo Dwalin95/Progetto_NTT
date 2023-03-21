@@ -1,10 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.EmailGenderOnlyDTO;
-import com.example.ntt.model.Message;
-import com.example.ntt.model.Post;
-import com.example.ntt.model.User;
-import com.example.ntt.model.UserCountPerCity;
+import com.example.ntt.model.*;
 import com.example.ntt.projections.UserContactInfoProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,8 +44,8 @@ public class ApplicationService {
         return userService.friendsCountPerCity(id);
     }
 
-    public User updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender){
-        return userService.updateUserById(id, username, firstName, lastName, email, gender);
+    public User updateUserById(String id, UpdatedUser updatedUser){
+        return userService.updateUserById(id, updatedUser);
     }
 
 
@@ -99,6 +96,10 @@ public class ApplicationService {
 
     public void createPost(String id, Post post){
         postService.createPost(id, post);
+    }
+
+    public void updatePost(String currentUserId, String postId, UpdatedPost updatedPost){
+        postService.updatePost(currentUserId, postId, updatedPost);
     }
 
     public void deletePost(String id, String postId){

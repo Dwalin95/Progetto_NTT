@@ -22,4 +22,5 @@ public class Message {
     private Date timestamp;
     private String senderId;
     private String receiverId;
+    private String imageUrl;
 }

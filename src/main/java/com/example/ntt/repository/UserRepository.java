@@ -28,33 +28,48 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query("{'_id': {$in: ?0}}")
     Optional<Set<User>> findFriendsById(Set<String> friendsIds);
 
-    //TODO: dto
     @Aggregation(
-            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: 0, messages: 1}}", "{$match: {\"messages.senderId\": ?1, \"messages.receiverId\": ?2}}"}
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {messages.senderId: {$ne: ObjectId(?1)}, messages.receiverId: {$ne: ObjectId(?2)}}"}
     )
-    List<Message> findChat(String username, String senderId, String receiverId);
+    List<Message> findMessagesWithoutSpecifiedInteraction(String username, String senderId, String receiverId);
 
     @Aggregation(
-            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {_id: ObjectId(?1)}}"}
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {\"messages.senderId\": ObjectId(?1), \"messages.receiverId\": ObjectId(?2)}"}
     )
-    Message findSingleMessage(String username, String messageId);
+    List<Message> findChatBySide(String username, String senderId, String receiverId);
+
+    @Aggregation(
+            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {_id: {$ne: ObjectId(?1)}}}"}
+    )
+    List<Message> findSingleMessage(String username, String messageId);
 
     //findMessageByText
 
     @Aggregation(
-            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$posts\"}}", "{$match: {\"posts._id\": ObjectId(?1)}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}"}
+            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$posts\"}}", "{$match: {\"posts._id\": {$ne: ObjectId(?1)}}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}"}
     )
-    Post findSinglePost(String id, String postId);
+    List<Post> getPostListWithoutSpecifiedMessage(String id, String postId);
 
     @Aggregation(
             pipeline = {"\"_id\": {$in: [?0]}", "{$unwind: {path: \"$posts\"}}", "{$match: {\"posts._id\": ObjectId(?1)}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}"}
     )
-    List<Post> findAllPostsByArray(Set<User> friends);
+    List<Post> findAllPostsByFriendIdsArr(Set<User> friends);
+
+    @Aggregation(
+            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$posts\"}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}", "{$match: {_id: {$ne: ObjectId(?0)}}}"}
+    )
+    List<Post> getPostListWithoutSpecifiedPost(String currentUserId, String postId);
+
+    @Aggregation(
+            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$posts\"}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}", "{$match: {_id: ObjectId(?1)}}", "{$set: {title: ?2, body: ?3, modified: true}}"}
+    )
+    Post updatedPost(String currentUserId, String postId, String title, String body);
+
 
     @Aggregation(
             pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}"}
     )
-    List<Message> findAllMessages(String id);
+    List<Message> findAllMessagesBetweenUserAndFriendBySide(String id);
 
     @Aggregation(
             pipeline = {"{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}

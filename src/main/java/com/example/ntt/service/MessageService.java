@@ -52,13 +52,12 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
-    //TODO: non cancella il messaggio
+    //TODO: implementare la possibilità di cancellare il messaggio entro un limite di tempo
     public void deleteSentMessage(String currentUserId, String friendId, String messageId){
         this.deleteMessageAndSaveUser(currentUserId, messageId);
         this.deleteMessageAndSaveUser(friendId, messageId);
     }
 
-    //TODO: non cancella il messaggio
     public void deleteReceivedMessage(String currentUserId, String messageId){
         this.deleteMessageAndSaveUser(currentUserId, messageId);
     }
@@ -71,47 +70,28 @@ public class MessageService {
     }
 
     private User removeMessage(User u, String messageId){
-        Message userMessage = mongoService.findSingleMessageAggregation(u.getUsername(), messageId);
-
-        List<Document> userMessages = Arrays.asList(new Document("$match",
-                        new Document("_id", new ObjectId(u.get_id()))),
-                new Document("$unwind",
-                        new Document("path", "$messages")),
-                new Document("$project",
-                        new Document("_id", "$messages._id")
-                                .append("body", "$messages.body")
-                                .append("timestamp", "$messages.timestamp")
-                                .append("senderId", "$messages.senderId")
-                                .append("receiverId", "$messages.receiverId")),
-                new Document("$match",
-                        new Document("_id",
-                                new ObjectId(messageId))));
-
-        MongoDatabase database = mongoClient.getDatabase("Task_Force");
-        MongoCollection<Document> collection = database.getCollection("users");
-
-        //collection.deleteOne(userMessage);
-        //u.getMessages().remove(userMessage);
+        List<Message> userMessage = mongoService.findSingleMessageAggregation(u.getUsername(), messageId);
+        u.setMessages(userMessage);
         return u;
     }
 
-    //TODO: non cancella il messaggio
+    //TODO: provare a cancellare una chat
     public void deleteChat(String currentUserId, String friendId){
         mongoService.findUserById(currentUserId)
                 .map(u -> this.handleRemoveChat(friendId, u))
-                .map(mongoService::saveUser)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
     }
 
     private User handleRemoveChat(String friendId, User u) {
-        this.removeChatBySide(u, friendId, u.get_id());
-        this.removeChatBySide(u, u.get_id(), friendId);
+        this.updateListMessages(u, friendId, u.get_id());
+        this.updateListMessages(u, u.get_id(), friendId);
         return u;
     }
 
-    private void removeChatBySide(User u, String senderId, String receiverId) {
-        List<Message> chat = mongoService.findChatAggregation(u.getUsername(), senderId, receiverId);
-        u.getMessages().removeAll(chat);
+    private void updateListMessages(User u, String senderId, String receiverId) {
+        List<Message> chat = mongoService.findMessagesWithoutSpecifiedInteraction(u.getUsername(), senderId, receiverId);
+        u.setMessages(chat);
+        mongoService.saveUser(u);
     }
 
     //TODO: da trasformare in funzionale

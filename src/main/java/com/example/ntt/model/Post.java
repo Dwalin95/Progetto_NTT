@@ -23,5 +23,6 @@ public class Post {
     private String title;
     private String body;
     private Date timestamp;
+    private String imageUrl;
     private List<Comment> comments = new ArrayList<>();
 }

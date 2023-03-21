@@ -2,6 +2,7 @@ package com.example.ntt.service;
 
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Post;
+import com.example.ntt.model.UpdatedPost;
 import com.example.ntt.model.User;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -31,7 +32,7 @@ public class PostService {
         return user;
     }
 
-    //TODO: non cancella il post
+    //TODO: provare a cancellare il post
     public void deletePost(String id, String postId){
         mongoService.findUserById(id)
                 .map(user -> removePost(id, postId, user))
@@ -40,13 +41,23 @@ public class PostService {
     }
 
     private User removePost(String id, String postId, User user) {
-        Post postToRemove = mongoService.findSinglePostAggregation(id, postId);
-        user.getPosts().remove(postToRemove);
+        List<Post> posts = mongoService.getPostListWithoutSpecifiedMessageAggregation(id, postId);
+        user.setPosts(posts);
         return user;
     }
 
-    public void updatePost(String id, String postId, Optional<String> title, Optional<String> body){
-        //TODO: in progress
+    public void updatePost(String currentUserId, String postId, UpdatedPost updatedPost){
+        mongoService.findUserById(currentUserId)
+                .map(u -> handleUpdatePost(postId, updatedPost, u))
+                .map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+    }
+
+    private User handleUpdatePost(String postId, UpdatedPost updatedPost, User u) {
+        List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(u.get_id(), postId);
+        posts.add(mongoService.updatedPost(u.get_id(), postId, updatedPost.getTitle(), updatedPost.getBody()));
+        u.setPosts(posts);
+        return u;
     }
 
     //TODO: da testare
