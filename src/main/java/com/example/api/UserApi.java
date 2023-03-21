@@ -54,5 +54,4 @@ public interface UserApi {
 
     @DeleteMapping(value = "/delete/{id}")
     public void deleteUserById(@PathVariable String id);
-
 }
