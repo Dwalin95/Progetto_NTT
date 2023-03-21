@@ -106,7 +106,6 @@ public class UserController implements UserApi {
 
         URI uri = URI.create("http://localhost:3000");
         return ResponseEntity.created(uri)
-                .header("Access-Control-Allow-Origin","http://localhost:3000")
                 .body(userConfiguration.checkLogin(email, password));
        /*
         return ResponseEntity.ok(userConfiguration.checkLogin(email, password))

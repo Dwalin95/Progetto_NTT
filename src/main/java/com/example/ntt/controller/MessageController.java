@@ -16,30 +16,30 @@ public class MessageController implements MessageApi {
     private final ApplicationService applicationService;
 
     @Override
-    public ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String id) {
+    public ResponseEntity<Set<String>> findAllMessageSenders(String id) {
         return ResponseEntity.ok(applicationService.findAllMessageSenders(id));
     }
 
     @Override
-    public ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
+    public ResponseEntity<List<Message>> findUserMessagesByFriendId(String id, String friendId) {
         return ResponseEntity.ok(applicationService.findMessagesByFriendIds(id, friendId));
     }
 
     @Override
-    public void deleteSentMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId) {
+    public void deleteSentMessage(String id, String friendId, String messageId) {
         applicationService.deleteSentMessage(id, friendId, messageId);
     }
     @Override
-    public void deleteReceivedMessage(@PathVariable String id, @RequestParam String messageId) {
+    public void deleteReceivedMessage(String id, String messageId) {
         applicationService.deleteReceivedMessage(id, messageId);
     }
 
     @Override
-    public void deleteChat(@PathVariable String id, @RequestParam String friendId) {
+    public void deleteChat(String id, String friendId) {
         applicationService.deleteChat(id, friendId);
     }
     @Override
-    public void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String body) {
+    public void sendMessage(String id, String friendId, String body) {
         applicationService.sendMessage(id, friendId, body);
     }
 }
