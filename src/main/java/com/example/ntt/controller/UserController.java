@@ -2,11 +2,13 @@ package com.example.ntt.controller;
 
 import com.example.api.UserApi;
 import com.example.ntt.configuration.UserConfiguration;
+import com.example.ntt.dto.UsernameOnlyDTO;
 import com.example.ntt.model.UpdatedUser;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import com.example.ntt.service.ApplicationService;
 import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
