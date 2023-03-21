@@ -3,6 +3,7 @@ package com.example.ntt.service;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.model.*;
 import com.example.ntt.projections.UserContactInfoProjection;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,11 @@ public class ApplicationService {
     //DTO
     public EmailGenderOnlyDTO getEmailGenderOnly(String username) {
         return userService.getUserEmailGender(username);
+    }
+
+    //Projection
+    public UserFriendsAndRequestReceivedList getFriendsAndRequestReceived(String username) {
+        return userService.getFriendsAndRequestReceived(username);
     }
 
     public User updatePasswordById(String id, String oldPassword, String confirmedPassword){

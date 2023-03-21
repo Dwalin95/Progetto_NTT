@@ -8,6 +8,7 @@ import com.example.ntt.model.UpdatedUser;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,16 +22,22 @@ public class UserService {
     private final UserConfiguration userConfiguration;
     private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
-
+    //Projection
     public UserContactInfoProjection getUserContactInfo(String username) {
         return mongoService.getUserContactInfoByUsernameProjection(username)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, username)));
     }
-
+    //DTO
     public EmailGenderOnlyDTO getUserEmailGender(String username) {
         return mongoService.getUserEmailGender(username)
                 .orElseThrow(() -> new ResourceNotFoundException((String.format(USER_NOT_FOUND_ERROR_MSG, username))));
     }
+    //Projection
+    public UserFriendsAndRequestReceivedList getFriendsAndRequestReceived(String username) {
+        return mongoService.getFriendsAndRequestReceived(username)
+                .orElseThrow(() -> new ResourceNotFoundException((String.format(USER_NOT_FOUND_ERROR_MSG, username))));
+    }
+
 
     public User updatePasswordById(String id, String oldPassword, String confirmedPassword) {
         return mongoService.findUserById(id)
