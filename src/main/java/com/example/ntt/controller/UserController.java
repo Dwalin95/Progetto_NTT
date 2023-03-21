@@ -116,12 +116,12 @@ public class UserController implements UserApi {
      * 3. Interfaccia di ritorno [friends e receivedFriendRequests]
      */
 
-    //-- [FINE] Interfaccia di proiezione e utilizzo dei DTO --//
-    //-- [Inizio] Aggiungi commento --//
+//-- [FINE] Interfaccia di proiezione e utilizzo dei DTO --//
+//-- [Inizio] Aggiungi commento --//
 
 //    @PostMapping(value="/{id}")
 
-    //-- [FINE] Aggiungi commento --//
+//-- [FINE] Aggiungi commento --//
 
     @GetMapping(value = "/{id}/receivedFriendRequests")
     public ResponseEntity<Set<User>> findUserFriendRequestsById(@PathVariable String id) {
