@@ -1,6 +1,6 @@
 package com.example.ntt.controller;
 
-import com.example.api.PostApi;
+import com.example.ntt.api.PostApi;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
 import com.example.ntt.service.ApplicationService;
@@ -17,7 +17,7 @@ public class PostController implements PostApi {
     private final ApplicationService applicationService;
 
     @Override
-    public void createPost(@PathVariable String id, @RequestBody Post post) {
+    public void createPost(String id, Post post) {
         applicationService.createPost(id, post);
     }
 
@@ -32,7 +32,7 @@ public class PostController implements PostApi {
     }
 
     @Override
-    public ResponseEntity<List<Post>> findAllFriendsPost(@PathVariable String id) {
+    public ResponseEntity<List<Post>> findAllFriendsPost(String id) {
         return ResponseEntity.ok(applicationService.findAllFriendsPosts(id));
     }
 
