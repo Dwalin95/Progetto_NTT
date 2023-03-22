@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
 public class UpdatedPost {
 
     private String body;

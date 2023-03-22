@@ -12,7 +12,6 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
 @Builder
 public class Comment {
 

@@ -12,7 +12,6 @@ import java.util.Optional;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
 public class UpdatedUser {
 
     private Optional<String> username;

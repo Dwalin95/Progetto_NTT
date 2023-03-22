@@ -24,4 +24,13 @@ public class ApiExceptionHandler {
                 ex.getMessage(),
                 "Action denied");
     }
+
+    @ExceptionHandler(value = PreconditionFailedException.class)
+    @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
+    public ErrorMessage preconditionFailedException(PreconditionFailedException ex){
+        return new ErrorMessage(
+                HttpStatus.PRECONDITION_FAILED.value(),
+                ex.getMessage(),
+                "Precondition Failed");
+    }
 }

@@ -7,6 +7,8 @@ import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
 import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
+import com.example.ntt.repository.MessageRepository;
+import com.example.ntt.repository.PostRepository;
 import com.example.ntt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import java.util.Set;
 public class MongoService {
 
     private final UserRepository userRepository;
+    private final MessageRepository messageRepository;
+    private final PostRepository postRepository;
 
     public Optional<User> findUserById(String id){
         return userRepository.findById(id);
@@ -64,36 +68,40 @@ public class MongoService {
         userRepository.deleteByEmail(email);
     }
 
-    public List<Message> findSingleMessageAggregation(String username, String messageId){
-        return userRepository.findSingleMessage(username, messageId);
+    public List<Message> getMessageListWithoutSpecifiedMessage(String username, String messageId){
+        return messageRepository.getMessageListWithoutSpecifiedMessage(username, messageId);
+    }
+
+    public Message findSingleMessage(String username, String messageId){
+        return messageRepository.findSingleMessage(username, messageId);
     }
 
     public List<Post> getPostListWithoutSpecifiedMessageAggregation(String id, String postId){
-        return userRepository.getPostListWithoutSpecifiedMessage(id, postId);
+        return postRepository.getPostListWithoutSpecifiedPost(id, postId);
     }
 
-    public List<Message> findMessagesWithoutSpecifiedInteraction(String username, String senderId, String receiverId){
-        return userRepository.findMessagesWithoutSpecifiedInteraction(username, senderId, receiverId);
+    public List<Message> findMessagesWithoutSpecifiedInteraction(String currentUserId, String senderId, String receiverId){
+        return messageRepository.findMessagesWithoutSpecifiedInteraction(currentUserId, senderId, receiverId);
     }
 
     public List<Post> getPostListWithoutSpecifiedPost(String currentUserId, String postId){
-        return userRepository.getPostListWithoutSpecifiedPost(currentUserId, postId);
+        return postRepository.getPostListWithoutSpecifiedPost(currentUserId, postId);
     }
 
     public Post updatedPost(String currentUserId, String postId, String title, String body){
-        return userRepository.updatedPost(currentUserId, postId, title, body);
+        return postRepository.updatedPost(currentUserId, postId, title, body);
     }
 
     public List<Message> findChatAggregation(String username, String senderId, String receiverId){
-        return userRepository.findChatBySide(username, senderId, receiverId);
+        return messageRepository.findChatBySide(username, senderId, receiverId);
     }
 
     public List<Post> findAllPostsByArrayAggregation(Set<User> friends){
-        return userRepository.findAllPostsByFriendIdsArr(friends);
+        return postRepository.findAllPostsByFriendIdsArr(friends);
     }
 
     public List<Message> findAllMessagesAggregation(String id){
-        return userRepository.findAllMessagesBetweenUserAndFriendBySide(id);
+        return messageRepository.findAllMessages(id);
     }
 
     public Set<UserCountPerCity> countUsersPerCityAggregation(){

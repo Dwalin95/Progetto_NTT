@@ -4,6 +4,7 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
 import com.example.ntt.model.User;
+import com.example.ntt.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class PostService {
     }
 
     private User removePost(String id, String postId, User user) {
-        List<Post> posts = mongoService.getPostListWithoutSpecifiedMessageAggregation(id, postId);
+        List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(id, postId);
         user.setPosts(posts);
         return user;
     }
