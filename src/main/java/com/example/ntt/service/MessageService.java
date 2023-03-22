@@ -22,13 +22,13 @@ public class MessageService {
     public Set<String> findAllMessageSenders(String currentUserId){
         List<Message> messages = mongoService.findUserById(currentUserId)
                 .map(u -> mongoService.findAllMessagesAggregation(u.get_id()))
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", currentUserId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
         return messages.stream()
                 .map(Message::getSenderId)
                 .collect(Collectors.toSet());
     }
 
-    //TODO: PERCHE' RITORNA NUUUUULLLL
+    //TODO: LDB - PERCHE' RITORNA NUUUUULLLL, migliorare la scrittura
     public List<Message> findMessagesByFriendIds(String currentUserId, String friendId) {
         User user = mongoService.findUserById(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
@@ -47,6 +47,25 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
+    //TODO: LDB - da testare
+    public List<Message> findMessageByTextGlobal(String currentUserId, String text){
+        return mongoService.findUserById(currentUserId)
+                .map(u -> mongoService.findMessageByTextGlobalAggregation(u.get_id(), text))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+    }
+
+    //TODO: LDB - migliorare la scrittura - da testare
+    public List<Message> findMessageByTextPerFriend(String currentUserId, String friendId, String text){
+        List<Message> userSide = mongoService.findMessageByTextPerFriendBySideAggregation(currentUserId, friendId, text);
+        List<Message> friendSide = mongoService.findMessageByTextPerFriendBySideAggregation(friendId, currentUserId, text);
+        List<Message> chat = new ArrayList<>();
+        chat.addAll(userSide);
+        chat.addAll(friendSide);
+
+        return chat.stream()
+                .sorted(Comparator.comparing(Message::getTimestamp)).collect(Collectors.toList());
+    }
+
     public void deleteSentMessage(String currentUserId, String friendId, String messageId){
         if(this.compareDatesForTimeLimit(currentUserId, messageId)) {
             this.deleteMessageAndSaveUser(currentUserId, messageId);
@@ -57,6 +76,7 @@ public class MessageService {
         }
     }
 
+    //TODO: LDB - migliorare la scrittura
     private boolean compareDatesForTimeLimit(String currentUserId, String messageId){
         Message messageToCheck = mongoService.findSingleMessage(currentUserId, messageId);
 
@@ -106,7 +126,7 @@ public class MessageService {
         mongoService.saveUser(u);
     }
 
-    //TODO: da trasformare in funzionale
+    //TODO: LDB - da trasformare in funzionale
     public void sendMessage(String currentUserId, String friendId, String body) {
         User user = mongoService.findUserById(currentUserId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
         User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendId)));

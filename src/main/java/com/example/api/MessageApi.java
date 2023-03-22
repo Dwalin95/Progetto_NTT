@@ -10,21 +10,27 @@ import java.util.Set;
 @RequestMapping("/api/v1")
 public interface MessageApi {
 
-    @GetMapping(value = "/{id}/chats")
-    ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String id);
+    @GetMapping(value = "/{currentUserId}/messages")
+    ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String currentUserId);
 
-    @GetMapping(value = "/{id}/messages/{friendId}")
-    ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId);
+    @GetMapping(value = "/{currentUserId}/messages/{friendId}")
+    ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String currentUserId, @PathVariable String friendId);
 
-    @PutMapping(value = "/{id}/deleteSentMessage/{friendId}")
-    void deleteSentMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId);
+    @GetMapping(value = "/{currentUserId}/messages")
+    ResponseEntity<List<Message>> findMessageByTextGlobal(@PathVariable String currentUserId, @RequestParam String text);
 
-    @PutMapping(value = "/{id}/deleteReceivedMessage")
-    void deleteReceivedMessage(@PathVariable String id, @RequestParam String messageId);
+    @GetMapping(value = "/{currentUserId}/messages/{friendId}")
+    ResponseEntity<List<Message>> findMessageByTextPerFriend(@PathVariable String currentUserId, @PathVariable String friendId, @RequestParam String text);
 
-    @PutMapping(value = "/{id}/deleteChat")
-    void deleteChat(@PathVariable String id, @RequestParam String friendId);
+    @PutMapping(value = "/{currentUserId}/deleteSentMessage/{friendId}")
+    void deleteSentMessage(@PathVariable String currentUserId, @PathVariable String friendId, @RequestParam String messageId);
 
-    @PostMapping(value = "/{id}/sendMessage/{friendId}")
-    void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String body);
+    @PutMapping(value = "/{currentUserId}/deleteReceivedMessage")
+    void deleteReceivedMessage(@PathVariable String currentUserId, @RequestParam String messageId);
+
+    @PutMapping(value = "/{currentUserId}/deleteChat")
+    void deleteChat(@PathVariable String currentUserId, @RequestParam String friendId);
+
+    @PostMapping(value = "/{currentUserId}/sendMessage/{friendId}")
+    void sendMessage(@PathVariable String currentUserId, @PathVariable String friendId, @RequestParam String body);
 }

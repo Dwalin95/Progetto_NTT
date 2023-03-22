@@ -68,6 +68,14 @@ public class ApplicationService {
         return messageService.findMessagesByFriendIds(id, friendId);
     }
 
+    public List<Message> findMessageByTextGlobal(String currentUserId, String text){
+        return messageService.findMessageByTextGlobal(currentUserId, text);
+    }
+
+    public List<Message> findMessageByTextPerFriend(String currentUserId, String friendId, String text){
+        return messageService.findMessageByTextPerFriend(currentUserId, friendId, text);
+    }
+
     public void deleteSentMessage(String id, String friendId, String messageId){
         messageService.deleteSentMessage(id, friendId, messageId);
     }

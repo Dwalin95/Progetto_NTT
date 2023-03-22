@@ -68,6 +68,14 @@ public class MongoService {
         userRepository.deleteByEmail(email);
     }
 
+    public Set<UserCountPerCity> countUsersPerCityAggregation(){
+        return userRepository.countUsersPerCity();
+    }
+
+    public Set<UserCountPerCity> countFriendsPerCityAggregation(Set<String> friendsUsernames){
+        return userRepository.countFriendsPerCity(friendsUsernames);
+    }
+
     public List<Message> getMessageListWithoutSpecifiedMessage(String username, String messageId){
         return messageRepository.getMessageListWithoutSpecifiedMessage(username, messageId);
     }
@@ -76,12 +84,28 @@ public class MongoService {
         return messageRepository.findSingleMessage(username, messageId);
     }
 
-    public List<Post> getPostListWithoutSpecifiedMessageAggregation(String id, String postId){
-        return postRepository.getPostListWithoutSpecifiedPost(id, postId);
-    }
-
     public List<Message> findMessagesWithoutSpecifiedInteraction(String currentUserId, String senderId, String receiverId){
         return messageRepository.findMessagesWithoutSpecifiedInteraction(currentUserId, senderId, receiverId);
+    }
+
+    public List<Message> findChatAggregation(String username, String senderId, String receiverId){
+        return messageRepository.findChatBySide(username, senderId, receiverId);
+    }
+
+    public List<Message> findAllMessagesAggregation(String id){
+        return messageRepository.findAllMessages(id);
+    }
+
+    public List<Message> findMessageByTextGlobalAggregation(String currentUserId, String text){
+        return messageRepository.findMessageByTextGlobal(currentUserId, text);
+    }
+
+    public List<Message> findMessageByTextPerFriendBySideAggregation(String currentUserId, String friendId, String text){
+        return messageRepository.findMessageByTextPerFriendBySide(currentUserId, friendId, text);
+    }
+
+    public List<Post> getPostListWithoutSpecifiedMessageAggregation(String id, String postId){
+        return postRepository.getPostListWithoutSpecifiedPost(id, postId);
     }
 
     public List<Post> getPostListWithoutSpecifiedPost(String currentUserId, String postId){
@@ -92,23 +116,7 @@ public class MongoService {
         return postRepository.updatedPost(currentUserId, postId, title, body);
     }
 
-    public List<Message> findChatAggregation(String username, String senderId, String receiverId){
-        return messageRepository.findChatBySide(username, senderId, receiverId);
-    }
-
     public List<Post> findAllPostsByArrayAggregation(Set<User> friends){
         return postRepository.findAllPostsByFriendIdsArr(friends);
-    }
-
-    public List<Message> findAllMessagesAggregation(String id){
-        return messageRepository.findAllMessages(id);
-    }
-
-    public Set<UserCountPerCity> countUsersPerCityAggregation(){
-        return userRepository.countUsersPerCity();
-    }
-
-    public Set<UserCountPerCity> countFriendsPerCityAggregation(Set<String> friendsUsernames){
-        return userRepository.countFriendsPerCity(friendsUsernames);
     }
 }

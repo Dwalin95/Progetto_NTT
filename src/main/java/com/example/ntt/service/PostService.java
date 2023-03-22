@@ -33,7 +33,7 @@ public class PostService {
         return user;
     }
 
-    //TODO: provare a cancellare il post
+    //TODO: LDB - provare a cancellare il post
     public void deletePost(String id, String postId){
         mongoService.findUserById(id)
                 .map(user -> removePost(id, postId, user))
@@ -61,7 +61,7 @@ public class PostService {
         return u;
     }
 
-    //TODO: da testare
+    //TODO: LDB - da testare
     public List<Post> findAllFriendsPosts(String id){
         Set<User> friends = mongoService.findUserById(id)
                         .map(u -> mongoService.findUserFriendsById(u.getFriends()))

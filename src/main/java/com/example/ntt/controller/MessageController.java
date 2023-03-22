@@ -26,6 +26,16 @@ public class MessageController implements MessageApi {
     }
 
     @Override
+    public ResponseEntity<List<Message>> findMessageByTextGlobal(String currentUserId, String text) {
+        return ResponseEntity.ok(applicationService.findMessageByTextGlobal(currentUserId, text));
+    }
+
+    @Override
+    public ResponseEntity<List<Message>> findMessageByTextPerFriend(String currentUserId, String friendId, String text) {
+        return ResponseEntity.ok(applicationService.findMessageByTextPerFriend(currentUserId, friendId, text));
+    }
+
+    @Override
     public void deleteSentMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId) {
         applicationService.deleteSentMessage(id, friendId, messageId);
     }
