@@ -1,5 +1,5 @@
 package com.example.ntt.controller;
-import com.example.api.RequestApi;
+import com.example.ntt.api.RequestApi;
 import com.example.ntt.model.User;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,12 @@
-package com.example.api;
+package com.example.ntt.api;
 
+import com.example.ntt.dto.EmailGenderOnlyDTO;
+import com.example.ntt.dto.UsernameOnlyDTO;
 import com.example.ntt.model.UpdatedUser;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
+import com.example.ntt.projections.UserContactInfoProjection;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,4 +52,16 @@ public interface UserApi {
 
     @DeleteMapping(value = "/delete/{id}")
     public void deleteUserById(@PathVariable String id);
+
+    @PostMapping(value = "/userInfo")
+    public ResponseEntity<UserContactInfoProjection> getContactInformation(@RequestBody UsernameOnlyDTO username);
+
+    @PostMapping(value = "/userEmailAndGender")
+    ResponseEntity<EmailGenderOnlyDTO> getEmailGenderOnly(@RequestBody UsernameOnlyDTO username);
+
+    @PostMapping(value = "/friendListAndRequestReceived")
+    ResponseEntity<UserFriendsAndRequestReceivedList> getFriendListAndRequestReceived(@RequestBody UsernameOnlyDTO username);
+
 }
+
+

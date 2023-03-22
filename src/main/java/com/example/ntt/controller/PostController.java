@@ -1,6 +1,6 @@
 package com.example.ntt.controller;
 
-import com.example.api.PostApi;
+import com.example.ntt.api.PostApi;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
 import com.example.ntt.service.ApplicationService;

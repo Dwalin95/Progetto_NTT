@@ -1,4 +1,4 @@
-package com.example.api;
+package com.example.ntt.api;
 
 import com.example.ntt.model.User;
 import org.springframework.http.ResponseEntity;

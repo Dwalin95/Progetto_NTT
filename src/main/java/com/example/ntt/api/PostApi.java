@@ -1,4 +1,4 @@
-package com.example.api;
+package com.example.ntt.api;
 
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;

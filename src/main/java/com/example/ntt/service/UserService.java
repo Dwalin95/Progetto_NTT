@@ -88,8 +88,8 @@ public class UserService {
                 .map(u -> {
                     mongoService.saveUser(u.withUsername(updatedUser.getUsername().orElse(u.getUsername()))
                             .withFirstName(updatedUser.getFirstName().orElse(u.getFirstName()))
-                            //.withLastName(updatedUser.getLastName()).orElse(u.getLastName()))
-                            //.withEmail(updatedUser.getEmail()).orElse(u.getEmail())
+                            .withLastName(String.valueOf(updatedUser.getLastName().orElse(u.getLastName())))
+                            .withEmail(String.valueOf(updatedUser.getEmail().orElse(u.getEmail())))
                             .withGender(updatedUser.getGender().orElse(u.getGender())));
                     return u;
                 }).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));

@@ -1,6 +1,6 @@
 package com.example.ntt.controller;
 
-import com.example.api.MessageApi;
+import com.example.ntt.api.MessageApi;
 import com.example.ntt.model.Message;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;
