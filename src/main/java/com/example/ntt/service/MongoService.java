@@ -88,8 +88,8 @@ public class MongoService {
         return messageRepository.findMessagesWithoutSpecifiedInteraction(currentUserId, senderId, receiverId);
     }
 
-    public List<Message> findChatAggregation(String username, String senderId, String receiverId){
-        return messageRepository.findChatBySide(username, senderId, receiverId);
+    public List<Message> findChatBySideAggregation(String currentUserId, String senderId, String receiverId){
+        return messageRepository.findChatBySide(currentUserId, senderId, receiverId);
     }
 
     public List<Message> findAllMessagesAggregation(String id){
@@ -100,8 +100,8 @@ public class MongoService {
         return messageRepository.findMessageByTextGlobal(currentUserId, text);
     }
 
-    public List<Message> findMessageByTextPerFriendBySideAggregation(String currentUserId, String friendId, String text){
-        return messageRepository.findMessageByTextPerFriendBySide(currentUserId, friendId, text);
+    public List<Message> findMessageByTextPerFriendBySideAggregation(String currentUserId, String senderId, String receivedId, String text){
+        return messageRepository.findMessageByTextPerFriendBySide(currentUserId, senderId, receivedId, text);
     }
 
     public List<Post> getPostListWithoutSpecifiedMessageAggregation(String id, String postId){

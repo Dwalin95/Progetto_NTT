@@ -8,9 +8,9 @@ import java.util.Set;
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/v1")
 public interface RequestApi {
-    @GetMapping(value = "/{id}/receivedFriendRequests")
-    ResponseEntity<Set<User>> findUserFriendRequestsById(@PathVariable String id);
 
+    @GetMapping(value = "/{id}/receivedFriendRequests")
+    ResponseEntity<Set<User>> findUserReceivedFriendRequestsById(@PathVariable String id);
 
     @GetMapping(value = "/{id}/sentFriendRequests")
     ResponseEntity<Set<User>> findUserSentFriendRequestById(@PathVariable String id);
@@ -20,5 +20,4 @@ public interface RequestApi {
 
     @PutMapping(value = "/{id}/manageFriendRequest/{friendId}")
     void handleFriendRequest(@PathVariable String id, @PathVariable String friendId, @RequestParam boolean accepted);
-
 }

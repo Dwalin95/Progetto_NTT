@@ -17,9 +17,9 @@ public interface MessageRepository extends MongoRepository<User, String> {
     List<Message> findMessagesWithoutSpecifiedInteraction(String currentUserId, String senderId, String receiverId);
 
     @Aggregation(
-            pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {\"messages.senderId\": ObjectId(?1), \"messages.receiverId\": ObjectId(?2)}"}
+            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {senderId: ?1, receiverId: ?2}}"}
     )
-    List<Message> findChatBySide(String username, String senderId, String receiverId);
+    List<Message> findChatBySide(String currentUserId, String senderId, String receiverId);
 
     @Aggregation(
             pipeline = {"{$match: {username: ?0}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {_id: {$ne: ObjectId(?1)}}}"}
@@ -37,9 +37,9 @@ public interface MessageRepository extends MongoRepository<User, String> {
     List<Message> findMessageByTextGlobal(String currentUserId, String text);
 
     @Aggregation(
-            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {senderId: ?0, receiverId: ?1, body: /?2/}}"}
+            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}", "{$match: {senderId: ?1, receiverId: ?2, body: /?3/}}"}
     )
-    List<Message> findMessageByTextPerFriendBySide(String currentUserId, String friendId, String text);
+    List<Message> findMessageByTextPerFriendBySide(String currentUserId, String senderId, String receiverId, String text);
 
     @Aggregation(
             pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$messages\"}}", "{$project: {_id: \"$messages._id\", body: \"$messages.body\", timestamp: \"$messages.timestamp\", senderId: \"$messages.senderId\", receiverId: \"$messages.receiverId\"}}"}

@@ -17,13 +17,13 @@ public class PostController implements PostApi {
     private final ApplicationService applicationService;
 
     @Override
-    public void createPost(String id, Post post) {
-        applicationService.createPost(id, post);
+    public void createPost(String currentUserId, Post post) {
+        applicationService.createPost(currentUserId, post);
     }
 
     @Override
-    public void removePost(String id, String postId) {
-        applicationService.deletePost(id, postId);
+    public void removePost(String currentUserId, String postId) {
+        applicationService.deletePost(currentUserId, postId);
     }
 
     @Override
@@ -32,8 +32,7 @@ public class PostController implements PostApi {
     }
 
     @Override
-    public ResponseEntity<List<Post>> findAllFriendsPost(String id) {
-        return ResponseEntity.ok(applicationService.findAllFriendsPosts(id));
+    public ResponseEntity<List<Post>> findAllFriendsPost(String currentUserId) {
+        return ResponseEntity.ok(applicationService.findAllFriendsPosts(currentUserId));
     }
-
 }

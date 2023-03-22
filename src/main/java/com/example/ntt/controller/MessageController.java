@@ -1,6 +1,6 @@
 package com.example.ntt.controller;
 
-import com.example.api.MessageApi;
+import com.example.ntt.api.MessageApi;
 import com.example.ntt.model.Message;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;
@@ -16,13 +16,13 @@ public class MessageController implements MessageApi {
     private final ApplicationService applicationService;
 
     @Override
-    public ResponseEntity<Set<String>> findAllMessageSenders(String id) {
-        return ResponseEntity.ok(applicationService.findAllMessageSenders(id));
+    public ResponseEntity<Set<String>> findAllMessageSenders(String currentUserId) {
+        return ResponseEntity.ok(applicationService.findAllMessageSenders(currentUserId));
     }
 
     @Override
-    public ResponseEntity<List<Message>> findUserMessagesByFriendId(String id, String friendId) {
-        return ResponseEntity.ok(applicationService.findMessagesByFriendIds(id, friendId));
+    public ResponseEntity<List<Message>> findUserMessagesByFriendId(String currentUserId, String friendId) {
+        return ResponseEntity.ok(applicationService.findMessagesByFriendIds(currentUserId, friendId));
     }
 
     @Override
@@ -36,20 +36,20 @@ public class MessageController implements MessageApi {
     }
 
     @Override
-    public void deleteSentMessage(String id, String friendId, String messageId) {
-        applicationService.deleteSentMessage(id, friendId, messageId);
+    public void deleteSentMessage(String currentUserId, String friendId, String messageId) {
+        applicationService.deleteSentMessage(currentUserId, friendId, messageId);
     }
     @Override
-    public void deleteReceivedMessage(String id, String messageId) {
-        applicationService.deleteReceivedMessage(id, messageId);
+    public void deleteReceivedMessage(String currentUserId, String messageId) {
+        applicationService.deleteReceivedMessage(currentUserId, messageId);
     }
 
     @Override
-    public void deleteChat(String id, String friendId) {
-        applicationService.deleteChat(id, friendId);
+    public void deleteChat(String currentUserId, String friendId) {
+        applicationService.deleteChat(currentUserId, friendId);
     }
     @Override
-    public void sendMessage(String id, String friendId, String body) {
-        applicationService.sendMessage(id, friendId, body);
+    public void sendMessage( String currentUserId, String friendId, String body) {
+        applicationService.sendMessage(currentUserId, friendId, body);
     }
 }

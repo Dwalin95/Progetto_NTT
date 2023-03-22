@@ -15,21 +15,22 @@ public class RequestController implements RequestApi {
     private final ApplicationService applicationService;
 
     @Override
-    public ResponseEntity<Set<User>> findUserFriendRequestsById(String id) {
-        return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(id));
-    }
-    @Override
-    public ResponseEntity<Set<User>> findUserSentFriendRequestById(String id) {
-        return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(id));
+    public ResponseEntity<Set<User>> findUserReceivedFriendRequestsById(String currentUserId) {
+        return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(currentUserId));
     }
 
     @Override
-    public void sendFriendRequest(String id, String friendId) {
-        applicationService.sendFriendRequest(id, friendId);
+    public ResponseEntity<Set<User>> findUserSentFriendRequestById(String currentUserId) {
+        return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(currentUserId));
     }
 
     @Override
-    public void handleFriendRequest(String id, String friendId, boolean accepted) {
-        applicationService.handleFriendRequest(id, friendId, accepted);
+    public void sendFriendRequest(String currentUserId, String friendId) {
+        applicationService.sendFriendRequest(currentUserId, friendId);
+    }
+
+    @Override
+    public void handleFriendRequest(String currentUserId, String friendId, boolean accepted) {
+        applicationService.handleFriendRequest(currentUserId, friendId, accepted);
     }
 }
