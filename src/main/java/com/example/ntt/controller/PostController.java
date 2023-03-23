@@ -1,6 +1,7 @@
 package com.example.ntt.controller;
 
 import com.example.ntt.api.PostApi;
+import com.example.ntt.dto.PostDTO;
 import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
@@ -18,8 +19,8 @@ public class PostController implements PostApi {
     private final ApplicationService applicationService;
 
     @Override
-    public void createPost(String currentUserId, Post post) {
-        applicationService.createPost(currentUserId, post);
+    public void createPost(PostDTO post) {
+        applicationService.createPost(post);
     }
 
     @Override

@@ -109,8 +109,8 @@ public class ApplicationService {
         requestService.handleFriendRequest(friendRequest);
     }
 
-    public void createPost(String id, Post post){
-        postService.createPost(id, post);
+    public void createPost(PostDTO post){
+        postService.createPost(post);
     }
 
     public void updatePost(String currentUserId, String postId, UpdatedPost updatedPost){

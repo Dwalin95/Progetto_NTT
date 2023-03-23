@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final MongoService mongoService;
+    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
-    //TODO: DTO - FC
     public void createPost(String id, Post post){
-        mongoService.findUserById(id)
-                .map(user -> addPost(post, user))
-                .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), id)));
+//        mongoService.findUserById(id)
+//                .map(user -> addPost(post, user))
+//                .map(mongoService::saveUser)
+//                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), id)));
     }
 
     private User addPost(Post post, User user) {
@@ -55,6 +55,8 @@ public class PostService {
                 .map(mongoService::saveUser)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
     }
+
+    //TODO: DTO - FC
     private User handleUpdatePost(String postId, UpdatedPost updatedPost, User u) {
         List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(u.get_id(), postId);
         posts.add(mongoService.updatedPost(u.get_id(), postId, updatedPost.getTitle(), updatedPost.getBody()));

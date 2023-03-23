@@ -5,9 +5,9 @@ import lombok.Data;
 import java.util.Optional;
 @Data
 public class UserInfoDTO {
-    private String Username;
-    private String FirstName;
-    private String LastName;
-    private String Email;
-    private String Gender;
+    private String username;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String gender;
 }

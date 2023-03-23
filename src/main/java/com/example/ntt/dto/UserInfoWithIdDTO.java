@@ -12,5 +12,5 @@ public class UserInfoWithIdDTO {
     private String lastName;
     private String email;
     private String gender;
-    private String ProfilePicUrl;
+    private String profilePicUrl;
 }

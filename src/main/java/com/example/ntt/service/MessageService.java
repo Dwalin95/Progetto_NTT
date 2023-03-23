@@ -7,6 +7,7 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.User;
+import com.mongodb.client.MongoClient;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final MongoService mongoService;
+    private final MongoClient mongoClient;
+    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found"; //TODO: spostare in un ENUM
 
     public Set<String> findAllMessageSenders(UserIdDTO userId){
         List<Message> messages = mongoService.findUserById(userId.getId())

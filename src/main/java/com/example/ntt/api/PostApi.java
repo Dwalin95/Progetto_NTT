@@ -1,5 +1,6 @@
 package com.example.ntt.api;
 
+import com.example.ntt.dto.PostDTO;
 import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
@@ -14,7 +15,7 @@ public interface PostApi {
 
     //TODO: usare i DTO - FC
     @PostMapping(value = "/post")
-    void createPost(@PathVariable String id, @RequestBody Post post);
+    void createPost(@RequestBody PostDTO post);
 
     @PutMapping(value = "/{id}/removePost")
     void removePost(@PathVariable String id, @RequestParam String postId);

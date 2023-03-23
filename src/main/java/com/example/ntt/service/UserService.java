@@ -84,27 +84,33 @@ public class UserService {
                         .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
     //TODO: DTO - FC
-    //TODO: trovare il modo di togliere tutti gli if - LDB
+    //TODO: prima era pieno di if ma si può migliorare - LDB
     public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023 - FC
         return mongoService.findUserById(userInfo.getId())
                 .map(u -> {
                     mongoService.saveUser(u.withFirstName(userInfo.getFirstName()))
                             .withLastName(String.valueOf(userInfo.getLastName()))
-                            .withGender(userInfo.getGender())
-                            .withProfilePicUrl(userInfo.getProfilePicUrl());
+                            .withGender(userInfo.getGender());
 
-                    if(userConfiguration.usernameExists(userInfo.getUsername())){
-                        throw new PreconditionFailedException(String.format("The username %s is already present in use", userInfo.getUsername()));
-                    } else {
-                        mongoService.saveUser(u.withUsername(userInfo.getUsername()));
-                    }
-                    if(userConfiguration.emailExists(userInfo.getEmail())){
-                        throw new PreconditionFailedException(String.format("The email %s is already present in use", userInfo.getEmail()));
-                    } else {
-                        mongoService.saveUser(u.withEmail(String.valueOf(userInfo.getEmail())));
-                    }
+                    this.handleUpdateException(userConfiguration.isImage(userInfo.getProfilePicUrl()),
+                                                new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()),
+                                                u.withProfilePicUrl(userInfo.getProfilePicUrl()));
+                    this.handleUpdateException(userConfiguration.usernameExists(userInfo.getUsername()),
+                                                new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), userInfo.getUsername())),
+                                                u.withUsername(userInfo.getUsername()));
+                    this.handleUpdateException(userConfiguration.emailExists(userInfo.getEmail()),
+                                                new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), userInfo.getEmail())),
+                                                u.withEmail(String.valueOf(userInfo.getEmail())));
                     return u;
                 }).orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userInfo.getId())));
+    }
+
+    public void handleUpdateException(boolean check, RuntimeException exception, User user){
+        if(check){
+            mongoService.saveUser(user);
+        } else {
+            throw exception;
+        }
     }
 
     public void removeFriend(CurrentUserIdAndFriendIdDTO userIds){
