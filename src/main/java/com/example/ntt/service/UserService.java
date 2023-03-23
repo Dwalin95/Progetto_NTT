@@ -2,6 +2,7 @@ package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.*;
+import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
@@ -20,30 +21,30 @@ public class UserService {
 
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
-    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
     //Projection
     public UserContactInfoProjection getUserContactInfo(String username) {
         return mongoService.getUserContactInfoByUsernameProjection(username)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, username)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username)));
     }
+
     //DTO
     public EmailGenderOnlyDTO getUserEmailAndGender(String username) {
         return mongoService.getUserEmailAndGender(username)
-                .orElseThrow(() -> new ResourceNotFoundException((String.format(USER_NOT_FOUND_ERROR_MSG, username))));
+                .orElseThrow(() -> new ResourceNotFoundException((String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username))));
     }
+
     //Projection
     public UserFriendsAndRequestReceivedList getFriendsAndRequestReceived(String username) {
         return mongoService.getFriendsAndRequestReceived(username)
-                .orElseThrow(() -> new ResourceNotFoundException((String.format(USER_NOT_FOUND_ERROR_MSG, username))));
+                .orElseThrow(() -> new ResourceNotFoundException((String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username))));
     }
-
 
     public User updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
         return mongoService.findUserById(newUserPassword.getId())
                         .map(user -> this.doesNotMatch(newUserPassword.getOldPassword(), user))
                         .map(user -> this.match(newUserPassword.getOldPassword(), user))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, newUserPassword.getId())));
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), newUserPassword.getId())));
     }
 
     private User match(String confirmedPassword, User user) {
@@ -52,7 +53,7 @@ public class UserService {
             mongoService.saveUser(user);
             return user;
         } else {
-            throw new UnauthorizedException("New password can't be equal to the old password");
+            throw new UnauthorizedException(ErrorMsg.NEW_PWS_EQUAL_TO_OLD_PSW.getMsg());
         }
     }
 
@@ -60,19 +61,19 @@ public class UserService {
         if(userConfiguration.passwordEncoder().matches(oldPassword, user.getPassword())){
             return user;
         } else {
-            throw new ResourceNotFoundException("Entered characters do not match the old password");
+            throw new ResourceNotFoundException(ErrorMsg.NO_MATCH_OLD_PSW.getMsg());
         }
     }
 
     public User findUserById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
     }
 
     public Set<User> findFriendsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
                         .map(u -> mongoService.findUserFriendsById(u.getFriends()))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())))
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
                         .orElse(new HashSet<>());
     }
 
@@ -80,11 +81,11 @@ public class UserService {
         return mongoService.findUserById(userId.getId())
                         .map(User::getFriends)
                         .map(mongoService::countFriendsPerCityAggregation)
-                        .orElseThrow(() -> new ResourceNotFoundException("No friends found"));
+                        .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
     //TODO: DTO - FC
-    //TODO: LDB - trovare il modo di togliere tutti gli if
-    public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023
+    //TODO: trovare il modo di togliere tutti gli if - LDB
+    public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023 - FC
         return mongoService.findUserById(userInfo.getId())
                 .map(u -> {
                     mongoService.saveUser(u.withFirstName(userInfo.getFirstName()))
@@ -103,7 +104,7 @@ public class UserService {
                         mongoService.saveUser(u.withEmail(String.valueOf(userInfo.getEmail())));
                     }
                     return u;
-                }).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userInfo.getId())));
+                }).orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userInfo.getId())));
     }
 
     public void removeFriend(CurrentUserIdAndFriendIdDTO userIds){
@@ -115,14 +116,12 @@ public class UserService {
         mongoService.findUserById(currentUserId)
                     .map(currentUser -> this.removeFriendFromList(friendUserId, currentUser))
                     .map(mongoService::saveUser)
-                    .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+                    .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
     }
 
     private User removeFriendFromList(String friendUserId, User user) {
         user.getFriends().remove(friendUserId);
         return user;
     }
-
-
 }
 
