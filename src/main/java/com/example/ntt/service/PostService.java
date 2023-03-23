@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final MongoService mongoService;
-    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
     public void createPost(String id, Post post){
 //        mongoService.findUserById(id)
