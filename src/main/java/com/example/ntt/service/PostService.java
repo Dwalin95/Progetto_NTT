@@ -1,6 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.UserIdDTO;
+import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
