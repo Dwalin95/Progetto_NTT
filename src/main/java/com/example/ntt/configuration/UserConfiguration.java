@@ -38,7 +38,7 @@ public class UserConfiguration {
         }
     }
 
-    private boolean emailExists(String email) {
+    public boolean emailExists(String email) {
         return mongoService.findUserByEmail(email).isPresent();
     }
 

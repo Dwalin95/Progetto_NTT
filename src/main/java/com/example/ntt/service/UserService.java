@@ -2,6 +2,7 @@ package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
+import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.UpdatedUser;
@@ -82,16 +83,19 @@ public class UserService {
                         .orElseThrow(() -> new ResourceNotFoundException("No friends found"));
     }
 
-    //TODO: capire perchè email e lastname non gli piacciono
-    //TODO: implementare check emailExists
+    //TODO: da testare(?)
     public User updateUserById(String id, UpdatedUser updatedUser) {
         return mongoService.findUserById(id)
                 .map(u -> {
                     mongoService.saveUser(u.withUsername(updatedUser.getUsername().orElse(u.getUsername()))
                             .withFirstName(updatedUser.getFirstName().orElse(u.getFirstName()))
                             .withLastName(String.valueOf(updatedUser.getLastName().orElse(u.getLastName())))
-                            .withEmail(String.valueOf(updatedUser.getEmail().orElse(u.getEmail())))
                             .withGender(updatedUser.getGender().orElse(u.getGender())));
+                    if(userConfiguration.emailExists(updatedUser.getEmail().orElse(null))){
+                        throw new PreconditionFailedException("The email is already present in the database");
+                    } else {
+                        mongoService.saveUser(u.withEmail(String.valueOf(updatedUser.getEmail().orElse(u.getEmail()))));
+                    }
                     return u;
                 }).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
     }
