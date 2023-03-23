@@ -1,5 +1,8 @@
 package com.example.ntt.controller;
 import com.example.ntt.api.RequestApi;
+import com.example.ntt.dto.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.FriendRequestDTO;
+import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.model.User;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;
@@ -15,22 +18,22 @@ public class RequestController implements RequestApi {
     private final ApplicationService applicationService;
 
     @Override
-    public ResponseEntity<Set<User>> findUserReceivedFriendRequestsById(String currentUserId) {
-        return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(currentUserId));
+    public ResponseEntity<Set<User>> findUserFriendRequestsById(@RequestBody UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(userId));
     }
 
     @Override
-    public ResponseEntity<Set<User>> findUserSentFriendRequestById(String currentUserId) {
-        return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(currentUserId));
+    public ResponseEntity<Set<User>> findUserSentFriendRequestById(@RequestBody UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(userId));
     }
 
     @Override
-    public void sendFriendRequest(String currentUserId, String friendId) {
-        applicationService.sendFriendRequest(currentUserId, friendId);
+    public void sendFriendRequest(@RequestParam CurrentUserIdAndFriendIdDTO userIds) {
+        applicationService.sendFriendRequest(userIds);
     }
 
     @Override
-    public void handleFriendRequest(String currentUserId, String friendId, boolean accepted) {
-        applicationService.handleFriendRequest(currentUserId, friendId, accepted);
+    public void handleFriendRequest(@RequestParam FriendRequestDTO friendRequest) {
+        applicationService.handleFriendRequest(friendRequest);
     }
 }

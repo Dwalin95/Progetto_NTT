@@ -1,5 +1,6 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
@@ -51,7 +52,7 @@ public class PostService {
                 .map(mongoService::saveUser)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
     }
-
+    //TODO: DTO - FC
     private User handleUpdatePost(String postId, UpdatedPost updatedPost, User u) {
         List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(u.get_id(), postId);
         posts.add(mongoService.updatedPost(u.get_id(), postId, updatedPost.getTitle(), updatedPost.getBody()));
@@ -59,13 +60,12 @@ public class PostService {
         return u;
     }
 
-    //TODO: LDB - da testare
-    public List<Post> findAllFriendsPosts(String currentUserId){
-        Set<User> friends = mongoService.findUserById(currentUserId)
+    //TODO: da testare
+    public List<Post> findAllFriendsPosts(UserIdDTO userId){
+        Set<User> friends = mongoService.findUserById(userId.getId())
                         .map(u -> mongoService.findUserFriendsById(u.getFriends()))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format("No friends found", currentUserId)));
-
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())))
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format("No friends found", userId.getId())));
         return mongoService.findAllPostsByArrayAggregation(friends).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());

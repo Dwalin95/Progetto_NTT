@@ -24,22 +24,28 @@ public class UserConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    public User checkLogin(String email, String psw) {
-        if (emailExists(email)) {
-            User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));
+    //TODO: LDB - trovare il modo di togliere gli if
+    public User checkLogin(UserAuthDTO credentials) {
+        if (emailExists(credentials.getEmail())) {
+            User user = mongoService.findUserByEmail(credentials.getEmail())
+                    .orElseThrow(() -> new ResourceNotFoundException(String.format("No users found with this email: %s", credentials.getEmail())));
 
-            if (passwordEncoder().matches(psw, user.getPassword())) {
+            if (passwordEncoder().matches(credentials.getPassword(), user.getPassword())) {
                 return user;
             } else {
                 throw new UnauthorizedException("Password not valid");
             }
         } else {
-            throw new ResourceNotFoundException(String.format("Email: %s not found", email));
+            throw new ResourceNotFoundException(String.format("Email: %s not found", credentials.getEmail()));
         }
     }
 
     public boolean emailExists(String email) {
         return mongoService.findUserByEmail(email).isPresent();
+    }
+
+    public boolean usernameExists(String username) {
+        return mongoService.findUserByUsername(username).isPresent();
     }
 
     public void validateSignUp(User user) {
@@ -48,12 +54,21 @@ public class UserConfiguration {
                 .map(mongoService::saveUser);
     }
 
+    //TODO: LDB - trovare il modo di togliere gli if
     private User validatePasswordAndEmail(User user) {
-        if(validatePassword(user.getPassword()) && validateEmail(user.getEmail())){
-            user.setPassword(passwordEncoder().encode(user.getPassword()));
-            return user;
+        if(emailExists(user.getEmail())){
+            if(usernameExists(user.getUsername())){
+                if(validatePassword(user.getPassword()) && validateEmail(user.getEmail())){
+                    user.setPassword(passwordEncoder().encode(user.getPassword()));
+                    return user;
+                } else {
+                    throw new UnauthorizedException("Access denied");
+                }
+            } else {
+                throw new PreconditionFailedException(String.format("The username %s is already present in use", user.getUsername()));
+            }
         } else {
-            throw new UnauthorizedException("Access denied");
+            throw new PreconditionFailedException(String.format("The email %s is already present in use", user.getEmail()));
         }
     }
 

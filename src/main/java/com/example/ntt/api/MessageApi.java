@@ -1,5 +1,6 @@
 package com.example.ntt.api;
 
+import com.example.ntt.dto.*;
 import com.example.ntt.model.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,26 +12,51 @@ import java.util.Set;
 public interface MessageApi {
 
     @GetMapping(value = "/{currentUserId}/messages")
-    ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String currentUserId);
-
-    @GetMapping(value = "/{currentUserId}/messages/{friendId}")
-    ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String currentUserId, @PathVariable String friendId);
-
-    @GetMapping(value = "/{currentUserId}/messages")
     ResponseEntity<List<Message>> findMessageByTextGlobal(@PathVariable String currentUserId, @RequestParam String text);
 
     @GetMapping(value = "/{currentUserId}/messages/{friendId}")
     ResponseEntity<List<Message>> findMessageByTextPerFriend(@PathVariable String currentUserId, @PathVariable String friendId, @RequestParam String text);
 
-    @PutMapping(value = "/{currentUserId}/deleteSentMessage/{friendId}")
-    void deleteSentMessage(@PathVariable String currentUserId, @PathVariable String friendId, @RequestParam String messageId);
+    /**
+     * @param userId {id}
+     * @return
+     */
+    @GetMapping(value = "/chats")
+    ResponseEntity<Set<String>> findAllMessageSenders(@RequestBody UserIdDTO userId);
 
-    @PutMapping(value = "/{currentUserId}/deleteReceivedMessage")
-    void deleteReceivedMessage(@PathVariable String currentUserId, @RequestParam String messageId);
+    /**
+     * @param userIds {currentUserId, friendId}
+     * @return
+     */
+    @GetMapping(value = "/friends/messages")
+    ResponseEntity<List<Message>> userMessagesByFriendId(CurrentUserIdAndFriendIdDTO userIds);
 
-    @PutMapping(value = "/{currentUserId}/deleteChat")
-    void deleteChat(@PathVariable String currentUserId, @RequestParam String friendId);
+    /**
+     * @param messageSent {id, friendId, messageId}
+     * String id,
+     * String friendId,
+     * String messageId
+     */
+    @PutMapping(value = "/deleteSentMessage")
+    void deleteSentMessage(@RequestBody MessageSentIdsDTO messageSent);
 
-    @PostMapping(value = "/{currentUserId}/sendMessage/{friendId}")
-    void sendMessage(@PathVariable String currentUserId, @PathVariable String friendId, @RequestParam String body);
+    /**
+     * @param messageReceived {currentUserId, messageId}
+     */
+    @PutMapping(value = "/deleteReceivedMessage")
+    void deleteReceivedMessage(@RequestBody MessageIdsDTO messageReceived); //ex @PathVariable String id, @RequestParam String messageId
+
+    /**
+     * @param userIds {id, friendId}
+     * @param id
+     * @param friendId
+     */
+    @PutMapping(value = "/{id}/deleteChat")
+    void deleteChat(@RequestBody CurrentUserIdAndFriendIdDTO userIds);
+
+    /**
+     * @param messageToSend {currentUserId, friendId, body}
+     */
+    @PostMapping(value = "/{id}/sendMessage/{friendId}")
+    void sendMessage(@RequestBody MessageToSendIdsAndBodyDTO messageToSend);
 }

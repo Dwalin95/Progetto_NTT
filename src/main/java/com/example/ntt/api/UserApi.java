@@ -1,5 +1,8 @@
 package com.example.ntt.api;
 
+import com.example.ntt.dto.*;
+import com.example.ntt.model.User;
+import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.dto.UsernameOnlyDTO;
 import com.example.ntt.model.UpdatedUser;
@@ -11,57 +14,39 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/v1")
 public interface UserApi {
 
-    @GetMapping(value = "/{id}/friends")
-    ResponseEntity<Set<User>> findUserFriendsById(@PathVariable String id);
+    @GetMapping(value = "/friends")
+    ResponseEntity<Set<User>> findUserFriendsById(@RequestBody UserIdDTO userId);
 
-    @GetMapping(value = "/{id}")
-    ResponseEntity<User> findUserById(@PathVariable String id);
+    @GetMapping(value = "/user")
+    ResponseEntity<User> findUserById(@RequestBody UserIdDTO userId);
 
-    @PutMapping(value = "{id}/updatePassword")
-    ResponseEntity<User> updatePasswordById(
-            @PathVariable String id,
-            @RequestParam String oldPassword,
-            @RequestParam String newPassword,
-            @RequestParam String confirmPassword
-    );
+    @PutMapping(value = "/password") // ex {id}/updatePassword
+    ResponseEntity<User> updatePasswordById(@RequestBody UserUpdatePasswordDTO newUserPassword); //oldPassword, newPassword, confirmPassword
 
-    @GetMapping(value = "/{id}/friendsPerCity")
-    ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@PathVariable String id);
+    @GetMapping(value = "/friendsPerCity")
+    ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@RequestBody UserIdDTO userId);
 
-    @PutMapping(value = "/update/{id}")
-    ResponseEntity<User> updateUserById(@PathVariable String id, @RequestBody UpdatedUser updatedUser);
+    @PutMapping(value = "/user") //Put = "update" -> /user
+    ResponseEntity<User> updateUserById(@RequestBody UserInfoWithIdDTO userInfo); //
 
-    @PutMapping(value = "{id}/removeFriend/{friendId}")
-    void removeFriend(@PathVariable String id, @PathVariable String friendId);
+    @PutMapping(value = "/friend") //TODO: Put o Delete?
+    void removeFriend(@RequestBody CurrentUserIdAndFriendIdDTO userIds);
 
-    @GetMapping(value = "/list")
+    @GetMapping(value = "/users")
     ResponseEntity<List<User>> findAllUsers();
 
-    @GetMapping(value = "/signin")
-    ResponseEntity<User> login(@RequestParam String email, @RequestParam String password);
+    @GetMapping(value = "/signin") //TODO: cambiare l'endpoint in user/signin?
+    ResponseEntity<User> login(@RequestBody UserAuthDTO credentials);
 
-    @PostMapping(value = "/signup")
+    @PostMapping(value = "/signup") //TODO: cambiare l'endpoint in user/signup?
     void createUser(@RequestBody User user);
 
-    @DeleteMapping(value = "/delete/{id}")
-    public void deleteUserById(@PathVariable String id);
-
-    @PostMapping(value = "/userInfo")
-    public ResponseEntity<UserContactInfoProjection> getContactInformation(@RequestBody UsernameOnlyDTO username);
-
-    @PostMapping(value = "/userEmailAndGender")
-    ResponseEntity<EmailGenderOnlyDTO> getEmailGenderOnly(@RequestBody UsernameOnlyDTO username);
-
-    @PostMapping(value = "/friendListAndRequestReceived")
-    ResponseEntity<UserFriendsAndRequestReceivedList> getFriendListAndRequestReceived(@RequestBody UsernameOnlyDTO username);
-
+    @DeleteMapping(value = "/user/delete")
+    public void deleteUserById(@RequestBody UserIdDTO userId);
 }
-
-

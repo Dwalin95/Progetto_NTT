@@ -1,9 +1,14 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.FriendRequestDTO;
+import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,25 +21,25 @@ public class RequestService {
     private final MongoService mongoService;
     private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
-    public Set<User> findUserReceivedFriendRequestsById(String id) {
-        return mongoService.findUserById(id)
+    public Set<User> findUserReceivedFriendRequestsById(UserIdDTO userId) {
+        return mongoService.findUserById(userId.getId())
                 .map(User::getReceivedFriendRequests)
                 .map(mongoService::findUserFriendsById)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())))
                 .orElse(new HashSet<>());
     }
 
-    public Set<User> findUserSentFriendRequestById(String currentUserId) {
-        return mongoService.findUserById(currentUserId)
+    public Set<User> findUserSentFriendRequestById(UserIdDTO currentUserId) {
+        return mongoService.findUserById(currentUserId.getId())
                 .map(User::getSentFriendRequests)
                 .map(mongoService::findUserFriendsById)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)))
                 .orElse(new HashSet<>());
     }
 
-    public void sendFriendRequest(String id, String friendId){
-        this.handleRequest(friendId, user -> this.addReceivedFriendRequestToFriendUser(id, user));
-        this.handleRequest(id, user -> this.addFriendRequestToCurrentUser(friendId, user));
+    public void sendFriendRequest(CurrentUserIdAndFriendIdDTO userIds){
+        this.handleRequest(userIds.getFriendId(), user -> this.addReceivedFriendRequestToFriendUser(userIds.getCurrentUserId(), user));
+        this.handleRequest(userIds.getCurrentUserId(), user -> this.addFriendRequestToCurrentUser(userIds.getFriendId(), user));
     }
 
     private User addFriendRequestToCurrentUser(String friendId, User user) {
@@ -55,18 +60,20 @@ public class RequestService {
     }
 
     //TODO: da ritrasformare perchè l'altro non funzionava
-    public void handleFriendRequest(String id, String friendId, boolean accepted){
-        User user = mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
-        User friend = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+    public void handleFriendRequest(FriendRequestDTO friendRequest){
+        User user = mongoService.findUserById(friendRequest.getCurrentUserId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendRequest.getCurrentUserId())));
+        User friend = mongoService.findUserById(friendRequest.getFriendId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendRequest.getFriendId())));
 
-        if(accepted){
-            user.getReceivedFriendRequests().remove(friendId);
-            friend.getSentFriendRequests().remove(id);
-            user.getFriends().add(friendId);
-            friend.getFriends().add(id);
+        if(friendRequest.isRequestAccepted()){
+            user.getReceivedFriendRequests().remove(friendRequest.getFriendId());
+            friend.getSentFriendRequests().remove(friendRequest.getCurrentUserId());
+            user.getFriends().add(friendRequest.getFriendId());
+            friend.getFriends().add(friendRequest.getCurrentUserId());
         } else {
-            user.getSentFriendRequests().remove(friendId);
-            friend.getReceivedFriendRequests().remove(id);
+            user.getSentFriendRequests().remove(friendRequest.getFriendId());
+            friend.getReceivedFriendRequests().remove(friendRequest.getCurrentUserId());
         }
         mongoService.saveUser(user);
         mongoService.saveUser(friend);

@@ -9,9 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailGenderOnlyDTO {
-    private String username;
-    private String email;
-    private String gender;
+public class UserIdDTO {
+    private String id;
 
 }
