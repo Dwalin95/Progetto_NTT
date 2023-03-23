@@ -1,5 +1,7 @@
 package com.example.ntt.configuration;
 
+import com.example.ntt.dto.UserAuthDTO;
+import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
@@ -65,10 +67,10 @@ public class UserConfiguration {
                     throw new UnauthorizedException("Access denied");
                 }
             } else {
-                throw new PreconditionFailedException(String.format("The username %s is already present in use", user.getUsername()));
+                throw new PreconditionFailedException(String.format("The username %s is already in use", user.getUsername()));
             }
         } else {
-            throw new PreconditionFailedException(String.format("The email %s is already present in use", user.getEmail()));
+            throw new PreconditionFailedException(String.format("The email %s is already in use", user.getEmail()));
         }
     }
 

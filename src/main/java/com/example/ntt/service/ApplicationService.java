@@ -1,10 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.*;
-import com.example.ntt.model.Message;
-import com.example.ntt.model.Post;
-import com.example.ntt.model.User;
-import com.example.ntt.model.UserCountPerCity;
+import com.example.ntt.model.*;
 import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import lombok.RequiredArgsConstructor;

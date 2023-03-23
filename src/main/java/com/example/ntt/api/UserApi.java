@@ -5,9 +5,6 @@ import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.dto.UsernameOnlyDTO;
-import com.example.ntt.model.UpdatedUser;
-import com.example.ntt.model.User;
-import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +16,17 @@ import java.util.Set;
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/v1")
 public interface UserApi {
+
+    //-- [INIZIO] Interfaccia di proiezione e utilizzo dei DTO --//
+    @GetMapping(value = "/contactInfo")
+    ResponseEntity<UserContactInfoProjection> getContactInformation(@RequestBody UsernameOnlyDTO username);
+
+    @PostMapping(value = "/userEmailAndGender")
+    ResponseEntity<EmailGenderOnlyDTO> getUserEmailAndGender(@RequestBody UsernameOnlyDTO username);
+
+    //TODO: approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
+    @GetMapping(value = "/friendsListAndRequest")
+    ResponseEntity<UserFriendsAndRequestReceivedList> getFriendListAndRequestReceived(@RequestBody UsernameOnlyDTO username);
 
     @GetMapping(value = "/friends")
     ResponseEntity<Set<User>> findUserFriendsById(@RequestBody UserIdDTO userId);
