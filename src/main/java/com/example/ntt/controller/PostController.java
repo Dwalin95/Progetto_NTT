@@ -35,7 +35,7 @@ public class PostController implements PostApi {
     }
 
     @Override
-    public ResponseEntity<List<Post>> findAllFriendsPost(@RequestBody UserIdDTO userId) {
+    public ResponseEntity<List<Post>> findAllFriendsPosts(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findAllFriendsPosts(userId));
     }
 

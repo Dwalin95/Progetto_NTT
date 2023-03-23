@@ -1,6 +1,7 @@
 package com.example.ntt.configuration;
 
 import com.example.ntt.dto.UserAuthDTO;
+import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
@@ -9,10 +10,11 @@ import com.example.ntt.service.MongoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Optional;
 
 @Configuration
@@ -42,6 +44,17 @@ public class UserConfiguration {
         }
     }
 
+    public boolean isImage(String imageUrl){
+        Image image = new ImageIcon(imageUrl).getImage();
+        return image.getWidth(null) != -1;
+    }
+
+    //TODO: metodo alternativo per fare il check dell'url decidere quale usare - LDB
+   /* public boolean isImage(String imageUrl) throws IOException {
+        Image image = ImageIO.read(new URL(imageUrl));
+        return image != null;
+    }*/
+
     public boolean emailExists(String email) {
         return mongoService.findUserByEmail(email).isPresent();
     }
@@ -56,21 +69,25 @@ public class UserConfiguration {
                 .map(mongoService::saveUser);
     }
 
-    //TODO: LDB - trovare il modo di togliere gli if
+    //TODO: LDB - trovare il modo di togliere gli if lo so che è brutto
     private User validatePasswordAndEmail(User user) {
         if(emailExists(user.getEmail())){
             if(usernameExists(user.getUsername())){
-                if(validatePassword(user.getPassword()) && validateEmail(user.getEmail())){
-                    user.setPassword(passwordEncoder().encode(user.getPassword()));
-                    return user;
+                if(isImage(user.getProfilePicUrl())){
+                    if(validatePassword(user.getPassword()) && validateEmail(user.getEmail())){
+                        user.setPassword(passwordEncoder().encode(user.getPassword()));
+                        return user;
+                    } else {
+                        throw new UnauthorizedException(ErrorMsg.ACCESS_DENIED.getMsg());
+                    }
                 } else {
-                    throw new UnauthorizedException("Access denied");
+                    throw new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg());
                 }
             } else {
-                throw new PreconditionFailedException(String.format("The username %s is already in use", user.getUsername()));
+                throw new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), user.getUsername()));
             }
         } else {
-            throw new PreconditionFailedException(String.format("The email %s is already in use", user.getEmail()));
+            throw new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), user.getEmail()));
         }
     }
 
