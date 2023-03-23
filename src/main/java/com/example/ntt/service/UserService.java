@@ -84,22 +84,26 @@ public class UserService {
                         .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
     //TODO: DTO - FC
-    //TODO: trovare il modo di togliere tutti gli if - LDB
+    //TODO: trovare il modo di togliere tutti gli if lo so che è brutto - LDB
     public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023 - FC
         return mongoService.findUserById(userInfo.getId())
                 .map(u -> {
                     mongoService.saveUser(u.withFirstName(userInfo.getFirstName()))
                             .withLastName(String.valueOf(userInfo.getLastName()))
-                            .withGender(userInfo.getGender())
-                            .withProfilePicUrl(userInfo.getProfilePicUrl());
+                            .withGender(userInfo.getGender());
 
+                    if(userConfiguration.isImage(userInfo.getProfilePicUrl())){
+                        mongoService.saveUser(u.withProfilePicUrl(userInfo.getProfilePicUrl()));
+                    } else {
+                        throw new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg());
+                    }
                     if(userConfiguration.usernameExists(userInfo.getUsername())){
-                        throw new PreconditionFailedException(String.format("The username %s is already present in use", userInfo.getUsername()));
+                        throw new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), userInfo.getUsername()));
                     } else {
                         mongoService.saveUser(u.withUsername(userInfo.getUsername()));
                     }
                     if(userConfiguration.emailExists(userInfo.getEmail())){
-                        throw new PreconditionFailedException(String.format("The email %s is already present in use", userInfo.getEmail()));
+                        throw new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), userInfo.getEmail()));
                     } else {
                         mongoService.saveUser(u.withEmail(String.valueOf(userInfo.getEmail())));
                     }
