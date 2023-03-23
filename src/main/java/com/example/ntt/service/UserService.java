@@ -84,8 +84,8 @@ public class UserService {
                         .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
     //TODO: DTO - FC
-    //TODO: LDB - trovare il modo di togliere tutti gli if
-    public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023
+    //TODO: trovare il modo di togliere tutti gli if - LDB
+    public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023 - FC
         return mongoService.findUserById(userInfo.getId())
                 .map(u -> {
                     mongoService.saveUser(u.withFirstName(userInfo.getFirstName()))

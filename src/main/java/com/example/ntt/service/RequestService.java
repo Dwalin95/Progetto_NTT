@@ -57,7 +57,7 @@ public class RequestService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), id)));
     }
 
-    //TODO: da ritrasformare perchè l'altro non funzionava
+    //TODO: da ritrasformare perchè l'altro non funzionava - LDB
     public void handleFriendRequest(FriendRequestDTO friendRequest){
         User user = mongoService.findUserById(friendRequest.getCurrentUserId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), friendRequest.getCurrentUserId())));

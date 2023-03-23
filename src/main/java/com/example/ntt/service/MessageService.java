@@ -38,12 +38,14 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
+    //TODO: DTO - FC
     public List<Message> findMessageByTextGlobal(String currentUserId, String text){
         return mongoService.findUserById(currentUserId)
                 .map(u -> mongoService.findMessageByTextGlobalAggregation(u.get_id(), text))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
     }
 
+    //TODO: DTO - FC
     public List<Message> findMessageByTextPerFriend(String currentUserId, String friendId, String text){
         List<Message> chat = new ArrayList<>();
         chat.addAll(mongoService.findMessageByTextPerFriendBySideAggregation(currentUserId, currentUserId, friendId, text));
@@ -52,7 +54,7 @@ public class MessageService {
                 .sorted(Comparator.comparing(Message::getTimestamp)).collect(Collectors.toList());
     }
 
-    //TODO: Aggiungi MessageSentIdsDTO messageSent
+    //TODO: Aggiungi MessageSentIdsDTO messageSent - FC
     public void deleteSentMessage(MessageSentIdsDTO messageSent){
         if(this.compareDatesForTimeLimit(messageSent.getCurrentUserId(), messageSent.getMessageId())) {
             this.deleteMessageAndSaveUser(messageSent.getCurrentUserId(), messageSent.getMessageId());
@@ -78,8 +80,8 @@ public class MessageService {
         return now.after(dateOfTheMessage);
     }
 
-    //TODO: aggiungi DTO MessageIdsDTO deleteMessage
-    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){ //TODO: vedere con Pier il metodo [passaggio del DTO]
+    //TODO: aggiungi DTO MessageIdsDTO deleteMessage - FC
+    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){ //TODO: vedere con Pier il metodo [passaggio del DTO] - FC
         this.deleteMessageAndSaveUser(deleteMessage.getCurrentUserId(), deleteMessage.getMessageId());
     }
 
@@ -97,7 +99,7 @@ public class MessageService {
         return u;
     }
 
-    //TODO: aggiungi CurrentUserIdAndFriendIdDTO userIds
+    //TODO: aggiungi CurrentUserIdAndFriendIdDTO userIds - FC
     public void deleteChat(CurrentUserIdAndFriendIdDTO userIds){
         mongoService.findUserById(userIds.getCurrentUserId())
                 .map(u -> this.handleRemoveChat(userIds.getFriendId(), u))

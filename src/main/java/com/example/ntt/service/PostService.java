@@ -19,6 +19,7 @@ public class PostService {
 
     private final MongoService mongoService;
 
+    //TODO: DTO - FC
     public void createPost(String id, Post post){
         mongoService.findUserById(id)
                 .map(user -> addPost(post, user))
@@ -33,6 +34,7 @@ public class PostService {
         return user;
     }
 
+    //TODO: DTO - FC
     public void deletePost(String currentUserId, String postId){
         mongoService.findUserById(currentUserId)
                 .map(user -> removePost(postId, user))
@@ -46,13 +48,13 @@ public class PostService {
         return user;
     }
 
+    //TODO: DTO - FC
     public void updatePost(String currentUserId, String postId, UpdatedPost updatedPost){
         mongoService.findUserById(currentUserId)
                 .map(u -> handleUpdatePost(postId, updatedPost, u))
                 .map(mongoService::saveUser)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
     }
-    //TODO: DTO - FC
     private User handleUpdatePost(String postId, UpdatedPost updatedPost, User u) {
         List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(u.get_id(), postId);
         posts.add(mongoService.updatedPost(u.get_id(), postId, updatedPost.getTitle(), updatedPost.getBody()));
@@ -60,7 +62,7 @@ public class PostService {
         return u;
     }
 
-    //TODO: da testare
+    //TODO: da testare - LDB
     public List<Post> findAllFriendsPosts(UserIdDTO userId){
         Set<User> friends = mongoService.findUserById(userId.getId())
                         .map(u -> mongoService.findUserFriendsById(u.getFriends()))
