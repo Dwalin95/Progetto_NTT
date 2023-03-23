@@ -2,9 +2,9 @@ package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.*;
+import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
-import com.example.ntt.model.UpdatedUser;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
@@ -87,20 +87,20 @@ public class UserService {
     public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023
         return mongoService.findUserById(userInfo.getId())
                 .map(u -> {
-                    mongoService.saveUser(u.withFirstName(updatedUser.getFirstName().orElse(u.getFirstName()))
-                            .withLastName(String.valueOf(updatedUser.getLastName().orElse(u.getLastName())))
-                            .withGender(updatedUser.getGender().orElse(u.getGender())))
-                            .withProfilePicUrl(updatedUser.getProfilePicUrl().orElse(u.getProfilePicUrl()));
+                    mongoService.saveUser(u.withFirstName(userInfo.getFirstName()))
+                            .withLastName(String.valueOf(userInfo.getLastName()))
+                            .withGender(userInfo.getGender())
+                            .withProfilePicUrl(userInfo.getProfilePicUrl());
 
-                    if(userConfiguration.usernameExists(updatedUser.getUsername().orElse(null))){
-                        throw new PreconditionFailedException(String.format("The username %s is already present in use", updatedUser.getUsername()));
+                    if(userConfiguration.usernameExists(userInfo.getUsername())){
+                        throw new PreconditionFailedException(String.format("The username %s is already present in use", userInfo.getUsername()));
                     } else {
-                        mongoService.saveUser(u.withUsername(updatedUser.getUsername().orElse(u.getUsername())));
+                        mongoService.saveUser(u.withUsername(userInfo.getUsername()));
                     }
-                    if(userConfiguration.emailExists(updatedUser.getEmail().orElse(null))){
-                        throw new PreconditionFailedException(String.format("The email %s is already present in use", updatedUser.getEmail()));
+                    if(userConfiguration.emailExists(userInfo.getEmail())){
+                        throw new PreconditionFailedException(String.format("The email %s is already present in use", userInfo.getEmail()));
                     } else {
-                        mongoService.saveUser(u.withEmail(String.valueOf(updatedUser.getEmail().orElse(u.getEmail()))));
+                        mongoService.saveUser(u.withEmail(String.valueOf(userInfo.getEmail())));
                     }
                     return u;
                 }).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userInfo.getId())));

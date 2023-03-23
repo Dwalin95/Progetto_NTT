@@ -1,5 +1,6 @@
-package com.example.api;
+package com.example.ntt.api;
 
+import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
 import org.springframework.http.ResponseEntity;

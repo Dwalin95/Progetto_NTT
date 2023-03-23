@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -37,32 +36,23 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(applicationService.getUserContactInfo(username.getUsername()));
     }
 
-    @PostMapping(value = "/userEmailAndGender")
-    public ResponseEntity<EmailGenderOnlyDTO> getUserEmailAndGender(@RequestBody UsernameOnlyDTO username) {
+    @Override
+    public ResponseEntity<EmailGenderOnlyDTO> getUserEmailAndGender(UsernameOnlyDTO username) {
         return ResponseEntity.ok(applicationService.getUserEmailAndGender(username.getUsername()));
     }
 
     //TODO: approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
     @Override
-    public ResponseEntity<UserFriendsAndRequestReceivedList> getFriendListAndRequestReceived(@RequestBody UsernameOnlyDTO username) {
+    public ResponseEntity<UserFriendsAndRequestReceivedList> getFriendListAndRequestReceived(UsernameOnlyDTO username) {
         return ResponseEntity.ok(applicationService.getFriendsAndRequestReceived(username.getUsername()));
     }
 
-    /**
-     * Post
-     * Passi come Body
-     * DTO all'andata [Username]
-     * 1. Interfaccia di ritorno [Nome, Cognome, Email, Gender]
-     * 2. DTO di ritorno in un secondo metodo [Email e Gender]
-     * 3. Interfaccia di ritorno [friends e receivedFriendRequests]
-     */
+    //-- [FINE] Interfaccia di proiezione e utilizzo dei DTO --//
+    //-- [Inizio] Aggiungi commento --//
 
-//-- [FINE] Interfaccia di proiezione e utilizzo dei DTO --//
-//-- [Inizio] Aggiungi commento --//
+    //    @PostMapping(value="/{id}")
 
-//    @PostMapping(value="/{id}")
-
-//-- [FINE] Aggiungi commento --//
+    //-- [FINE] Aggiungi commento --//
 
     @Override
     public ResponseEntity<Set<User>> findUserFriendsById(UserIdDTO userId) {
@@ -124,4 +114,5 @@ public class UserController implements UserApi {
     public void deleteUserById(UserIdDTO userId) {
         mongoService.deleteUserById(userId);
     }
+
 }

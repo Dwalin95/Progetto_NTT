@@ -59,12 +59,12 @@ public class MessageService {
     }
 
     //TODO: Aggiungi MessageSentIdsDTO messageSent
-    public void deleteSentMessage(String currentUserId, String friendId, String messageId){
-        if(this.compareDatesForTimeLimit(currentUserId, messageId)) {
-            this.deleteMessageAndSaveUser(currentUserId, messageId);
-            this.deleteMessageAndSaveUser(friendId, messageId);
+    public void deleteSentMessage(MessageSentIdsDTO messageSent){
+        if(this.compareDatesForTimeLimit(messageSent.getCurrentUserId(), messageSent.getMessageId())) {
+            this.deleteMessageAndSaveUser(messageSent.getCurrentUserId(), messageSent.getMessageId());
+            this.deleteMessageAndSaveUser(messageSent.getFriendId(), messageSent.getMessageId());
         } else {
-            this.deleteMessageAndSaveUser(currentUserId, messageId);
+            this.deleteMessageAndSaveUser(messageSent.getCurrentUserId(), messageSent.getMessageId());
             throw new PreconditionFailedException("Messages sent more than an hour ago cannot be deleted for both users, it was deleted only for you");
         }
     }
@@ -85,8 +85,8 @@ public class MessageService {
     }
 
     //TODO: aggiungi DTO MessageIdsDTO deleteMessage
-    public void deleteReceivedMessage(String currentUserId, String messageId){
-        this.deleteMessageAndSaveUser(currentUserId, messageId);
+    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){ //TODO: vedere con Pier il metodo [passaggio del DTO]
+        this.deleteMessageAndSaveUser(deleteMessage.getCurrentUserId(), deleteMessage.getMessageId());
     }
 
 
@@ -104,10 +104,10 @@ public class MessageService {
     }
 
     //TODO: aggiungi CurrentUserIdAndFriendIdDTO userIds
-    public void deleteChat(String currentUserId, String friendId){
-        mongoService.findUserById(currentUserId)
-                .map(u -> this.handleRemoveChat(friendId, u))
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+    public void deleteChat(CurrentUserIdAndFriendIdDTO userIds){
+        mongoService.findUserById(userIds.getCurrentUserId())
+                .map(u -> this.handleRemoveChat(userIds.getFriendId(), u))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userIds.getCurrentUserId())));
     }
 
     private User handleRemoveChat(String friendId, User u) {
@@ -141,9 +141,9 @@ public class MessageService {
                     .timestamp(new Date())
                     .build();
 
-            mongoService.findUserById(currentUserId)
+            mongoService.findUserById(messageToSend.getCurrentUserId())
                     .map(u -> this.addMessage(message, u))
-                    .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+                    .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, messageToSend.getCurrentUserId())));
             this.addMessage(message, messageReceiver);
         } else {
             throw new UnauthorizedException("You can only send messages between friends");

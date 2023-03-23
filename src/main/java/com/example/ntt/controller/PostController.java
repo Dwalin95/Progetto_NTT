@@ -27,13 +27,15 @@ public class PostController implements PostApi {
         applicationService.deletePost(currentUserId, postId);
     }
 
+    //TODO: DTO - FC
+    @Override
+    public void updatePost(String currentUserId, String postId, UpdatedPost updatedPost) {
+        applicationService.updatePost(currentUserId, postId, updatedPost);
+    }
+
     @Override
     public ResponseEntity<List<Post>> findAllFriendsPost(@RequestBody UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findAllFriendsPosts(userId));
     }
 
-    @Override
-    public ResponseEntity<List<Post>> findAllFriendsPost(String currentUserId) {
-        return ResponseEntity.ok(applicationService.findAllFriendsPosts(currentUserId));
-    }
 }
