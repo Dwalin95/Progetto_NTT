@@ -1,5 +1,6 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.PostDTO;
 import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
@@ -19,7 +20,8 @@ public class PostService {
 
     private final MongoService mongoService;
 
-    public void createPost(String id, Post post){
+
+    public void createPost(PostDTO post){
 //        mongoService.findUserById(id)
 //                .map(user -> addPost(post, user))
 //                .map(mongoService::saveUser)

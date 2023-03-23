@@ -11,10 +11,10 @@ import java.util.Set;
 @RequestMapping("/api/v1")
 public interface MessageApi {
 
-    @GetMapping(value = "/{currentUserId}/messages")
+    @GetMapping(value = "/{currentUserId}/chats")
     ResponseEntity<List<Message>> findMessageByTextGlobal(@PathVariable String currentUserId, @RequestParam String text);
 
-    @GetMapping(value = "/{currentUserId}/messages/{friendId}")
+    @GetMapping(value = "/{currentUserId}/chats/{friendId}")
     ResponseEntity<List<Message>> findMessageByTextPerFriend(@PathVariable String currentUserId, @PathVariable String friendId, @RequestParam String text);
 
     /**

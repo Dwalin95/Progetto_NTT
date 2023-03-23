@@ -40,7 +40,7 @@ public interface UserApi {
     @GetMapping(value = "/friendsPerCity")
     ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@RequestBody UserIdDTO userId);
 
-    @PutMapping(value = "/user") //Put = "update" -> /user
+    @PutMapping(produces="application/json",value = "/user") //Put = "update" -> /user
     ResponseEntity<User> updateUserById(@RequestBody UserInfoWithIdDTO userInfo); //
 
     @PutMapping(value = "/friend") //TODO: Put o Delete?
@@ -49,7 +49,7 @@ public interface UserApi {
     @GetMapping(value = "/users")
     ResponseEntity<List<User>> findAllUsers();
 
-    @GetMapping(value = "/signin") //TODO: cambiare l'endpoint in user/signin?
+    @PostMapping(value = "/signin") //TODO: cambiare l'endpoint in user/signin?
     ResponseEntity<User> login(@RequestBody UserAuthDTO credentials);
 
     @PostMapping(value = "/signup") //TODO: cambiare l'endpoint in user/signup?

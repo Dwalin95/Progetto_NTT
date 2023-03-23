@@ -42,13 +42,13 @@ public class UserService {
 
     public User updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
         return mongoService.findUserById(newUserPassword.getId())
-                        .map(user -> this.doesNotMatch(newUserPassword.getOldPassword(), user))
-                        .map(user -> this.match(newUserPassword.getOldPassword(), user))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), newUserPassword.getId())));
+                .map(user -> this.doesNotMatch(newUserPassword.getOldPassword(), user))
+                .map(user -> this.match(newUserPassword.getOldPassword(), user))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), newUserPassword.getId())));
     }
 
     private User match(String confirmedPassword, User user) {
-        if(!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPassword())){
+        if (!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPassword())) {
             user.setPassword(userConfiguration.passwordEncoder().encode(confirmedPassword));
             mongoService.saveUser(user);
             return user;
@@ -58,7 +58,7 @@ public class UserService {
     }
 
     private User doesNotMatch(String oldPassword, User user) {
-        if(userConfiguration.passwordEncoder().matches(oldPassword, user.getPassword())){
+        if (userConfiguration.passwordEncoder().matches(oldPassword, user.getPassword())) {
             return user;
         } else {
             throw new ResourceNotFoundException(ErrorMsg.NO_MATCH_OLD_PSW.getMsg());
@@ -72,57 +72,64 @@ public class UserService {
 
     public Set<User> findFriendsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
-                        .map(u -> mongoService.findUserFriendsById(u.getFriends()))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
-                        .orElse(new HashSet<>());
+                .map(u -> mongoService.findUserFriendsById(u.getFriends()))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
+                .orElse(new HashSet<>());
     }
 
     public Set<UserCountPerCity> friendsCountPerCity(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
-                        .map(User::getFriends)
-                        .map(mongoService::countFriendsPerCityAggregation)
-                        .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
+                .map(User::getFriends)
+                .map(mongoService::countFriendsPerCityAggregation)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
+
     //TODO: DTO - FC
-    //TODO: prima era pieno di if ma si può migliorare - LDB
+    //TODO: Da migliorare, rimessi gli optional
     public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023 - FC
         return mongoService.findUserById(userInfo.getId())
-                .map(u -> {
-                    mongoService.saveUser(u.withFirstName(userInfo.getFirstName()))
-                            .withLastName(String.valueOf(userInfo.getLastName()))
-                            .withGender(userInfo.getGender());
-
-                    this.handleUpdateException(userConfiguration.isImage(userInfo.getProfilePicUrl()),
-                                                new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()),
-                                                u.withProfilePicUrl(userInfo.getProfilePicUrl()));
-                    this.handleUpdateException(userConfiguration.usernameExists(userInfo.getUsername()),
-                                                new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), userInfo.getUsername())),
-                                                u.withUsername(userInfo.getUsername()));
-                    this.handleUpdateException(userConfiguration.emailExists(userInfo.getEmail()),
-                                                new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), userInfo.getEmail())),
-                                                u.withEmail(String.valueOf(userInfo.getEmail())));
-                    return u;
-                }).orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userInfo.getId())));
+                .map(u -> this.handleException(userInfo, u))
+                .map(u -> this.saveUpdatedUser(userInfo, u))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userInfo.getId())));
     }
 
-    public void handleUpdateException(boolean check, RuntimeException exception, User user){
-        if(check){
-            mongoService.saveUser(user);
-        } else {
+    private User saveUpdatedUser(UserInfoWithIdDTO userInfo, User u) {
+        mongoService.saveUser(u.withFirstName(userInfo.getFirstName().orElse(u.getFirstName()))
+                .withUsername(userInfo.getUsername().orElse(u.getUsername()))
+                .withLastName(userInfo.getLastName().orElse(u.getLastName()))
+                .withEmail(userInfo.getEmail().orElse(u.getEmail()))
+                .withGender(userInfo.getGender().orElse(u.getGender()))
+                .withProfilePicUrl(userInfo.getProfilePicUrl().orElse(u.getProfilePicUrl())));
+
+        return u;
+    }
+
+    private User handleException(UserInfoWithIdDTO userInfo, User user) {
+        this.handleUpdateException(userInfo.getProfilePicUrl().isPresent() && userConfiguration.isImage(userInfo.getProfilePicUrl().get()),
+                new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
+        this.handleUpdateException(userInfo.getUsername().isPresent() && userConfiguration.usernameExists(userInfo.getUsername().get()),
+                new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), userInfo.getUsername())));
+        this.handleUpdateException(userInfo.getEmail().isPresent() && userConfiguration.emailExists(userInfo.getEmail().get()),
+                new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), userInfo.getEmail())));
+        return user;
+    }
+
+    private void handleUpdateException(boolean check, RuntimeException exception) {
+        if (check) {
             throw exception;
         }
     }
 
-    public void removeFriend(CurrentUserIdAndFriendIdDTO userIds){
+    public void removeFriend(CurrentUserIdAndFriendIdDTO userIds) {
         this.handleRemoveFriend(userIds.getCurrentUserId(), userIds.getFriendId());
         this.handleRemoveFriend(userIds.getFriendId(), userIds.getCurrentUserId());
     }
 
     private void handleRemoveFriend(String currentUserId, String friendUserId) {
         mongoService.findUserById(currentUserId)
-                    .map(currentUser -> this.removeFriendFromList(friendUserId, currentUser))
-                    .map(mongoService::saveUser)
-                    .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
+                .map(currentUser -> this.removeFriendFromList(friendUserId, currentUser))
+                .map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
     }
 
     private User removeFriendFromList(String friendUserId, User user) {
