@@ -85,7 +85,7 @@ public class MessageService {
     }
 
     //TODO: aggiungi DTO MessageIdsDTO deleteMessage
-    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){ //TODO: vedere con Pier il metodo [passaggio del DTO]
+    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){
         this.deleteMessageAndSaveUser(deleteMessage.getCurrentUserId(), deleteMessage.getMessageId());
     }
 

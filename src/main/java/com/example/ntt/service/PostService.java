@@ -1,5 +1,6 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.PostDTO;
 import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Post;
@@ -19,11 +20,11 @@ public class PostService {
     private final MongoService mongoService;
     private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
-    public void createPost(String id, Post post){
-        mongoService.findUserById(id)
-                .map(user -> addPost(post, user))
-                .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+    public void createPost(PostDTO post){
+//        mongoService.findUserById(post.getCurrentUserId())
+//                .map(user -> addPost(post, user))
+//                .map(mongoService::saveUser)
+//                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
     }
 
     private User addPost(Post post, User user) {
@@ -32,6 +33,12 @@ public class PostService {
         user.getPosts().add(post);
         return user;
     }
+//    private User addPost(Post post, User user) {
+//        post.with_id(new ObjectId())
+//            .withTimestamp(new Date());
+//        user.getPosts().add(post);
+//        return user;
+//    }
 
     public void deletePost(String currentUserId, String postId){
         mongoService.findUserById(currentUserId)
