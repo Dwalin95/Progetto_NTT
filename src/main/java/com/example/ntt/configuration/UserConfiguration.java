@@ -24,7 +24,6 @@ public class UserConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    //TODO: da trasformare in funzionale
     public User checkLogin(String email, String psw) {
         if (emailExists(email)) {
             User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));

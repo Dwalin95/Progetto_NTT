@@ -83,6 +83,7 @@ public class UserService {
     }
 
     //TODO: capire perchè email e lastname non gli piacciono
+    //TODO: implementare check emailExists
     public User updateUserById(String id, UpdatedUser updatedUser) {
         return mongoService.findUserById(id)
                 .map(u -> {

@@ -1,6 +1,5 @@
 package com.example.ntt.repository;
 
-import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -8,7 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,7 +30,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     )
     Set<UserCountPerCity> countUsersPerCity();
 
-    //TODO da ricontrollare
     @Aggregation(
             pipeline = {"{$match: {'_id': {$in: ?0}}}", "{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}
     )

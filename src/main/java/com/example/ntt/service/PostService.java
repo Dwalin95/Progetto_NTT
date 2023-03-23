@@ -4,7 +4,6 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
 import com.example.ntt.model.User;
-import com.example.ntt.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -33,16 +32,15 @@ public class PostService {
         return user;
     }
 
-    //TODO: LDB - provare a cancellare il post
-    public void deletePost(String id, String postId){
-        mongoService.findUserById(id)
-                .map(user -> removePost(id, postId, user))
+    public void deletePost(String currentUserId, String postId){
+        mongoService.findUserById(currentUserId)
+                .map(user -> removePost(postId, user))
                 .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
     }
 
-    private User removePost(String id, String postId, User user) {
-        List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(id, postId);
+    private User removePost(String postId, User user) {
+        List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(user.get_id(), postId);
         user.setPosts(posts);
         return user;
     }
@@ -62,11 +60,12 @@ public class PostService {
     }
 
     //TODO: LDB - da testare
-    public List<Post> findAllFriendsPosts(String id){
-        Set<User> friends = mongoService.findUserById(id)
+    public List<Post> findAllFriendsPosts(String currentUserId){
+        Set<User> friends = mongoService.findUserById(currentUserId)
                         .map(u -> mongoService.findUserFriendsById(u.getFriends()))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format("No friends found", id)));
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)))
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format("No friends found", currentUserId)));
+
         return mongoService.findAllPostsByArrayAggregation(friends).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());
