@@ -1,6 +1,6 @@
 package com.example.ntt.service;
 
-import com.example.ntt.dto.EmailGenderOnlyDTO;
+import com.example.ntt.dto.*;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
@@ -9,9 +9,10 @@ import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -28,8 +29,8 @@ public class ApplicationService {
         return userService.getUserContactInfo(username);
     }
     //DTO
-    public EmailGenderOnlyDTO getEmailGenderOnly(String username) {
-        return userService.getUserEmailGender(username);
+    public EmailGenderOnlyDTO getUserEmailAndGender(String username) {
+        return userService.getUserEmailAndGender(username);
     }
 
     //Projection
@@ -37,70 +38,70 @@ public class ApplicationService {
         return userService.getFriendsAndRequestReceived(username);
     }
 
-    public User updatePasswordById(String id, String oldPassword, String confirmedPassword){
-        return userService.updatePasswordById(id, oldPassword, confirmedPassword);
+    public User updatePasswordById(UserUpdatePasswordDTO newUserPassword){
+        return userService.updatePasswordById(newUserPassword);
     }
 
-    public User findUserById(String id){
-        return userService.findUserById(id);
+    public User findUserById(UserIdDTO userId){
+        return userService.findUserById(userId);
     }
 
-    public Set<User> findFriendsById(String id){
-        return userService.findFriendsById(id);
+    public Set<User> findFriendsById(UserIdDTO userId){
+        return userService.findFriendsById(userId);
     }
 
-    public Set<UserCountPerCity> friendsCountPerCity(String id){
-        return userService.friendsCountPerCity(id);
+    public Set<UserCountPerCity> friendsCountPerCity(UserIdDTO userId){
+        return userService.friendsCountPerCity(userId);
     }
 
-    public User updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender){
-        return userService.updateUserById(id, username, firstName, lastName, email, gender);
-    }
-
-
-    public void removeFriend(String currentUserId, String friendUserId){
-        userService.removeFriend(currentUserId, friendUserId);
+    public User updateUserById(UserInfoWithIdDTO userInfo){
+        return userService.updateUserById(userInfo);
     }
 
 
-    public Set<String> findAllMessageSenders(String id){
-        return messageService.findAllMessageSenders(id);
+    public void removeFriend(CurrentUserIdAndFriendIdDTO userIds){
+        userService.removeFriend(userIds);
     }
 
-    public List<Message> findMessagesByFriendIds(String id, String friendId){
-        return messageService.findMessagesByFriendIds(id, friendId);
+
+    public Set<String> findAllMessageSenders(UserIdDTO userId){
+        return messageService.findAllMessageSenders(userId);
     }
 
-    public void deleteSentMessage(String id, String friendId, String messageId){
-        messageService.deleteSentMessage(id, friendId, messageId);
+    public List<Message> findMessagesByFriendIds(CurrentUserIdAndFriendIdDTO userIds){
+        return messageService.findMessagesByFriendIds(userIds);
     }
 
-    public void deleteReceivedMessage(String id, String messageId){
-        messageService.deleteReceivedMessage(id, messageId);
+    public void deleteSentMessage(MessageSentIdsDTO messageSent){
+        messageService.deleteSentMessage(messageSent);
     }
 
-    public void deleteChat(String id, String friendId){
-        messageService.deleteChat(id, friendId);
+    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){
+        messageService.deleteReceivedMessage(deleteMessage);
     }
 
-    public void sendMessage(String id, String friendId, String body){
-        messageService.sendMessage(id, friendId, body);
+    public void deleteChat(CurrentUserIdAndFriendIdDTO userIds){
+        messageService.deleteChat(userIds);
     }
 
-    public Set<User> findUserReceivedFriendRequestsById(String id){
-        return requestService.findUserReceivedFriendRequestsById(id);
+    public void sendMessage(MessageToSendIdsAndBodyDTO messageToSend){
+        messageService.sendMessage(messageToSend);
     }
 
-    public Set<User> findUserSentFriendRequestById(String currentUserId){
+    public Set<User> findUserReceivedFriendRequestsById(UserIdDTO userId){
+        return requestService.findUserReceivedFriendRequestsById(userId);
+    }
+
+    public Set<User> findUserSentFriendRequestById(UserIdDTO currentUserId){
         return requestService.findUserSentFriendRequestById(currentUserId);
     }
 
-    public void sendFriendRequest(String id, String friendId){
-        requestService.sendFriendRequest(id, friendId);
+    public void sendFriendRequest(CurrentUserIdAndFriendIdDTO userIds){
+        requestService.sendFriendRequest(userIds);
     }
 
-    public void handleFriendRequest(String id, String friendId, boolean accepted){
-        requestService.handleFriendRequest(id, friendId, accepted);
+    public void handleFriendRequest(FriendRequestDTO friendRequest){
+        requestService.handleFriendRequest(friendRequest);
     }
 
     public void createPost(String id, Post post){
@@ -111,8 +112,8 @@ public class ApplicationService {
         postService.deletePost(id, postId);
     }
 
-    public List<Post> findAllFriendsPosts(String id){
-        return postService.findAllFriendsPosts(id);
+    public List<Post> findAllFriendsPosts(UserIdDTO userId){
+        return postService.findAllFriendsPosts(userId);
     }
 
 

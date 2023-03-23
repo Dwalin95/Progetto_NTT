@@ -1,5 +1,6 @@
 package com.example.ntt.configuration;
 
+import com.example.ntt.dto.UserAuthDTO;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
@@ -25,17 +26,18 @@ public class UserConfiguration {
     }
 
     //TODO: da trasformare in funzionale
-    public User checkLogin(String email, String psw) {
-        if (emailExists(email)) {
-            User user = mongoService.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(String.format("Not users found with this email: %s", email)));
+    public User checkLogin(UserAuthDTO credentials) {
+        if (emailExists(credentials.getEmail())) {
+            User user = mongoService.findUserByEmail(credentials.getEmail())
+                    .orElseThrow(() -> new ResourceNotFoundException(String.format("No users found with this email: %s", credentials.getEmail())));
 
-            if (passwordEncoder().matches(psw, user.getPassword())) {
+            if (passwordEncoder().matches(credentials.getPassword(), user.getPassword())) {
                 return user;
             } else {
                 throw new UnauthorizedException("Password not valid");
             }
         } else {
-            throw new ResourceNotFoundException(String.format("Email: %s not found", email));
+            throw new ResourceNotFoundException(String.format("Email: %s not found", credentials.getEmail()));
         }
     }
 

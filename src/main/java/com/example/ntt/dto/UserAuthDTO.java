@@ -9,9 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailGenderOnlyDTO {
-    private String username;
+public class UserAuthDTO {
     private String email;
-    private String gender;
+    private String password;
 
 }

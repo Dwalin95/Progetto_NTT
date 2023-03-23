@@ -1,0 +1,35 @@
+/**
+     * [REST API Design Best Practices]
+     *
+     * - JSON Format for Sending and Receiving Data
+     * To ensure the client interprets JSON data correctly,
+     * you should set the Content-Type type in the response header to application/json while making the request.
+     *
+     * - Use Nouns Instead of Verbs in Endpoints
+     * The endpoints should use nouns, signifying what each of them does.
+     * This is because HTTP methods such as
+     * GET [read data], POST [create data], PUT [update data], and DELETE [delete data]
+     * are already in verb form for performing basic CRUD operations.
+     *
+     * - Name Collections with Plural Nouns
+     * You can think of the data of your API as a collection of different resources from your consumers.
+     * If you have an endpoint like https://localhost/post/123,
+     * it might be okay for deleting a post with a DELETE request or updating a post with PUT or PATCH request,
+     * but it doesn't tell the user that there could be some other posts in the collection.
+     * This is why your collections should use plural nouns.
+     * So, instead of https://localhost/post/123, it should be https://localhost/posts/123.
+     *
+     * - Use Status Codes in Error Handling
+     *
+     * - Use Nesting on Endpoints to Show Relationships
+     * Different endpoints can be interlinked, so you should nest them to improve readability.
+     * Example: case of a multi-user blogging platform, different posts could be written by different authors,
+     * so an endpoint such as /posts/author would make a valid nesting in this case;
+     *
+     * In the same vein, the posts might have their individual comments, so to retrieve the comments,
+     * an endpoint like /posts/postId/comments would make sense.
+     * You should avoid nesting that is more than 3 levels deep as this can make the API less elegant and readable.
+     *
+     * - best practice: https://www.freecodecamp.org/news/rest-api-best-practices-rest-endpoint-design-examples/
+     *
+*/

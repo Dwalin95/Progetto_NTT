@@ -1,9 +1,8 @@
 package com.example.ntt.controller;
 
-import com.example.api.UserApi;
+import com.example.ntt.api.UserApi;
 import com.example.ntt.configuration.UserConfiguration;
-import com.example.ntt.dto.EmailGenderOnlyDTO;
-import com.example.ntt.dto.UsernameOnlyDTO;
+import com.example.ntt.dto.*;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -39,8 +37,8 @@ public class UserController implements UserApi {
     }
 
     @PostMapping(value = "/userEmailAndGender")
-    public ResponseEntity<EmailGenderOnlyDTO> getEmailGenderOnly(@RequestBody UsernameOnlyDTO username) {
-        return ResponseEntity.ok(applicationService.getEmailGenderOnly(username.getUsername()));
+    public ResponseEntity<EmailGenderOnlyDTO> getUserEmailAndGender(@RequestBody UsernameOnlyDTO username) {
+        return ResponseEntity.ok(applicationService.getUserEmailAndGender(username.getUsername()));
     }
     //TODO: approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
     @PostMapping(value = "/friendListAndRequestReceived")
@@ -65,34 +63,35 @@ public class UserController implements UserApi {
 //-- [FINE] Aggiungi commento --//
 
     @Override
-    public ResponseEntity<Set<User>> findUserFriendsById(String id) {
-        return ResponseEntity.ok(applicationService.findFriendsById(id));
+    public ResponseEntity<Set<User>> findUserFriendsById(UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.findFriendsById(userId));
     }
 
     @Override
-    public ResponseEntity<User> findUserById(String id) {
-        return ResponseEntity.ok(applicationService.findUserById(id));
+    public ResponseEntity<User> findUserById(UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.findUserById(userId));
     }
 
     @Override
-    public ResponseEntity<User> updatePasswordById(String id, String oldPassword, String newPassword, String confirmPassword) {
-        return ResponseEntity.ok(applicationService.updatePasswordById(id, oldPassword, confirmPassword));
+    public ResponseEntity<User> updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
+        return ResponseEntity.ok(applicationService.updatePasswordById(newUserPassword));
 
     }
 
     @Override
-    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(String id) {
-        return ResponseEntity.ok(applicationService.friendsCountPerCity(id));
+    public ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.friendsCountPerCity(userId));
+    }
+
+    //DTO Attributes: id, username, firstName, lastName, email, gender
+    @Override
+    public ResponseEntity<User> updateUserById(UserInfoWithIdDTO userInfo) {
+        return ResponseEntity.ok(applicationService.updateUserById(userInfo));
     }
 
     @Override
-    public ResponseEntity<User> updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
-        return ResponseEntity.ok(applicationService.updateUserById(id, username, firstName, lastName, email, gender));
-    }
-
-    @Override
-    public void removeFriend(String id, String friendId) {
-        applicationService.removeFriend(id, friendId);
+    public void removeFriend(CurrentUserIdAndFriendIdDTO userIds) {
+        applicationService.removeFriend(userIds);
     }
 
     @Override
@@ -101,12 +100,12 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<User> login(String email, String password) {
+    public ResponseEntity<User> login(UserAuthDTO credentials) {
 
         URI uri = URI.create("http://localhost:3000");
         return ResponseEntity.created(uri)
                 .header("Access-Control-Allow-Origin","http://localhost:3000")
-                .body(userConfiguration.checkLogin(email, password));
+                .body(userConfiguration.checkLogin(credentials));
        /*
         return ResponseEntity.ok(userConfiguration.checkLogin(email, password))
                 .getHeaders()
@@ -120,7 +119,7 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public void deleteUserById(String id) {
-        mongoService.deleteUserById(id);
+    public void deleteUserById(UserIdDTO userId) {
+        mongoService.deleteUserById(userId);
     }
 }

@@ -1,7 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
-import com.example.ntt.dto.EmailGenderOnlyDTO;
+import com.example.ntt.dto.*;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
@@ -27,8 +27,8 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, username)));
     }
     //DTO
-    public EmailGenderOnlyDTO getUserEmailGender(String username) {
-        return mongoService.getUserEmailGender(username)
+    public EmailGenderOnlyDTO getUserEmailAndGender(String username) {
+        return mongoService.getUserEmailAndGender(username)
                 .orElseThrow(() -> new ResourceNotFoundException((String.format(USER_NOT_FOUND_ERROR_MSG, username))));
     }
     //Projection
@@ -38,11 +38,11 @@ public class UserService {
     }
 
 
-    public User updatePasswordById(String id, String oldPassword, String confirmedPassword) {
-        return mongoService.findUserById(id)
-                        .map(u -> this.doesNotMatch(oldPassword, u))
-                        .map(u -> this.match(confirmedPassword, u))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+    public User updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
+        return mongoService.findUserById(newUserPassword.getId())
+                        .map(user -> this.doesNotMatch(newUserPassword.getOldPassword(), user))
+                        .map(user -> this.match(newUserPassword.getOldPassword(), user))
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, newUserPassword.getId())));
     }
 
     private User match(String confirmedPassword, User user) {
@@ -63,39 +63,41 @@ public class UserService {
         }
     }
 
-    public User findUserById(String id) {
-        return mongoService.findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+    public User findUserById(UserIdDTO userId) {
+        return mongoService.findUserById(userId.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())));
     }
 
-    public Set<User> findFriendsById(String id) {
-        return mongoService.findUserById(id)
+    public Set<User> findFriendsById(UserIdDTO userId) {
+        return mongoService.findUserById(userId.getId())
                         .map(u -> mongoService.findUserFriendsById(u.getFriends()))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)))
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())))
                         .orElse(new HashSet<>());
     }
 
-    public Set<UserCountPerCity> friendsCountPerCity(String id) {
-        return mongoService.findUserById(id)
+    public Set<UserCountPerCity> friendsCountPerCity(UserIdDTO userId) {
+        return mongoService.findUserById(userId.getId())
                         .map(User::getFriends)
                         .map(mongoService::countFriendsPerCityAggregation)
                         .orElseThrow(() -> new ResourceNotFoundException("No friends found"));
     }
 
-    public User updateUserById(String id, Optional<String> username, Optional<String> firstName, Optional<String> lastName, Optional<String> email, Optional<String> gender) {
-        return mongoService.findUserById(id)
+    public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023
+        return mongoService.findUserById(userInfo.getId())
                 .map(u -> {
-                    mongoService.saveUser(u.withUsername(username.orElse(u.getUsername()))
-                            .withFirstName(firstName.orElse(u.getFirstName()))
-                            .withLastName(lastName.orElse(u.getLastName()))
-                            .withEmail(email.orElse(u.getEmail()))
-                            .withGender(gender.orElse(u.getGender())));
+                    mongoService.saveUser(
+                            u.withUsername(userInfo.getUsername())
+                            .withFirstName(userInfo.getFirstName())
+                            .withLastName(userInfo.getLastName())
+                            .withEmail(userInfo.getEmail())
+                            .withGender(userInfo.getGender()));
                     return u;
-                }).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+                }).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userInfo.getId())));
     }
 
-    public void removeFriend(String currentUserId, String friendUserId){
-        this.handleRemoveFriend(currentUserId, friendUserId);
-        this.handleRemoveFriend(friendUserId, currentUserId);
+    public void removeFriend(CurrentUserIdAndFriendIdDTO userIds){
+        this.handleRemoveFriend(userIds.getCurrentUserId(), userIds.getFriendId());
+        this.handleRemoveFriend(userIds.getFriendId(), userIds.getCurrentUserId());
     }
 
     private void handleRemoveFriend(String currentUserId, String friendUserId) {

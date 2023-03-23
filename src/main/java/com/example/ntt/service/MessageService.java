@@ -1,5 +1,6 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.*;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.Message;
@@ -9,10 +10,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
-import org.bson.conversions.Bson;
+//import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,23 +24,23 @@ public class MessageService {
     private final MongoClient mongoClient;
     private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found"; //TODO: spostare in un ENUM
 
-    public Set<String> findAllMessageSenders(String currentUserId){
-        List<Message> messages = mongoService.findUserById(currentUserId)
+    public Set<String> findAllMessageSenders(UserIdDTO userId){
+        List<Message> messages = mongoService.findUserById(userId.getId())
                 .map(u -> mongoService.findAllMessagesAggregation(u.get_id()))
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", currentUserId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with id: %s not found", userId.getId())));
         return messages.stream()
                 .map(Message::getSenderId)
                 .collect(Collectors.toSet());
     }
 
     //TODO: PERCHE' RITORNA NUUUUULLLL
-    public List<Message> findMessagesByFriendIds(String currentUserId, String friendId) {
-        User user = mongoService.findUserById(currentUserId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
-        User friend = mongoService.findUserById(friendId)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendId)));
+    public List<Message> findMessagesByFriendIds(CurrentUserIdAndFriendIdDTO userIds) {
+        User user = mongoService.findUserById(userIds.getCurrentUserId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userIds.getCurrentUserId())));
+        User friend = mongoService.findUserById(userIds.getFriendId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userIds.getFriendId())));
 
-        List<Message> messagesFromUser = mongoService.findChatAggregation(user.getUsername(), user.get_id(), friendId);
+        List<Message> messagesFromUser = mongoService.findChatAggregation(user.getUsername(), user.get_id(), userIds.getFriendId());
         List<Message> messagesToUser = mongoService.findChatAggregation(user.getUsername(), friend.get_id(), user.get_id());
 
         List<Message> chat = new ArrayList<>();
@@ -53,14 +53,14 @@ public class MessageService {
     }
 
     //TODO: non cancella il messaggio
-    public void deleteSentMessage(String currentUserId, String friendId, String messageId){
-        this.deleteMessageAndSaveUser(currentUserId, messageId);
-        this.deleteMessageAndSaveUser(friendId, messageId);
+    public void deleteSentMessage(MessageSentIdsDTO messageSent){
+        this.deleteMessageAndSaveUser(messageSent.getCurrentUserId(), messageSent.getMessageId());
+        this.deleteMessageAndSaveUser(messageSent.getFriendId(), messageSent.getMessageId());
     }
 
     //TODO: non cancella il messaggio
-    public void deleteReceivedMessage(String currentUserId, String messageId){
-        this.deleteMessageAndSaveUser(currentUserId, messageId);
+    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){
+        this.deleteMessageAndSaveUser(deleteMessage.getCurrentUserId(), deleteMessage.getMessageId());
     }
 
     private void deleteMessageAndSaveUser(String currentUserId, String messageId) {
@@ -96,11 +96,11 @@ public class MessageService {
     }
 
     //TODO: non cancella il messaggio
-    public void deleteChat(String currentUserId, String friendId){
-        mongoService.findUserById(currentUserId)
-                .map(u -> this.handleRemoveChat(friendId, u))
+    public void deleteChat(CurrentUserIdAndFriendIdDTO userIds){
+        mongoService.findUserById(userIds.getCurrentUserId())
+                .map(u -> this.handleRemoveChat(userIds.getFriendId(), u))
                 .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userIds.getCurrentUserId())));
     }
 
     private User handleRemoveChat(String friendId, User u) {
@@ -115,9 +115,11 @@ public class MessageService {
     }
 
     //TODO: da trasformare in funzionale
-    public void sendMessage(String currentUserId, String friendId, String body) {
-        User user = mongoService.findUserById(currentUserId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
-        User messageReceiver = mongoService.findUserById(friendId).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendId)));
+    public void sendMessage(MessageToSendIdsAndBodyDTO messageToSend) {
+        User user = mongoService.findUserById(messageToSend.getCurrentUserId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, messageToSend.getCurrentUserId())));
+        User messageReceiver = mongoService.findUserById(messageToSend.getFriendId())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, messageToSend.getFriendId())));
 
         Set<String> friends = messageReceiver.getFriends();
 
@@ -125,9 +127,9 @@ public class MessageService {
 
             Message message = Message.builder()
                     ._id(new ObjectId())
-                    .body(body)
-                    .receiverId(friendId)
-                    .senderId(currentUserId)
+                    .body(messageToSend.getBody())
+                    .receiverId(messageToSend.getFriendId())
+                    .senderId(messageToSend.getCurrentUserId())
                     .timestamp(new Date())
                     .build();
 

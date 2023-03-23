@@ -1,5 +1,6 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
@@ -50,11 +51,11 @@ public class PostService {
     }
 
     //TODO: da testare
-    public List<Post> findAllFriendsPosts(String id){
-        Set<User> friends = mongoService.findUserById(id)
+    public List<Post> findAllFriendsPosts(UserIdDTO userId){
+        Set<User> friends = mongoService.findUserById(userId.getId())
                         .map(u -> mongoService.findUserFriendsById(u.getFriends()))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format("No friends found", id)));
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())))
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format("No friends found", userId.getId())));
         return mongoService.findAllPostsByArrayAggregation(friends).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());

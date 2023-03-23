@@ -1,6 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.EmailGenderOnlyDTO;
+import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
@@ -28,7 +29,7 @@ public class MongoService {
         return this.userRepository.findByUsername(username, UserContactInfoProjection.class);
     }
 
-    public Optional<EmailGenderOnlyDTO> getUserEmailGender(String username) {
+    public Optional<EmailGenderOnlyDTO> getUserEmailAndGender(String username) {
         return this.userRepository.findByUsername(username, EmailGenderOnlyDTO.class);
     }
 
@@ -56,8 +57,8 @@ public class MongoService {
         return userRepository.save(user);
     }
 
-    public void deleteUserById(String id){
-        userRepository.deleteById(id);
+    public void deleteUserById(UserIdDTO userId){
+        userRepository.deleteById(userId.getId());
     }
 
     public void deleteUserByEmail(String email){

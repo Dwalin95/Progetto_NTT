@@ -1,6 +1,7 @@
 package com.example.ntt.controller;
 
-import com.example.api.MessageApi;
+import com.example.ntt.api.MessageApi;
+import com.example.ntt.dto.*;
 import com.example.ntt.model.Message;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;
@@ -16,30 +17,30 @@ public class MessageController implements MessageApi {
     private final ApplicationService applicationService;
 
     @Override
-    public ResponseEntity<Set<String>> findAllMessageSenders(@PathVariable String id) {
-        return ResponseEntity.ok(applicationService.findAllMessageSenders(id));
+    public ResponseEntity<Set<String>> findAllMessageSenders(@RequestBody UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.findAllMessageSenders(userId));
     }
 
     @Override
-    public ResponseEntity<List<Message>> findUserMessagesByFriendId(@PathVariable String id, @PathVariable String friendId) {
-        return ResponseEntity.ok(applicationService.findMessagesByFriendIds(id, friendId));
+    public ResponseEntity<List<Message>> userMessagesByFriendId(@RequestBody CurrentUserIdAndFriendIdDTO userIds) {
+        return ResponseEntity.ok(applicationService.findMessagesByFriendIds(userIds));
     }
 
     @Override
-    public void deleteSentMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String messageId) {
-        applicationService.deleteSentMessage(id, friendId, messageId);
+    public void deleteSentMessage(@RequestBody MessageSentIdsDTO messageSent) {
+        applicationService.deleteSentMessage(messageSent);
     }
     @Override
-    public void deleteReceivedMessage(@PathVariable String id, @RequestParam String messageId) {
-        applicationService.deleteReceivedMessage(id, messageId);
+    public void deleteReceivedMessage(@RequestBody MessageIdsDTO deleteMessage) { //currentUserId, messageId;
+        applicationService.deleteReceivedMessage(deleteMessage);
     }
 
     @Override
-    public void deleteChat(@PathVariable String id, @RequestParam String friendId) {
-        applicationService.deleteChat(id, friendId);
+    public void deleteChat(@RequestBody CurrentUserIdAndFriendIdDTO userIds) {
+        applicationService.deleteChat(userIds);
     }
     @Override
-    public void sendMessage(@PathVariable String id, @PathVariable String friendId, @RequestParam String body) {
-        applicationService.sendMessage(id, friendId, body);
+    public void sendMessage(@RequestBody MessageToSendIdsAndBodyDTO messageToSend) {
+        applicationService.sendMessage(messageToSend);
     }
 }

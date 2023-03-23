@@ -1,5 +1,8 @@
 package com.example.ntt.controller;
-import com.example.api.RequestApi;
+import com.example.ntt.api.RequestApi;
+import com.example.ntt.dto.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.FriendRequestDTO;
+import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.model.User;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;
@@ -15,21 +18,21 @@ public class RequestController implements RequestApi {
     private final ApplicationService applicationService;
 
     @Override
-    public ResponseEntity<Set<User>> findUserFriendRequestsById(@PathVariable String id) {
-        return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(id));
+    public ResponseEntity<Set<User>> findUserFriendRequestsById(@RequestBody UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(userId));
     }
     @Override
-    public ResponseEntity<Set<User>> findUserSentFriendRequestById(@PathVariable String id) {
-        return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(id));
-    }
-
-    @Override
-    public void sendFriendRequest(@PathVariable String id, @RequestParam String friendId) {
-        applicationService.sendFriendRequest(id, friendId);
+    public ResponseEntity<Set<User>> findUserSentFriendRequestById(@RequestBody UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(userId));
     }
 
     @Override
-    public void handleFriendRequest(@PathVariable String id, @PathVariable String friendId, @RequestParam boolean accepted) {
-        applicationService.handleFriendRequest(id, friendId, accepted);
+    public void sendFriendRequest(@RequestParam CurrentUserIdAndFriendIdDTO userIds) {
+        applicationService.sendFriendRequest(userIds);
+    }
+
+    @Override
+    public void handleFriendRequest(@RequestParam FriendRequestDTO friendRequest) {
+        applicationService.handleFriendRequest(friendRequest);
     }
 }
