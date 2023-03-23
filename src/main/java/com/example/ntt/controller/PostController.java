@@ -1,6 +1,7 @@
 package com.example.ntt.controller;
 
 import com.example.ntt.api.PostApi;
+import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
 import com.example.ntt.service.ApplicationService;
@@ -27,8 +28,8 @@ public class PostController implements PostApi {
     }
 
     @Override
-    public void updatePost(String currentUserId, String postId, UpdatedPost updatedPost){
-        applicationService.updatePost(currentUserId, postId, updatedPost);
+    public ResponseEntity<List<Post>> findAllFriendsPost(@RequestBody UserIdDTO userId) {
+        return ResponseEntity.ok(applicationService.findAllFriendsPosts(userId));
     }
 
     @Override

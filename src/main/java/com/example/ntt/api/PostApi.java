@@ -1,4 +1,4 @@
-package com.example.ntt.api;
+package com.example.api;
 
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
@@ -11,7 +11,8 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public interface PostApi {
 
-    @PostMapping(value = "/{id}/createPost")
+    //TODO: usare i DTO - FC
+    @PostMapping(value = "/post")
     void createPost(@PathVariable String id, @RequestBody Post post);
 
     @PutMapping(value = "/{id}/removePost")
@@ -20,6 +21,9 @@ public interface PostApi {
     @PutMapping(value = "/{currentUserId}/updatePost")
     void updatePost(@PathVariable String currentUserId, @RequestParam String postId, @RequestBody UpdatedPost updatedPost);
 
+    /**
+     * @param userId {id}
+     */
     @GetMapping(value = "/{id}/friendsPost")
-    ResponseEntity<List<Post>> findAllFriendsPost(@PathVariable String id);
+    ResponseEntity<List<Post>> findAllFriendsPost(@RequestBody UserIdDTO userId);
 }
