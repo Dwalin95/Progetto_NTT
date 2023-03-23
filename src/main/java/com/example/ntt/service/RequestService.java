@@ -3,12 +3,11 @@ package com.example.ntt.service;
 import com.example.ntt.dto.CurrentUserIdAndFriendIdDTO;
 import com.example.ntt.dto.FriendRequestDTO;
 import com.example.ntt.dto.UserIdDTO;
+import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,13 +18,12 @@ import java.util.function.UnaryOperator;
 public class RequestService {
 
     private final MongoService mongoService;
-    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found";
 
     public Set<User> findUserReceivedFriendRequestsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
                 .map(User::getReceivedFriendRequests)
                 .map(mongoService::findUserFriendsById)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
                 .orElse(new HashSet<>());
     }
 
@@ -33,7 +31,7 @@ public class RequestService {
         return mongoService.findUserById(currentUserId.getId())
                 .map(User::getSentFriendRequests)
                 .map(mongoService::findUserFriendsById)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)))
                 .orElse(new HashSet<>());
     }
 
@@ -56,15 +54,15 @@ public class RequestService {
         mongoService.findUserById(id)
                 .map(addRequest)
                 .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), id)));
     }
 
     //TODO: da ritrasformare perchè l'altro non funzionava
     public void handleFriendRequest(FriendRequestDTO friendRequest){
         User user = mongoService.findUserById(friendRequest.getCurrentUserId())
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendRequest.getCurrentUserId())));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), friendRequest.getCurrentUserId())));
         User friend = mongoService.findUserById(friendRequest.getFriendId())
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, friendRequest.getFriendId())));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), friendRequest.getFriendId())));
 
         if(friendRequest.isRequestAccepted()){
             user.getReceivedFriendRequests().remove(friendRequest.getFriendId());
@@ -78,24 +76,4 @@ public class RequestService {
         mongoService.saveUser(user);
         mongoService.saveUser(friend);
     }
-
-    /*public void handleFriendRequest(String id, String friendId, boolean accepted){
-        this.handleSingleFriendRequest(id, friendId, accepted);
-        this.handleSingleFriendRequest(friendId, id, accepted);
-    }
-
-    private void handleSingleFriendRequest(String id, String friendId, boolean accepted) {
-        mongoService.findUserById(id)
-                .map(u -> this.removeRequest(friendId, u))
-                .filter(u -> accepted)
-                .ifPresent(u -> u.getFriends().add(friendId));
-        mongoService.findUserById(id)
-                .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, id)));
-    }
-
-    private User removeRequest(String friendId, User u) {
-        u.getReceivedFriendRequests().remove(friendId);
-        return u;
-    }*/
 }

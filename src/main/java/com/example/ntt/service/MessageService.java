@@ -1,17 +1,13 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.*;
+import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.User;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import lombok.RequiredArgsConstructor;
-import org.bson.Document;
-//import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +19,11 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final MongoService mongoService;
-    private final MongoClient mongoClient;
-    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found"; //TODO: spostare in un ENUM
 
     public Set<String> findAllMessageSenders(UserIdDTO userId){
         List<Message> messages = mongoService.findUserById(userId.getId())
                 .map(u -> mongoService.findAllMessagesAggregation(u.get_id()))
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userId.getId())));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
         return messages.stream()
                 .map(Message::getSenderId)
                 .collect(Collectors.toSet());
@@ -47,7 +41,7 @@ public class MessageService {
     public List<Message> findMessageByTextGlobal(String currentUserId, String text){
         return mongoService.findUserById(currentUserId)
                 .map(u -> mongoService.findMessageByTextGlobalAggregation(u.get_id(), text))
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
     }
 
     public List<Message> findMessageByTextPerFriend(String currentUserId, String friendId, String text){
@@ -65,7 +59,7 @@ public class MessageService {
             this.deleteMessageAndSaveUser(messageSent.getFriendId(), messageSent.getMessageId());
         } else {
             this.deleteMessageAndSaveUser(messageSent.getCurrentUserId(), messageSent.getMessageId());
-            throw new PreconditionFailedException("Messages sent more than an hour ago cannot be deleted for both users, it was deleted only for you");
+            throw new PreconditionFailedException(ErrorMsg.DELETE_MESSAGE_TIMEOUT.getMsg());
         }
     }
 
@@ -94,7 +88,7 @@ public class MessageService {
         mongoService.findUserById(currentUserId)
                 .map(u -> this.removeMessage(u, messageId))
                 .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, currentUserId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
     }
 
     private User removeMessage(User u, String messageId){
@@ -107,7 +101,7 @@ public class MessageService {
     public void deleteChat(CurrentUserIdAndFriendIdDTO userIds){
         mongoService.findUserById(userIds.getCurrentUserId())
                 .map(u -> this.handleRemoveChat(userIds.getFriendId(), u))
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, userIds.getCurrentUserId())));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userIds.getCurrentUserId())));
     }
 
     private User handleRemoveChat(String friendId, User u) {
@@ -124,10 +118,8 @@ public class MessageService {
 
     //TODO: controllare - FC
     public void sendMessage(MessageToSendIdsAndBodyDTO messageToSend) {
-        User user = mongoService.findUserById(messageToSend.getCurrentUserId())
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, messageToSend.getCurrentUserId())));
         User messageReceiver = mongoService.findUserById(messageToSend.getFriendId())
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, messageToSend.getFriendId())));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), messageToSend.getFriendId())));
 
         Set<String> friends = messageReceiver.getFriends();
 
@@ -143,7 +135,7 @@ public class MessageService {
 
             mongoService.findUserById(messageToSend.getCurrentUserId())
                     .map(u -> this.addMessage(message, u))
-                    .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND_ERROR_MSG, messageToSend.getCurrentUserId())));
+                    .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), messageToSend.getCurrentUserId())));
             this.addMessage(message, messageReceiver);
         } else {
             throw new UnauthorizedException("You can only send messages between friends");
