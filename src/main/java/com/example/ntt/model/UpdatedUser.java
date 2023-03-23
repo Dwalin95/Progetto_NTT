@@ -19,4 +19,5 @@ public class UpdatedUser {
     private Optional<String> lastName;
     private Optional<String> email;
     private Optional<String> gender;
+    private Optional<String> profilePicUrl;
 }

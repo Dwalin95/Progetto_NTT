@@ -83,16 +83,22 @@ public class UserService {
                         .orElseThrow(() -> new ResourceNotFoundException("No friends found"));
     }
 
-    //TODO: da testare(?)
+    //TODO: LDB - trovare il modo di togliere tutti gli if
     public User updateUserById(String id, UpdatedUser updatedUser) {
         return mongoService.findUserById(id)
                 .map(u -> {
-                    mongoService.saveUser(u.withUsername(updatedUser.getUsername().orElse(u.getUsername()))
-                            .withFirstName(updatedUser.getFirstName().orElse(u.getFirstName()))
+                    mongoService.saveUser(u.withFirstName(updatedUser.getFirstName().orElse(u.getFirstName()))
                             .withLastName(String.valueOf(updatedUser.getLastName().orElse(u.getLastName())))
-                            .withGender(updatedUser.getGender().orElse(u.getGender())));
+                            .withGender(updatedUser.getGender().orElse(u.getGender())))
+                            .withProfilePicUrl(updatedUser.getProfilePicUrl().orElse(u.getProfilePicUrl()));
+
+                    if(userConfiguration.usernameExists(updatedUser.getUsername().orElse(null))){
+                        throw new PreconditionFailedException(String.format("The username %s is already present in use", updatedUser.getUsername()));
+                    } else {
+                        mongoService.saveUser(u.withUsername(updatedUser.getUsername().orElse(u.getUsername())));
+                    }
                     if(userConfiguration.emailExists(updatedUser.getEmail().orElse(null))){
-                        throw new PreconditionFailedException("The email is already present in the database");
+                        throw new PreconditionFailedException(String.format("The email %s is already present in use", updatedUser.getEmail()));
                     } else {
                         mongoService.saveUser(u.withEmail(String.valueOf(updatedUser.getEmail().orElse(u.getEmail()))));
                     }
