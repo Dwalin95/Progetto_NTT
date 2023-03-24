@@ -1,8 +1,9 @@
 package com.example.ntt.dto;
 
 import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class FriendRequestDTO {
     private String currentUserId;
     private String friendId;

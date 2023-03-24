@@ -20,17 +20,21 @@ public class PostService {
 
     private final MongoService mongoService;
 
-
-    public void createPost(PostDTO post){
-//        mongoService.findUserById(id)
-//                .map(user -> addPost(post, user))
-//                .map(mongoService::saveUser)
-//                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), id)));
+    public void createPost(PostDTO postDto){ //TODO: completare l'implementazione - FC [Vedere gli Optional nel return]
+        mongoService.findUserById(postDto.getCurrentUserId())
+                .map(user -> addPost(postDto, user))
+                .map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), postDto.getCurrentUserId())));
     }
 
-    private User addPost(Post post, User user) {
-        post.with_id(new ObjectId())
-            .withTimestamp(new Date());
+    private User addPost(PostDTO postDto, User user) {
+        Post post = Post.builder()
+                ._id(new ObjectId())
+                .title(postDto.getTitle())
+                .body(postDto.getBody())
+                .timestamp(new Date())
+                .imageUrl(postDto.getImageUrl())
+                .build();
         user.getPosts().add(post);
         return user;
     }

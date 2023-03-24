@@ -1,9 +1,11 @@
 package com.example.ntt.dto;
 
 import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class CurrentUserIdAndFriendIdDTO {
-    private String currentUserId;
-    private String friendId;
+    String currentUserId;
+    String friendId;
+
 }

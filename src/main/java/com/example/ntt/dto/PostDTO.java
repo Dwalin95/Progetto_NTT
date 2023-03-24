@@ -1,16 +1,14 @@
 package com.example.ntt.dto;
 
-import lombok.Data;
-import org.bson.types.ObjectId;
-
+import lombok.Value;
 import java.util.Date;
 
-@Data
+@Value
 public class PostDTO {
-    private String currentUserId;
-    private String title;
-    private String body;
-    private Date timestamp;
-    private String imageUrl;
+    String currentUserId;
+    String title;
+    String body;
+    Date timestamp;
+    String imageUrl;
 
 }
