@@ -14,6 +14,7 @@ public enum ErrorMsg {
     NO_MATCH_OLD_PSW("Entered characters do not match the old password"),
     ACCESS_DENIED("Access denied"),
     URL_IS_NOT_IMG("Entered URL is not an image"),
+    URL_IS_NOT_VALID("Entered URL is not valid"),
     USERNAME_ALREADY_IN_USE("The username %s is already in use"),
     EMAIL_ALREADY_IN_USE("The email %s is already in use");
 

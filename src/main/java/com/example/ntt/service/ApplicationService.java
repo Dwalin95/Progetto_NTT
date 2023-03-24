@@ -43,6 +43,10 @@ public class ApplicationService {
         return userService.findUserById(userId);
     }
 
+    public User findUserByUsername(UsernameOnlyDTO username){
+        return userService.findUserByUsername(username);
+    }
+
     public Set<User> findFriendsById(UserIdDTO userId){
         return userService.findFriendsById(userId);
     }

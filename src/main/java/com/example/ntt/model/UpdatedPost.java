@@ -14,4 +14,5 @@ public class UpdatedPost {
 
     private String body;
     private String title;
+    private String imageUrl;
 }

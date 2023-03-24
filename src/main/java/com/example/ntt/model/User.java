@@ -29,6 +29,9 @@ public class User{
     private String password;
     private String gender;
     private String profilePicUrl;
+    private boolean isVisible;
+    //TODO: implementare il refresh continuo(?)
+    private boolean isOnline;
     private Set<String> friends = new HashSet<>();
     private Set<String> receivedFriendRequests = new HashSet<>();
     private Set<String> sentFriendRequests = new HashSet<>();

@@ -38,5 +38,4 @@ public class PostController implements PostApi {
     public ResponseEntity<List<Post>> findAllFriendsPosts(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findAllFriendsPosts(userId));
     }
-
 }

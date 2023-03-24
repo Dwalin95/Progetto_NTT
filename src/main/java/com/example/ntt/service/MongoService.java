@@ -117,7 +117,7 @@ public class MongoService {
         return postRepository.updatedPost(currentUserId, postId, title, body);
     }
 
-    public List<Post> findAllPostsByArrayAggregation(Set<User> friends){
+    public List<Post> findAllPostsByArrayAggregation(Set<String> friends){
         return postRepository.findAllPostsByFriendIdsArr(friends);
     }
 }

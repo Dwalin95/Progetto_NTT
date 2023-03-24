@@ -1,8 +1,10 @@
 package com.example.ntt.service;
 
+import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.PostDTO;
 import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
+import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.UpdatedPost;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,18 +22,27 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final MongoService mongoService;
+    private final UserConfiguration userConfiguration;
 
 
-    public void createPost(PostDTO post){
-//        mongoService.findUserById(id)
-//                .map(user -> addPost(post, user))
-//                .map(mongoService::saveUser)
-//                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), id)));
+    public void createPost(PostDTO postDto){ //TODO: completare l'implementazione - FC [Vedere gli Optional nel return]
+        mongoService.findUserById(postDto.getCurrentUserId())
+                .map(user -> this.addPost(postDto, user))
+                .map(mongoService::saveUser)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), postDto.getCurrentUserId())));
     }
 
-    private User addPost(Post post, User user) {
-        post.with_id(new ObjectId())
-            .withTimestamp(new Date());
+    private User addPost(PostDTO postDto, User user) {
+        userConfiguration.handleUpdateException(postDto.getImageUrl().isPresent() && !userConfiguration.isImage(postDto.getImageUrl().get()),
+                new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
+
+        Post post = Post.builder()
+                ._id(new ObjectId())
+                .title(postDto.getTitle())
+                .body(postDto.getBody())
+                .timestamp(new Date())
+                .imageUrl(postDto.getImageUrl().get())
+                .build();
         user.getPosts().add(post);
         return user;
     }
@@ -67,11 +79,10 @@ public class PostService {
 
     //TODO: da testare - LDB
     public List<Post> findAllFriendsPosts(UserIdDTO userId){
-        Set<User> friends = mongoService.findUserById(userId.getId())
-                        .map(u -> mongoService.findUserFriendsById(u.getFriends()))
-                        .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
-                        .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
-        return mongoService.findAllPostsByArrayAggregation(friends).stream()
+        Set<String> friends = mongoService.findUserById(userId.getId())
+                        .map(User::getFriends)
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
+       return mongoService.findAllPostsByArrayAggregation(friends).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());
     }

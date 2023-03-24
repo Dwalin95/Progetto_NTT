@@ -26,6 +26,6 @@ public interface PostApi {
     /**
      * @param userId {id}
      */
-    @GetMapping(value = "/{id}/friendsPosts")
+    @GetMapping(value = "/friendsPosts")
     ResponseEntity<List<Post>> findAllFriendsPosts(@RequestBody UserIdDTO userId);
 }

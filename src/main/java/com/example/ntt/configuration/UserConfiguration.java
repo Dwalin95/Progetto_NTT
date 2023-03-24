@@ -13,8 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.Optional;
 
 @Configuration
@@ -44,16 +42,28 @@ public class UserConfiguration {
         }
     }
 
+    //TODO: vedere come fare per fare l'upload delle immagini dalla galleria
     public boolean isImage(String imageUrl){
-        Image image = new ImageIcon(imageUrl).getImage();
-        return image.getWidth(null) != -1;
+        //    The URL must start with either https and
+        //    then followed by :// and
+        //    then it must contain www. and
+        //    then followed by subdomain of length (2, 256) and
+        //    last part contains top level domain like .com, .org etc.
+        //    must end with jpg, jpeg, png, webp, svg
+        String regex = "((https)://)(www.)?[a-zA-Z0-9@:%._\\+~#?&//=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%._\\+~#?&//=]*)(?i)(jpg\\Z|jpeg\\Z|png\\Z|webp\\Z|svg\\Z)";
+
+        if(imageUrl.matches(regex)){
+            return true;
+        } else {
+            throw new PreconditionFailedException(ErrorMsg.URL_IS_NOT_VALID.getMsg());
+        }
     }
 
-    //TODO: metodo alternativo per fare il check dell'url decidere quale usare - LDB
-   /* public boolean isImage(String imageUrl) throws IOException {
-        Image image = ImageIO.read(new URL(imageUrl));
-        return image != null;
-    }*/
+    public void handleUpdateException(boolean check, RuntimeException exception) {
+        if (check) {
+            throw exception;
+        }
+    }
 
     public boolean emailExists(String email) {
         return mongoService.findUserByEmail(email).isPresent();

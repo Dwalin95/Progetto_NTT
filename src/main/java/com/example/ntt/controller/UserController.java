@@ -11,8 +11,6 @@ import com.example.ntt.service.ApplicationService;
 import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -60,9 +58,14 @@ public class UserController implements UserApi {
     }
 
     @Override
+    public ResponseEntity<User> findUserByUsername(UsernameOnlyDTO username){
+        return ResponseEntity.ok(applicationService.findUserByUsername(username));
+    }
+
+    /*@Override
     public ResponseEntity<User> findUserById(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findUserById(userId));
-    }
+    }*/
 
     @Override
     public ResponseEntity<User> updatePasswordById(UserUpdatePasswordDTO newUserPassword) {

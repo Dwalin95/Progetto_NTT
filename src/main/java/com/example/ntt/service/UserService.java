@@ -70,6 +70,11 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
     }
 
+    public User findUserByUsername(UsernameOnlyDTO  username){
+        return mongoService.findUserByUsername(username.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username.getUsername())));
+    }
+
     public Set<User> findFriendsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
                 .map(u -> mongoService.findUserFriendsById(u.getFriends()))
@@ -100,24 +105,17 @@ public class UserService {
                 .withEmail(userInfo.getEmail().orElse(u.getEmail()))
                 .withGender(userInfo.getGender().orElse(u.getGender()))
                 .withProfilePicUrl(userInfo.getProfilePicUrl().orElse(u.getProfilePicUrl())));
-
         return u;
     }
 
     private User handleException(UserInfoWithIdDTO userInfo, User user) {
-        this.handleUpdateException(userInfo.getProfilePicUrl().isPresent() && userConfiguration.isImage(userInfo.getProfilePicUrl().get()),
+        userConfiguration.handleUpdateException(userInfo.getProfilePicUrl().isPresent() && !userConfiguration.isImage(userInfo.getProfilePicUrl().get()),
                 new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
-        this.handleUpdateException(userInfo.getUsername().isPresent() && userConfiguration.usernameExists(userInfo.getUsername().get()),
+        userConfiguration.handleUpdateException(userInfo.getUsername().isPresent() && userConfiguration.usernameExists(userInfo.getUsername().get()),
                 new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), userInfo.getUsername())));
-        this.handleUpdateException(userInfo.getEmail().isPresent() && userConfiguration.emailExists(userInfo.getEmail().get()),
+        userConfiguration.handleUpdateException(userInfo.getEmail().isPresent() && userConfiguration.emailExists(userInfo.getEmail().get()),
                 new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), userInfo.getEmail())));
         return user;
-    }
-
-    private void handleUpdateException(boolean check, RuntimeException exception) {
-        if (check) {
-            throw exception;
-        }
     }
 
     public void removeFriend(CurrentUserIdAndFriendIdDTO userIds) {

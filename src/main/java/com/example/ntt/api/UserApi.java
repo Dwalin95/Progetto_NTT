@@ -32,7 +32,10 @@ public interface UserApi {
     ResponseEntity<Set<User>> findUserFriendsById(@RequestBody UserIdDTO userId);
 
     @GetMapping(value = "/user")
-    ResponseEntity<User> findUserById(@RequestBody UserIdDTO userId);
+    ResponseEntity<User> findUserByUsername(@RequestBody UsernameOnlyDTO username);
+
+    /*@GetMapping(value = "/user")
+    ResponseEntity<User> findUserById(@RequestBody UserIdDTO userId);*/
 
     @PutMapping(value = "/password") // ex {id}/updatePassword
     ResponseEntity<User> updatePasswordById(@RequestBody UserUpdatePasswordDTO newUserPassword); //oldPassword, newPassword, confirmPassword
