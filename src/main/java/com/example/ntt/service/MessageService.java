@@ -21,7 +21,6 @@ public class MessageService {
 
     private final MongoService mongoService;
     private final MongoClient mongoClient;
-    private static final String USER_NOT_FOUND_ERROR_MSG = "User: %s not found"; //TODO: spostare in un ENUM
 
     public Set<String> findAllMessageSenders(UserIdDTO userId){
         List<Message> messages = mongoService.findUserById(userId.getId())

@@ -1,13 +1,13 @@
 package com.example.ntt.dto;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class UserInfoDTO {
 
-    private String username;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String gender;
+    String username;
+    String firstName;
+    String lastName;
+    String email;
+    String gender;
 }

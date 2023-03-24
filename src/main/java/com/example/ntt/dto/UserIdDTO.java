@@ -1,16 +1,9 @@
 package com.example.ntt.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 public class UserIdDTO {
 
-    private String id;
-
+    String id;
 }

@@ -20,3 +20,19 @@
  * i tipi di dato utilizzati nei DTO dovrebbero essere coerenti con
  * i tipi di dato dell'oggetto di dominio.
  */
+
+
+/**
+* "@Value is the immutable variant of @Data; all fields are made private and final by default, and setters are not generated."
+* - source: https://projectlombok.org/features/Value
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*/

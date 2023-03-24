@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,7 +22,6 @@ public class PostService {
 
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
-
 
     public void createPost(PostDTO postDto){ //TODO: completare l'implementazione - FC [Vedere gli Optional nel return]
         mongoService.findUserById(postDto.getCurrentUserId())
