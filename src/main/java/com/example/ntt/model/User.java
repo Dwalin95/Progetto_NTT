@@ -35,7 +35,7 @@ public class User{
     private Set<String> friends = new HashSet<>();
     private Set<String> receivedFriendRequests = new HashSet<>();
     private Set<String> sentFriendRequests = new HashSet<>();
+    private Set<String> postsIds = new HashSet<>();
     private List<Message> messages = new ArrayList<>();
-    private List<Post> posts = new ArrayList<>();
     private Address address;
 }

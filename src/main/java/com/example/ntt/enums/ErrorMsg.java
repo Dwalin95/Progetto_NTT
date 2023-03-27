@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ErrorMsg {
 
     USER_NOT_FOUND_ERROR_MSG("User: %s not found"),
+    POST_NOT_FOUND("Post not found"),
     NO_FRIENDS_FOUND("No friends found"),
     DELETE_MESSAGE_TIMEOUT("Messages sent more than an hour ago cannot be deleted for both users, it was deleted only for you"),
     NEW_PWS_EQUAL_TO_OLD_PSW("New password can't be equal to the old password"),

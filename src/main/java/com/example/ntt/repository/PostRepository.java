@@ -1,30 +1,30 @@
 package com.example.ntt.repository;
 
+import com.example.ntt.dto.CommentIdAndPostIdDTO;
+import com.example.ntt.model.Comment;
 import com.example.ntt.model.Post;
-import com.example.ntt.model.User;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface PostRepository extends MongoRepository<User, String> {
+public interface PostRepository extends MongoRepository<Post, String> {
 
-    //TODO: LDB - da vedere perché $in non funziona (solo qua)
-    @Aggregation(
-            pipeline = {"{$match: {'_id': {$in: ?0}}}", "{$unwind: {path: \"$posts\"}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\", imageUrl: \"$posts.imageUrl\"}}"}
-    )
-    List<Post> findAllPostsByFriendIdsArr(Set<String> friendsId);
+    @Query("{'_id': {$in: ?0}}")
+    List<Post> findAllPostsByIdsArr(Set<String> postsIds);
 
     @Aggregation(
-            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$posts\"}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}", "{$match: {_id: {$ne: ObjectId(?1)}}}"}
+            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$set: {title: ?1, body: ?2, imageUrl: ?3, modified: true}}"}
     )
-    List<Post> getPostListWithoutSpecifiedPost(String currentUserId, String postId);
+    Post updatedPost(String postId, String title, String body, String imageUrl);
 
+    //questa ti serve per fare la delete del messaggio, restituisce una lista di messaggi SENZA quello di cui gli dai l'id. I commenti farei che si possono solo cancellare e non modificare quindi non c'è bisogno dell'update
     @Aggregation(
-            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$posts\"}}", "{$project: {_id: \"$posts._id\", title: \"$posts.title\", body: \"$posts.body\", timestamp: \"$posts.timestamp\", comments: \"$posts.comments\"}}", "{$match: {_id: ObjectId(?1)}}", "{$set: {title: ?2, body: ?3, modified: true}}"}
+            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$comments\"}}", "{$project: {_id: \"$comments._id\", body: \"$comments.body\", author: \"$comments.author\", timestamp: \"$comments.timestamp\"}}",  "{$match: {_id: {$ne: ObjectId(?1)}}}"}
     )
-    Post updatedPost(String currentUserId, String postId, String title, String body);
+    List<Comment> findCommentListWithoutSpecifiedOne(CommentIdAndPostIdDTO commentIdAndPostId);
 }
