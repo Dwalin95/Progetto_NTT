@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ErrorMsg {
 
     USER_NOT_FOUND_ERROR_MSG("User: %s not found"),
+    EMAIL_NOT_FOUND("Email: %s not found"),
     POST_NOT_FOUND("Post not found"),
     NO_FRIENDS_FOUND("No friends found"),
     DELETE_MESSAGE_TIMEOUT("Messages sent more than an hour ago cannot be deleted for both users, it was deleted only for you"),
@@ -18,6 +19,7 @@ public enum ErrorMsg {
     URL_IS_NOT_VALID("Entered URL is not valid"),
     USERNAME_ALREADY_IN_USE("The username %s is already in use"),
     EMAIL_ALREADY_IN_USE("The email %s is already in use"),
+    PASSWORD_NOT_VALID("Password not valid"),
     EMAIL_MUST_CONTAIN_AT("Email must contain @"),
     //TODO: migliorare il nome dell'errore
     PASSWORD_MUST_RESPECT_RULES("Password must respect rules");
