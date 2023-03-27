@@ -66,17 +66,17 @@ public class UserConfiguration {
 
     public boolean emailExists(String email) {
         if(mongoService.findUserByEmail(email).isPresent()){
-            return true;
-        } else {
             throw new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), email));
+        } else {
+            return true;
         }
     }
 
     public boolean usernameExists(String username) {
         if(mongoService.findUserByUsername(username).isPresent()){
-            return true;
-        } else {
             throw new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), username));
+        } else {
+            return true;
         }
     }
 
@@ -86,6 +86,7 @@ public class UserConfiguration {
                 .map(mongoService::saveUser);
     }
 
+    //TODO: sistemare sono invertite le eccezioni di emailExists e usernameExists
     private User validatePasswordAndEmail(User user) {
         return Optional.of(user)
                 .filter(u -> this.emailExists(u.getEmail()))
@@ -101,12 +102,21 @@ public class UserConfiguration {
         return u;
     }
 
+
     private boolean validateEmail(String email) {
-        return email.contains("@");
+        if(email.contains("@")){
+            return true;
+        } else {
+            throw new PreconditionFailedException(ErrorMsg.EMAIL_MUST_CONTAIN_AT.getMsg());
+        }
     }
 
     private boolean validatePassword(String password) {
         //regex: Must be from 8 to 32 characters long, at least 1 special character (only [!, #, %, @]), at least 1 upper-case letter, at least 1 lower-case letter, at least 1 number
-        return password.matches("^(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\\D*\\d)(?=[^!#%@]*[!#%@])[A-Za-z0-9!#%@]{8,32}$");
+        if(password.matches("^(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\\D*\\d)(?=[^!#%@]*[!#%@])[A-Za-z0-9!#%@]{8,32}$")){
+            return true;
+        } else {
+            throw new PreconditionFailedException(ErrorMsg.PASSWORD_MUST_RESPECT_RULES.getMsg());
+        }
     }
 }

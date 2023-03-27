@@ -17,7 +17,10 @@ public enum ErrorMsg {
     URL_IS_NOT_IMG("Entered URL is not an image"),
     URL_IS_NOT_VALID("Entered URL is not valid"),
     USERNAME_ALREADY_IN_USE("The username %s is already in use"),
-    EMAIL_ALREADY_IN_USE("The email %s is already in use");
+    EMAIL_ALREADY_IN_USE("The email %s is already in use"),
+    EMAIL_MUST_CONTAIN_AT("Email must contain @"),
+    //TODO: migliorare il nome dell'errore
+    PASSWORD_MUST_RESPECT_RULES("Password must respect rules");
 
     private final String msg;
 }
