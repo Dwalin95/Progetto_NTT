@@ -26,18 +26,27 @@ public class UserConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    //TODO: LDB - trovare il modo di togliere gli if
+    //TODO: LDB - da testare
     public User checkLogin(UserAuthDTO credentials) {
-        if (emailExists(credentials.getEmail())) {
-            User user = mongoService.findUserByEmail(credentials.getEmail())
-                    .orElseThrow(() -> new ResourceNotFoundException(String.format("No users found with this email: %s", credentials.getEmail())));
-            if (passwordEncoder().matches(credentials.getPassword(), user.getPassword())) {
-                return user;
-            } else {
-                throw new UnauthorizedException("Password not valid");
-            }
+        return mongoService.findUserByEmail(credentials.getEmail())
+                .filter(u -> this.emailIsPresent(credentials.getEmail()))
+                .filter(u -> this.passwordMatchesDb(credentials.getPassword(), u))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.EMAIL_NOT_FOUND.getMsg(), credentials.getEmail())));
+    }
+
+    private boolean passwordMatchesDb(String password, User u){
+        if(passwordEncoder().matches(password, u.getPassword())){
+            return true;
         } else {
-            throw new ResourceNotFoundException(String.format("Email: %s not found", credentials.getEmail()));
+            throw new UnauthorizedException(ErrorMsg.PASSWORD_NOT_VALID.getMsg());
+        }
+    }
+
+    private boolean emailIsPresent(String email) {
+        if(mongoService.findUserByEmail(email).isPresent()){
+            return true;
+        } else {
+            throw new ResourceNotFoundException(String.format(ErrorMsg.EMAIL_NOT_FOUND.getMsg(), email));
         }
     }
 
@@ -64,7 +73,7 @@ public class UserConfiguration {
         }
     }
 
-    public boolean emailExists(String email) {
+    public boolean emailAlreadyExists(String email) {
         if(mongoService.findUserByEmail(email).isPresent()){
             throw new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), email));
         } else {
@@ -72,7 +81,7 @@ public class UserConfiguration {
         }
     }
 
-    public boolean usernameExists(String username) {
+    public boolean usernameAlreadyExists(String username) {
         if(mongoService.findUserByUsername(username).isPresent()){
             throw new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), username));
         } else {
@@ -88,8 +97,8 @@ public class UserConfiguration {
 
     private User validatePasswordAndEmail(User user) {
         return Optional.of(user)
-                .filter(u -> this.emailExists(u.getEmail()))
-                .filter(u -> this.usernameExists(u.getUsername()))
+                .filter(u -> this.emailAlreadyExists(u.getEmail()))
+                .filter(u -> this.usernameAlreadyExists(u.getUsername()))
                 .filter(u -> this.isImage(u.getProfilePicUrl()))
                 .filter(u -> this.validatePassword(u.getPassword()) && this.validateEmail(u.getEmail()))
                 .map(this::encodeNewPassword)
