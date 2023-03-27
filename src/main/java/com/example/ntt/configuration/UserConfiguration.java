@@ -65,11 +65,19 @@ public class UserConfiguration {
     }
 
     public boolean emailExists(String email) {
-        return mongoService.findUserByEmail(email).isPresent();
+        if(mongoService.findUserByEmail(email).isPresent()){
+            return true;
+        } else {
+            throw new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), email));
+        }
     }
 
     public boolean usernameExists(String username) {
-        return mongoService.findUserByUsername(username).isPresent();
+        if(mongoService.findUserByUsername(username).isPresent()){
+            return true;
+        } else {
+            throw new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), username));
+        }
     }
 
     public void validateSignUp(User user) {
@@ -78,26 +86,19 @@ public class UserConfiguration {
                 .map(mongoService::saveUser);
     }
 
-    //TODO: LDB - trovare il modo di togliere gli if lo so che è brutto
     private User validatePasswordAndEmail(User user) {
-        if(emailExists(user.getEmail())){
-            if(usernameExists(user.getUsername())){
-                if(isImage(user.getProfilePicUrl())){
-                    if(validatePassword(user.getPassword()) && validateEmail(user.getEmail())){
-                        user.setPassword(passwordEncoder().encode(user.getPassword()));
-                        return user;
-                    } else {
-                        throw new UnauthorizedException(ErrorMsg.ACCESS_DENIED.getMsg());
-                    }
-                } else {
-                    throw new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg());
-                }
-            } else {
-                throw new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), user.getUsername()));
-            }
-        } else {
-            throw new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), user.getEmail()));
-        }
+        return Optional.of(user)
+                .filter(u -> this.emailExists(u.getEmail()))
+                .filter(u -> this.usernameExists(u.getUsername()))
+                .filter(u -> this.isImage(u.getProfilePicUrl()))
+                .filter(u -> this.validatePassword(u.getPassword()) && this.validateEmail(u.getEmail()))
+                .map(this::encodeNewPassword)
+                .orElseThrow(() -> new UnauthorizedException(ErrorMsg.ACCESS_DENIED.getMsg()));
+    }
+
+    private User encodeNewPassword(User u) {
+        u.setPassword(passwordEncoder().encode(u.getPassword()));
+        return u;
     }
 
     private boolean validateEmail(String email) {
