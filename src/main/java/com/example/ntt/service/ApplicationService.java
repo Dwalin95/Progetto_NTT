@@ -117,17 +117,19 @@ public class ApplicationService {
         postService.createPost(post);
     }
 
-    public void updatePost(String currentUserId, String postId, UpdatedPost updatedPost){
-        postService.updatePost(currentUserId, postId, updatedPost);
+    public void updatePost(PostDTO postDTO){
+        postService.updatePost(postDTO);
     }
 
-    public void deletePost(String id, String postId){
-        postService.deletePost(id, postId);
+    public void deletePost(PostIdAndUserIdDTO postDTO){
+        postService.deletePost(postDTO);
     }
 
     public List<Post> findAllFriendsPosts(UserIdDTO userId){
         return postService.findAllFriendsPosts(userId);
     }
 
-
+    public void createComment(CommentDTO commentDTO){
+        postService.createComment(commentDTO);
+    }
 }

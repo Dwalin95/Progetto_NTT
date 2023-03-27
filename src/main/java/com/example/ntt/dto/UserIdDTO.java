@@ -2,7 +2,8 @@ package com.example.ntt.dto;
 
 import lombok.*;
 
-@Value
+@Getter
+@Setter
 public class UserIdDTO {
 
     String id;

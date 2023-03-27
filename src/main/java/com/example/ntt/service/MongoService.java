@@ -2,10 +2,7 @@ package com.example.ntt.service;
 
 import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.dto.UserIdDTO;
-import com.example.ntt.model.Message;
-import com.example.ntt.model.Post;
-import com.example.ntt.model.UserCountPerCity;
-import com.example.ntt.model.User;
+import com.example.ntt.model.*;
 import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
 import com.example.ntt.repository.MessageRepository;
@@ -51,6 +48,10 @@ public class MongoService {
 
     public Optional<Set<User>> findUserFriendsById(Set<String> friendsIds){
         return userRepository.findFriendsById(friendsIds);
+    }
+
+    public Set<PostAuthorAndId> findAllFriendsPostsIdsAggregation(Set<String> friendsIds){
+        return userRepository.findAllFriendsPostsIds(friendsIds);
     }
 
     public List<User> findAllUsers(){
@@ -105,19 +106,27 @@ public class MongoService {
         return messageRepository.findMessageByTextPerFriendBySide(currentUserId, senderId, receivedId, text);
     }
 
-    public List<Post> getPostListWithoutSpecifiedMessageAggregation(String id, String postId){
-        return postRepository.getPostListWithoutSpecifiedPost(id, postId);
+    public Optional<User> findUserPostAggregation(String postId){
+        return userRepository.findUserPost(postId);
     }
 
-    public List<Post> getPostListWithoutSpecifiedPost(String currentUserId, String postId){
-        return postRepository.getPostListWithoutSpecifiedPost(currentUserId, postId);
+    public Post savePost(Post post){
+        return postRepository.save(post);
     }
 
-    public Post updatedPost(String currentUserId, String postId, String title, String body){
+    public Optional<Post> findPostById(String postId){
+        return postRepository.findById(postId);
+    }
+
+    public void deletePost(String postId){
+        postRepository.deleteById(postId);
+    }
+
+    public Post updatedPostAggregation(String currentUserId, String postId, String title, String body){
         return postRepository.updatedPost(currentUserId, postId, title, body);
     }
 
-    public List<Post> findAllPostsByArrayAggregation(Set<String> friends){
-        return postRepository.findAllPostsByFriendIdsArr(friends);
+    public List<Post> findAllPostsByArrAggregation(Set<String> postsIds){
+        return postRepository.findAllPostsByIdsArr(postsIds);
     }
 }

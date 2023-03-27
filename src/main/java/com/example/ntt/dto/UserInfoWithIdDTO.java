@@ -13,6 +13,7 @@ public class UserInfoWithIdDTO {
     String email;
     String gender;
     String profilePicUrl;
+    boolean isVisible;
 
     public Optional<String> getFirstName() {
         return Optional.ofNullable(firstName);
@@ -36,5 +37,9 @@ public class UserInfoWithIdDTO {
 
     public Optional<String> getProfilePicUrl() {
         return Optional.ofNullable(profilePicUrl);
+    }
+
+    public Optional<Boolean> isVisible() {
+        return Optional.of(isVisible);
     }
 }

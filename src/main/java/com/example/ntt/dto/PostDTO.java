@@ -1,17 +1,27 @@
 package com.example.ntt.dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Value;
-import java.util.Date;
 import java.util.Optional;
 
-@Value
+@Getter
+@Setter
 public class PostDTO {
 
-    String currentUserId;
-    String title;
-    String body;
-    Date timestamp;
-    String imageUrl;
+    private String currentUserId;
+    private String postId;
+    private String title;
+    private String body;
+    private String imageUrl;
+
+    public Optional<String> getTitle(){
+        return Optional.ofNullable(this.title);
+    }
+
+    public Optional<String> getBody(){
+        return Optional.ofNullable(this.body);
+    }
 
     public Optional<String> getImageUrl(){
         return Optional.ofNullable(this.imageUrl);

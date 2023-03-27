@@ -15,10 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Document(collection = "posts")
 public class Post {
 
     @Id
-    private ObjectId _id;
+    private String _id;
     private String title;
     private String body;
     private Date timestamp;

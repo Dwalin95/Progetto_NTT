@@ -46,7 +46,7 @@ public interface UserApi {
     @PutMapping(produces="application/json",value = "/user") //Put = "update" -> /user
     ResponseEntity<User> updateUserById(@RequestBody UserInfoWithIdDTO userInfo); //
 
-    @PutMapping(value = "/friend") //TODO: Put o Delete?
+    @PutMapping(value = "/friend")
     void removeFriend(@RequestBody CurrentUserIdAndFriendIdDTO userIds);
 
     @GetMapping(value = "/users")

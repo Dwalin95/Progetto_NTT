@@ -70,7 +70,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
     }
 
-    public User findUserByUsername(UsernameOnlyDTO  username){
+    public User findUserByUsername(UsernameOnlyDTO username){
         return mongoService.findUserByUsername(username.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username.getUsername())));
     }
@@ -89,7 +89,6 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
 
-    //TODO: DTO - FC
     //TODO: Da migliorare, rimessi gli optional
     public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023 - FC
         return mongoService.findUserById(userInfo.getId())
@@ -104,7 +103,8 @@ public class UserService {
                 .withLastName(userInfo.getLastName().orElse(u.getLastName()))
                 .withEmail(userInfo.getEmail().orElse(u.getEmail()))
                 .withGender(userInfo.getGender().orElse(u.getGender()))
-                .withProfilePicUrl(userInfo.getProfilePicUrl().orElse(u.getProfilePicUrl())));
+                .withProfilePicUrl(userInfo.getProfilePicUrl().orElse(u.getProfilePicUrl()))
+                .withVisible(userInfo.isVisible().orElse(u.isVisible())));
         return u;
     }
 

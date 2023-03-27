@@ -31,7 +31,6 @@ public class UserConfiguration {
         if (emailExists(credentials.getEmail())) {
             User user = mongoService.findUserByEmail(credentials.getEmail())
                     .orElseThrow(() -> new ResourceNotFoundException(String.format("No users found with this email: %s", credentials.getEmail())));
-
             if (passwordEncoder().matches(credentials.getPassword(), user.getPassword())) {
                 return user;
             } else {
@@ -42,7 +41,7 @@ public class UserConfiguration {
         }
     }
 
-    //TODO: vedere come fare per fare l'upload delle immagini dalla galleria
+    //TODO: LDB - vedere come fare per fare l'upload delle immagini dalla galleria
     public boolean isImage(String imageUrl){
         //    The URL must start with either https and
         //    then followed by :// and

@@ -1,13 +1,16 @@
 package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
+import com.example.ntt.dto.CommentDTO;
 import com.example.ntt.dto.PostDTO;
+import com.example.ntt.dto.PostIdAndUserIdDTO;
 import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
+import com.example.ntt.model.Comment;
 import com.example.ntt.model.Post;
-import com.example.ntt.model.UpdatedPost;
+import com.example.ntt.model.PostAuthorAndId;
 import com.example.ntt.model.User;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
@@ -35,53 +38,72 @@ public class PostService {
                 new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
 
         Post post = Post.builder()
-                ._id(new ObjectId())
-                .title(postDto.getTitle())
-                .body(postDto.getBody())
+                .title(postDto.getTitle().get())
+                .body(postDto.getBody().get())
                 .timestamp(new Date())
                 .imageUrl(postDto.getImageUrl().get())
+                .comments(new ArrayList<>())
                 .build();
-        user.getPosts().add(post);
+        mongoService.savePost(post);
+        user.getPostsIds().add(post.get_id());
         return user;
     }
 
-    //TODO: DTO - FC
-    public void deletePost(String currentUserId, String postId){
-        mongoService.findUserById(currentUserId)
-                .map(user -> removePost(postId, user))
+    public void deletePost(PostIdAndUserIdDTO postDto){
+        mongoService.findUserById(postDto.getCurrentUserId())
+                .map(user -> this.removePost(postDto.getPostId(), user))
                 .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), postDto.getCurrentUserId())));
     }
 
     private User removePost(String postId, User user) {
-        List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(user.get_id(), postId);
-        user.setPosts(posts);
+        user.getPostsIds().remove(postId);
+        mongoService.deletePost(postId);
         return user;
     }
 
-    //TODO: DTO - FC
-    public void updatePost(String currentUserId, String postId, UpdatedPost updatedPost){
-        mongoService.findUserById(currentUserId)
-                .map(u -> handleUpdatePost(postId, updatedPost, u))
-                .map(mongoService::saveUser)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
+    public void updatePost(PostDTO postDTO){
+        mongoService.findPostById(postDTO.getPostId())
+                .map(p -> this.saveUpdatedPost(postDTO, p))
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.POST_NOT_FOUND.getMsg()));
     }
 
-    //TODO: DTO - FC
-    private User handleUpdatePost(String postId, UpdatedPost updatedPost, User u) {
-        List<Post> posts = mongoService.getPostListWithoutSpecifiedPost(u.get_id(), postId);
-        posts.add(mongoService.updatedPost(u.get_id(), postId, updatedPost.getTitle(), updatedPost.getBody()));
-        u.setPosts(posts);
-        return u;
+    private Post saveUpdatedPost(PostDTO postDto, Post p){
+        userConfiguration.handleUpdateException(postDto.getImageUrl().isPresent() && !userConfiguration.isImage(postDto.getImageUrl().get()),
+                new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
+
+        mongoService.savePost(p.withBody(postDto.getBody().orElse(p.getBody()))
+                                .withTitle(postDto.getTitle().orElse(p.getTitle()))
+                .withImageUrl(postDto.getImageUrl().orElse(p.getImageUrl())));
+        return p;
     }
 
-    //TODO: da testare - LDB
     public List<Post> findAllFriendsPosts(UserIdDTO userId){
         Set<String> friends = mongoService.findUserById(userId.getId())
                         .map(User::getFriends)
                         .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
-       return mongoService.findAllPostsByArrayAggregation(friends).stream()
+        Set<String> postsIds = mongoService.findAllFriendsPostsIdsAggregation(friends).stream().map(PostAuthorAndId::getPostId).collect(Collectors.toSet());
+        return mongoService.findAllPostsByArrAggregation(postsIds).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());
+    }
+
+    public void createComment(CommentDTO commentDTO){
+        mongoService.findPostById(commentDTO.getPostId())
+                .map(p -> this.addComment(commentDTO, p))
+                .map(mongoService::savePost)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.POST_NOT_FOUND.getMsg()));
+    }
+
+    private Post addComment(CommentDTO commentDTO, Post p) {
+        Comment comment = Comment.builder()
+                ._id(new ObjectId())
+                .body(commentDTO.getBody())
+                .author(commentDTO.getAuthor())
+                .timestamp(new Date())
+                .build();
+
+        p.getComments().add(comment);
+        return p;
     }
 }

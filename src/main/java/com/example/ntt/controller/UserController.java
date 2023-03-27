@@ -62,11 +62,6 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(applicationService.findUserByUsername(username));
     }
 
-    /*@Override
-    public ResponseEntity<User> findUserById(UserIdDTO userId) {
-        return ResponseEntity.ok(applicationService.findUserById(userId));
-    }*/
-
     @Override
     public ResponseEntity<User> updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
         return ResponseEntity.ok(applicationService.updatePasswordById(newUserPassword));
