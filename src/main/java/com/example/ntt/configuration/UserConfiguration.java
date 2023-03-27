@@ -86,7 +86,6 @@ public class UserConfiguration {
                 .map(mongoService::saveUser);
     }
 
-    //TODO: sistemare sono invertite le eccezioni di emailExists e usernameExists
     private User validatePasswordAndEmail(User user) {
         return Optional.of(user)
                 .filter(u -> this.emailExists(u.getEmail()))
