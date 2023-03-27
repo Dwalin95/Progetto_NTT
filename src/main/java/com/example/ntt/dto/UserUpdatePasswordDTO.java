@@ -2,7 +2,10 @@ package com.example.ntt.dto;
 
 import lombok.*;
 
-@Value
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class UserUpdatePasswordDTO {
     String id;
     String oldPassword;

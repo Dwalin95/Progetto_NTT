@@ -34,8 +34,8 @@ public interface UserApi {
     @GetMapping(value = "/user")
     ResponseEntity<User> findUserByUsername(@RequestBody UsernameOnlyDTO username);
 
-    /*@GetMapping(value = "/user")
-    ResponseEntity<User> findUserById(@RequestBody UserIdDTO userId);*/
+    /* @GetMapping(value = "/user")
+    ResponseEntity<User> findUserById(@RequestBody UserIdDTO userId); */
 
     @PutMapping(value = "/password") // ex {id}/updatePassword
     ResponseEntity<User> updatePasswordById(@RequestBody UserUpdatePasswordDTO newUserPassword); //oldPassword, newPassword, confirmPassword

@@ -42,24 +42,37 @@ public class UserService {
 
     public User updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
         return mongoService.findUserById(newUserPassword.getId())
-                .map(user -> this.doesNotMatch(newUserPassword.getOldPassword(), user))
-                .map(user -> this.match(newUserPassword.getOldPassword(), user))
+                .filter(user -> this.compareInsertedPasswordWithDbPassword(newUserPassword.getOldPassword(), user))
+                .filter(user -> this.checkIfEqual(newUserPassword.getOldPassword(), user))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), newUserPassword.getId())));
     }
+//                .map(user -> this.compareInsertedPasswordWithDbPassword(newUserPassword.getOldPassword(), user))
+//                .map(user -> this.checkIfEqual(newUserPassword.getOldPassword(), user))
+//                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), newUserPassword.getId())));
+//
+// }
 
-    private User match(String confirmedPassword, User user) {
+
+    /**
+
+      */
+    private boolean checkIfEqual(String confirmedPassword, User user) {
         if (!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPassword())) {
             user.setPassword(userConfiguration.passwordEncoder().encode(confirmedPassword));
             mongoService.saveUser(user);
-            return user;
+            return true;
         } else {
             throw new UnauthorizedException(ErrorMsg.NEW_PWS_EQUAL_TO_OLD_PSW.getMsg());
         }
     }
 
-    private User doesNotMatch(String oldPassword, User user) {
+    /**
+     * questo metodo confronta la password inserita dall'utente con quella presente nel db
+     */
+    private boolean compareInsertedPasswordWithDbPassword(String oldPassword, User user) {
+
         if (userConfiguration.passwordEncoder().matches(oldPassword, user.getPassword())) {
-            return user;
+            return true;
         } else {
             throw new ResourceNotFoundException(ErrorMsg.NO_MATCH_OLD_PSW.getMsg());
         }
@@ -70,7 +83,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
     }
 
-    public User findUserByUsername(UsernameOnlyDTO username){
+    public User findUserByUsername(UsernameOnlyDTO username) {
         return mongoService.findUserByUsername(username.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username.getUsername())));
     }
