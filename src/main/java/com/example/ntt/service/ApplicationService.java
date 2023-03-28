@@ -3,11 +3,10 @@ package com.example.ntt.service;
 import com.example.ntt.dto.*;
 import com.example.ntt.model.*;
 import com.example.ntt.projections.UserContactInfoProjection;
-import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
+import com.example.ntt.projections.UserFriendsListProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Set;
@@ -31,7 +30,7 @@ public class ApplicationService {
     }
 
     //Projection
-    public UserFriendsAndRequestReceivedList getFriendsAndRequestReceived(String username) {
+    public UserFriendsAndRequestReceivedListProjection getFriendsAndRequestReceived(String username) {
         return userService.getFriendsAndRequestReceived(username);
     }
 
@@ -47,7 +46,7 @@ public class ApplicationService {
         return userService.findUserByUsername(username);
     }
 
-    public Set<User> findFriendsById(UserIdDTO userId){
+    public Set<UserFriendsListProjection> findFriendsById(UserIdDTO userId){
         return userService.findFriendsById(userId);
     }
 
