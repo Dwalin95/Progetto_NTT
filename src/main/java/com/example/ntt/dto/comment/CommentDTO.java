@@ -1,4 +1,4 @@
-package com.example.ntt.dto;
+package com.example.ntt.dto.comment;
 
 import lombok.Getter;
 import lombok.Setter;

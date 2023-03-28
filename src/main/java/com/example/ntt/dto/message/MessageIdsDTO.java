@@ -1,4 +1,4 @@
-package com.example.ntt.dto;
+package com.example.ntt.dto.message;
 
 import lombok.Data;
 import lombok.Value;

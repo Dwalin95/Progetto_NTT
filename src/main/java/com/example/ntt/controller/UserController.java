@@ -2,7 +2,7 @@ package com.example.ntt.controller;
 
 import com.example.ntt.api.UserApi;
 import com.example.ntt.configuration.UserConfiguration;
-import com.example.ntt.dto.*;
+import com.example.ntt.dto.user.*;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;

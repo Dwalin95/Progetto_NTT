@@ -1,10 +1,10 @@
 package com.example.ntt.controller;
 
 import com.example.ntt.api.PostApi;
-import com.example.ntt.dto.CommentDTO;
-import com.example.ntt.dto.PostDTO;
-import com.example.ntt.dto.PostIdAndUserIdDTO;
-import com.example.ntt.dto.UserIdDTO;
+import com.example.ntt.dto.comment.CommentDTO;
+import com.example.ntt.dto.post.PostDTO;
+import com.example.ntt.dto.post.PostIdAndUserIdDTO;
+import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.model.Post;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;

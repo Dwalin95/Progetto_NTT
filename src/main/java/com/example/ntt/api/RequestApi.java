@@ -1,8 +1,8 @@
 package com.example.ntt.api;
 
-import com.example.ntt.dto.CurrentUserIdAndFriendIdDTO;
-import com.example.ntt.dto.FriendRequestDTO;
-import com.example.ntt.dto.UserIdDTO;
+import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.request.FriendRequestDTO;
+import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.projections.UserReceivedFriendRequestsProjection;
 import com.example.ntt.projections.UserSentFriendRequestsProjection;
 import org.springframework.http.ResponseEntity;

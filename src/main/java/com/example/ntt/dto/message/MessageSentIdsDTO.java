@@ -1,11 +1,11 @@
-package com.example.ntt.dto;
+package com.example.ntt.dto.message;
 
 import lombok.Data;
 import lombok.Value;
 
 @Value
-public class FriendRequestDTO {
+public class MessageSentIdsDTO {
     private String currentUserId;
     private String friendId;
-    private boolean isRequestAccepted;
+    private String messageId;
 }

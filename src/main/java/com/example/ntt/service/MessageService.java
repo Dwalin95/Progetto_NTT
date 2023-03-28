@@ -1,6 +1,10 @@
 package com.example.ntt.service;
 
-import com.example.ntt.dto.*;
+import com.example.ntt.dto.message.MessageIdsDTO;
+import com.example.ntt.dto.message.MessageSentIdsDTO;
+import com.example.ntt.dto.message.MessageToSendIdsAndBodyDTO;
+import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;

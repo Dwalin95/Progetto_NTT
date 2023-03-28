@@ -1,7 +1,11 @@
 package com.example.ntt.controller;
 
 import com.example.ntt.api.MessageApi;
-import com.example.ntt.dto.*;
+import com.example.ntt.dto.message.MessageIdsDTO;
+import com.example.ntt.dto.message.MessageSentIdsDTO;
+import com.example.ntt.dto.message.MessageToSendIdsAndBodyDTO;
+import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.model.Message;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;

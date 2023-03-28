@@ -1,10 +1,8 @@
 package com.example.ntt.api;
 
-import com.example.ntt.dto.*;
+import com.example.ntt.dto.user.*;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
-import com.example.ntt.dto.EmailGenderOnlyDTO;
-import com.example.ntt.dto.UsernameOnlyDTO;
 import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
 import com.example.ntt.projections.UserFriendsListWithUsernameAndProfilePicProjection;

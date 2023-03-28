@@ -1,7 +1,7 @@
 package com.example.ntt.service;
 
-import com.example.ntt.dto.EmailGenderOnlyDTO;
-import com.example.ntt.dto.UserIdDTO;
+import com.example.ntt.dto.user.EmailGenderOnlyDTO;
+import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.model.*;
 import com.example.ntt.projections.*;
 import com.example.ntt.repository.MessageRepository;

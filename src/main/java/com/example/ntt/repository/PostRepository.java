@@ -1,6 +1,6 @@
 package com.example.ntt.repository;
 
-import com.example.ntt.dto.CommentIdAndPostIdDTO;
+import com.example.ntt.dto.comment.CommentIdAndPostIdDTO;
 import com.example.ntt.model.Comment;
 import com.example.ntt.model.Post;
 import org.springframework.data.mongodb.repository.Aggregation;

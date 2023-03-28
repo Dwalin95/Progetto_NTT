@@ -1,6 +1,6 @@
 package com.example.ntt.configuration;
 
-import com.example.ntt.dto.UserAuthDTO;
+import com.example.ntt.dto.user.UserAuthDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;

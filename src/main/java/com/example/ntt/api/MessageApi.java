@@ -1,6 +1,10 @@
 package com.example.ntt.api;
 
-import com.example.ntt.dto.*;
+import com.example.ntt.dto.message.MessageIdsDTO;
+import com.example.ntt.dto.message.MessageSentIdsDTO;
+import com.example.ntt.dto.message.MessageToSendIdsAndBodyDTO;
+import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.model.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

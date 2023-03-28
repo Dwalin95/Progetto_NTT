@@ -1,10 +1,10 @@
 package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
-import com.example.ntt.dto.CommentDTO;
-import com.example.ntt.dto.PostDTO;
-import com.example.ntt.dto.PostIdAndUserIdDTO;
-import com.example.ntt.dto.UserIdDTO;
+import com.example.ntt.dto.comment.CommentDTO;
+import com.example.ntt.dto.post.PostDTO;
+import com.example.ntt.dto.post.PostIdAndUserIdDTO;
+import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;

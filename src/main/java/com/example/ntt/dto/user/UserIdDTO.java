@@ -1,4 +1,4 @@
-package com.example.ntt.dto;
+package com.example.ntt.dto.user;
 
 import lombok.*;
 

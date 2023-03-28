@@ -1,6 +1,13 @@
 package com.example.ntt.service;
 
-import com.example.ntt.dto.*;
+import com.example.ntt.dto.comment.CommentDTO;
+import com.example.ntt.dto.message.MessageIdsDTO;
+import com.example.ntt.dto.message.MessageSentIdsDTO;
+import com.example.ntt.dto.message.MessageToSendIdsAndBodyDTO;
+import com.example.ntt.dto.post.PostDTO;
+import com.example.ntt.dto.post.PostIdAndUserIdDTO;
+import com.example.ntt.dto.request.FriendRequestDTO;
+import com.example.ntt.dto.user.*;
 import com.example.ntt.model.*;
 import com.example.ntt.projections.*;
 import lombok.RequiredArgsConstructor;

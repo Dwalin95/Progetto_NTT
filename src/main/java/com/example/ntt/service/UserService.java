@@ -1,7 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
-import com.example.ntt.dto.*;
+import com.example.ntt.dto.user.*;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
