@@ -52,7 +52,7 @@ public class UserConfiguration {
 
     //TODO: LDB - vedere come fare per fare l'upload delle immagini dalla galleria
     public boolean isImage(String imageUrl){
-        //    The URL must start with either https and
+        //    The URL must start with https and
         //    then followed by :// and
         //    then it must contain www. and
         //    then followed by subdomain of length (2, 256) and
@@ -73,7 +73,7 @@ public class UserConfiguration {
         }
     }
 
-    public boolean emailAlreadyExists(String email) {
+    public boolean emailDoesNotExists(String email) {
         if(mongoService.findUserByEmail(email).isPresent()){
             throw new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), email));
         } else {
@@ -81,7 +81,7 @@ public class UserConfiguration {
         }
     }
 
-    public boolean usernameAlreadyExists(String username) {
+    public boolean usernameDoesNotExists(String username) {
         if(mongoService.findUserByUsername(username).isPresent()){
             throw new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), username));
         } else {
@@ -91,15 +91,15 @@ public class UserConfiguration {
 
     public void validateSignUp(User user) {
         Optional.of(user)
-                .map(this::validatePasswordAndEmail)
+                .map(this::handleSignUpValidation)
                 .map(mongoService::saveUser);
     }
 
-    private User validatePasswordAndEmail(User user) {
+    private User handleSignUpValidation(User user) {
         return Optional.of(user)
-                .filter(u -> this.emailAlreadyExists(u.getEmail()))
-                .filter(u -> this.usernameAlreadyExists(u.getUsername()))
-                .filter(u -> this.isImage(u.getProfilePicUrl()))
+                .filter(u -> this.emailDoesNotExists(u.getEmail()))
+                .filter(u -> this.usernameDoesNotExists(u.getUsername()))
+                .filter(u -> u.getProfilePicUrl() != null && this.isImage(u.getProfilePicUrl()))
                 .filter(u -> this.validatePassword(u.getPassword()) && this.validateEmail(u.getEmail()))
                 .map(this::encodeNewPassword)
                 .orElseThrow(() -> new UnauthorizedException(ErrorMsg.ACCESS_DENIED.getMsg()));

@@ -125,9 +125,9 @@ public class UserService {
     private User handleException(UserInfoWithIdDTO userInfo, User user) {
         userConfiguration.handleUpdateException(userInfo.getProfilePicUrl().isPresent() && !userConfiguration.isImage(userInfo.getProfilePicUrl().get()),
                 new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
-        userConfiguration.handleUpdateException(userInfo.getUsername().isPresent() && userConfiguration.usernameAlreadyExists(userInfo.getUsername().get()),
+        userConfiguration.handleUpdateException(userInfo.getUsername().isPresent() && userConfiguration.usernameDoesNotExists(userInfo.getUsername().get()),
                 new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), userInfo.getUsername())));
-        userConfiguration.handleUpdateException(userInfo.getEmail().isPresent() && userConfiguration.emailAlreadyExists(userInfo.getEmail().get()),
+        userConfiguration.handleUpdateException(userInfo.getEmail().isPresent() && userConfiguration.emailDoesNotExists(userInfo.getEmail().get()),
                 new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), userInfo.getEmail())));
         return user;
     }

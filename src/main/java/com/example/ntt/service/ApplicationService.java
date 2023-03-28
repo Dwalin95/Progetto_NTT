@@ -68,7 +68,6 @@ public class ApplicationService {
         userService.removeFriend(userIds);
     }
 
-
     public Set<String> findAllMessageSenders(UserIdDTO userId){
         return messageService.findAllMessageSenders(userId);
     }
