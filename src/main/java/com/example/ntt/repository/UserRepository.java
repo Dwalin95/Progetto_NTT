@@ -1,6 +1,5 @@
 package com.example.ntt.repository;
 
-import com.example.ntt.model.PostAuthorAndId;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -24,8 +23,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     void deleteByEmail(String email);
 
     @Query("{'_id': {$in: ?0}}")
-    Optional<Set<User>> findFriendsById(Set<String> friendsIds);
-
     <T> Optional<Set<T>> findFriendsById(Set<String> friendsIds, Class<T> type);
 
     @Aggregation(
@@ -34,9 +31,9 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findUserPost(String postId);
 
     @Aggregation(
-            pipeline = {"{$match: {'_id': {$in: ?0}}}", "{$unwind: {path: \"$postsIds\"}}", "{$project: {_id: 0, author: \"$_id\", postId: \"$postsIds\"}}"}
+            pipeline = {"{$match: {'_id': {$in: ?0}}}", "{$unwind: {path: \"$postsIds\"}}", "{$project: {_id: 0, authorUsername: \"$username\", postId: \"$postsIds\"}}"}
     )
-    Set<PostAuthorAndId> findAllFriendsPostsIds(Set<String> friendsIds);
+    <T> Set<T> findAllFriendsPostsIds(Set<String> friendsIds, Class<T> type);
 
     @Aggregation(
             pipeline = {"{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}

@@ -10,8 +10,8 @@ import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Comment;
 import com.example.ntt.model.Post;
-import com.example.ntt.model.PostAuthorAndId;
 import com.example.ntt.model.User;
+import com.example.ntt.projections.post.PostIdAndAuthorUsernameProjection;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -82,7 +82,7 @@ public class PostService {
         Set<String> friends = mongoService.findUserById(userId.getId())
                         .map(User::getFriends)
                         .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
-        Set<String> postsIds = mongoService.findAllFriendsPostsIdsAggregation(friends).stream().map(PostAuthorAndId::getPostId).collect(Collectors.toSet());
+        Set<String> postsIds = mongoService.findAllFriendsPostsIdsAggregation(friends).stream().map(PostIdAndAuthorUsernameProjection::getPostId).collect(Collectors.toSet());
         return mongoService.findAllPostsByArrAggregation(postsIds).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());

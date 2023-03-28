@@ -1,4 +1,4 @@
-package com.example.ntt.projections;
+package com.example.ntt.projections.user;
 
 import java.util.Set;
 

@@ -3,9 +3,9 @@ package com.example.ntt.api;
 import com.example.ntt.dto.user.*;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
-import com.example.ntt.projections.UserContactInfoProjection;
-import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.UserFriendsListWithUsernameAndProfilePicProjection;
+import com.example.ntt.projections.user.UserContactInfoProjection;
+import com.example.ntt.projections.user.UserFriendsAndRequestReceivedListProjection;
+import com.example.ntt.projections.user.UserFriendsListWithUsernameAndProfilePicProjection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +32,6 @@ public interface UserApi {
 
     @GetMapping(value = "/user")
     ResponseEntity<User> findUserByUsername(@RequestBody UsernameOnlyDTO username);
-
-    /* @GetMapping(value = "/user")
-    ResponseEntity<User> findUserById(@RequestBody UserIdDTO userId); */
 
     @PutMapping(value = "/password") // ex {id}/updatePassword
     ResponseEntity<User> updatePasswordById(@RequestBody UserUpdatePasswordDTO newUserPassword); //oldPassword, newPassword, confirmPassword

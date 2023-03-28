@@ -3,7 +3,8 @@ package com.example.ntt.service;
 import com.example.ntt.dto.user.EmailGenderOnlyDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.model.*;
-import com.example.ntt.projections.*;
+import com.example.ntt.projections.post.PostIdAndAuthorUsernameProjection;
+import com.example.ntt.projections.user.*;
 import com.example.ntt.repository.MessageRepository;
 import com.example.ntt.repository.PostRepository;
 import com.example.ntt.repository.UserRepository;
@@ -51,12 +52,13 @@ public class MongoService {
     public Optional<Set<UserReceivedFriendRequestsProjection>> findUserReceivedFriendRequestById(Set<String> friendsIds){
         return userRepository.findFriendsById(friendsIds, UserReceivedFriendRequestsProjection.class);
     }
+
     public Optional<Set<UserSentFriendRequestsProjection>> findUserSentFriendRequestById(Set<String> friendsIds){
         return userRepository.findFriendsById(friendsIds, UserSentFriendRequestsProjection.class);
     }
 
-    public Set<PostAuthorAndId> findAllFriendsPostsIdsAggregation(Set<String> friendsIds){
-        return userRepository.findAllFriendsPostsIds(friendsIds);
+    public Set<PostIdAndAuthorUsernameProjection> findAllFriendsPostsIdsAggregation(Set<String> friendsIds){
+        return userRepository.findAllFriendsPostsIds(friendsIds, PostIdAndAuthorUsernameProjection.class);
     }
 
     public List<User> findAllUsers(){
@@ -127,6 +129,7 @@ public class MongoService {
         postRepository.deleteById(postId);
     }
 
+    //TODO: refuso(?)
     public Post updatedPostAggregation(String currentUserId, String postId, String title, String body){
         return postRepository.updatedPost(currentUserId, postId, title, body);
     }

@@ -9,7 +9,7 @@ import com.example.ntt.dto.post.PostIdAndUserIdDTO;
 import com.example.ntt.dto.request.FriendRequestDTO;
 import com.example.ntt.dto.user.*;
 import com.example.ntt.model.*;
-import com.example.ntt.projections.*;
+import com.example.ntt.projections.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

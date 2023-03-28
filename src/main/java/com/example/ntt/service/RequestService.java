@@ -6,8 +6,8 @@ import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.User;
-import com.example.ntt.projections.UserReceivedFriendRequestsProjection;
-import com.example.ntt.projections.UserSentFriendRequestsProjection;
+import com.example.ntt.projections.user.UserReceivedFriendRequestsProjection;
+import com.example.ntt.projections.user.UserSentFriendRequestsProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

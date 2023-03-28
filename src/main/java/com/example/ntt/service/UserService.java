@@ -8,9 +8,9 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
-import com.example.ntt.projections.UserContactInfoProjection;
-import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.UserFriendsListWithUsernameAndProfilePicProjection;
+import com.example.ntt.projections.user.UserContactInfoProjection;
+import com.example.ntt.projections.user.UserFriendsAndRequestReceivedListProjection;
+import com.example.ntt.projections.user.UserFriendsListWithUsernameAndProfilePicProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
