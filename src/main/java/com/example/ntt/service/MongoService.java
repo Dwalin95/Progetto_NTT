@@ -7,7 +7,8 @@ import com.example.ntt.model.Post;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
 import com.example.ntt.projections.UserContactInfoProjection;
-import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
+import com.example.ntt.projections.UserFriendsListProjection;
 import com.example.ntt.repository.MessageRepository;
 import com.example.ntt.repository.PostRepository;
 import com.example.ntt.repository.UserRepository;
@@ -37,8 +38,8 @@ public class MongoService {
         return this.userRepository.findByUsername(username, EmailGenderOnlyDTO.class);
     }
 
-    public Optional<UserFriendsAndRequestReceivedList> getFriendsAndRequestReceived(String username) {
-        return this.userRepository.findByUsername(username, UserFriendsAndRequestReceivedList.class);
+    public Optional<UserFriendsAndRequestReceivedListProjection> getFriendsAndRequestReceived(String username) {
+        return this.userRepository.findByUsername(username, UserFriendsAndRequestReceivedListProjection.class);
     }
 
     public Optional<User> findUserByEmail(String email){
@@ -49,8 +50,8 @@ public class MongoService {
         return userRepository.findByUsername(username);
     }
 
-    public Optional<Set<User>> findUserFriendsById(Set<String> friendsIds){
-        return userRepository.findFriendsById(friendsIds);
+    public Optional<Set<UserFriendsListProjection>> findUserFriendsById(Set<String> friendsIds){
+        return userRepository.findFriendsById(friendsIds, UserFriendsListProjection.class);
     }
 
     public List<User> findAllUsers(){

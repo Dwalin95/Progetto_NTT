@@ -6,7 +6,8 @@ import com.example.ntt.dto.*;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
-import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
+import com.example.ntt.projections.UserFriendsListProjection;
 import com.example.ntt.service.ApplicationService;
 import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
@@ -41,7 +42,7 @@ public class UserController implements UserApi {
 
     //TODO: approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
     @Override
-    public ResponseEntity<UserFriendsAndRequestReceivedList> getFriendListAndRequestReceived(UsernameOnlyDTO username) {
+    public ResponseEntity<UserFriendsAndRequestReceivedListProjection> getFriendListAndRequestReceived(UsernameOnlyDTO username) {
         return ResponseEntity.ok(applicationService.getFriendsAndRequestReceived(username.getUsername()));
     }
 
@@ -53,7 +54,7 @@ public class UserController implements UserApi {
     //-- [FINE] Aggiungi commento --//
 
     @Override
-    public ResponseEntity<Set<User>> findUserFriendsById(UserIdDTO userId) {
+    public ResponseEntity<Set<UserFriendsListProjection>> findUserFriendsById(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findFriendsById(userId));
     }
 
@@ -70,7 +71,6 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<User> updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
         return ResponseEntity.ok(applicationService.updatePasswordById(newUserPassword));
-
     }
 
     @Override

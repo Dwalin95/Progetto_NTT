@@ -9,7 +9,8 @@ import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
-import com.example.ntt.projections.UserFriendsAndRequestReceivedList;
+import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
+import com.example.ntt.projections.UserFriendsListProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class UserService {
     }
 
     //Projection
-    public UserFriendsAndRequestReceivedList getFriendsAndRequestReceived(String username) {
+    public UserFriendsAndRequestReceivedListProjection getFriendsAndRequestReceived(String username) {
         return mongoService.getFriendsAndRequestReceived(username)
                 .orElseThrow(() -> new ResourceNotFoundException((String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username))));
     }
@@ -75,7 +76,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username.getUsername())));
     }
 
-    public Set<User> findFriendsById(UserIdDTO userId) {
+    public Set<UserFriendsListProjection> findFriendsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
                 .map(u -> mongoService.findUserFriendsById(u.getFriends()))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))

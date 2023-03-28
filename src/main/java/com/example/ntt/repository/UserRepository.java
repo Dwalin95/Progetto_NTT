@@ -2,6 +2,7 @@ package com.example.ntt.repository;
 
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
+import com.example.ntt.projections.UserFriendsListProjection;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -24,6 +25,8 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     @Query("{'_id': {$in: ?0}}")
     Optional<Set<User>> findFriendsById(Set<String> friendsIds);
+
+    <T> Optional<Set<T>> findFriendsById(Set<String> friendsIds, Class<T> type);
 
     @Aggregation(
             pipeline = {"{$group: {_id: \"$address.city\", numUsers: {$sum: 1}}}"}

@@ -1,9 +1,8 @@
 package com.example.ntt.projections;
 
-import java.util.List;
 import java.util.Set;
 
-public interface UserFriendsAndRequestReceivedList {
+public interface UserFriendsAndRequestReceivedListProjection {
     Set<String> getFriends();
     Set<String> getReceivedFriendRequests();
 
