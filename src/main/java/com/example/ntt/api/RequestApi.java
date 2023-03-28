@@ -3,7 +3,8 @@ package com.example.ntt.api;
 import com.example.ntt.dto.CurrentUserIdAndFriendIdDTO;
 import com.example.ntt.dto.FriendRequestDTO;
 import com.example.ntt.dto.UserIdDTO;
-import com.example.ntt.model.User;
+import com.example.ntt.projections.UserReceivedFriendRequestsProjection;
+import com.example.ntt.projections.UserSentFriendRequestsProjection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Set;
@@ -12,11 +13,11 @@ import java.util.Set;
 @RequestMapping("/api/v1")
 public interface RequestApi {
     @GetMapping(value = "/receivedFriendRequests")
-    ResponseEntity<Set<User>> findUserFriendRequestsById(@RequestBody UserIdDTO userId);
+    ResponseEntity<Set<UserReceivedFriendRequestsProjection>> findUserReceivedFriendRequestsById(@RequestBody UserIdDTO userId);
 
 
     @GetMapping(value = "/sentFriendRequests")
-    ResponseEntity<Set<User>> findUserSentFriendRequestById(@RequestBody UserIdDTO userId);
+    ResponseEntity<Set<UserSentFriendRequestsProjection>> findUserSentFriendRequestById(@RequestBody UserIdDTO userId);
 
     @PostMapping(value = "/sendFriendRequest")
     void sendFriendRequest(@RequestParam CurrentUserIdAndFriendIdDTO userIds);

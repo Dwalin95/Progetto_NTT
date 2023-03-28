@@ -3,7 +3,6 @@ package com.example.ntt.repository;
 import com.example.ntt.model.PostAuthorAndId;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.model.User;
-import com.example.ntt.projections.UserFriendsListProjection;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

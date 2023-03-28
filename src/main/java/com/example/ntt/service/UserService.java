@@ -10,7 +10,7 @@ import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.UserFriendsListProjection;
+import com.example.ntt.projections.UserFriendsListWithUsernameAndProfilePicProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -89,9 +89,9 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username.getUsername())));
     }
 
-    public Set<UserFriendsListProjection> findFriendsById(UserIdDTO userId) {
+    public Set<UserFriendsListWithUsernameAndProfilePicProjection> findFriendsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
-                .map(u -> mongoService.findUserFriendsById(u.getFriends()))
+                .map(u -> mongoService.findUserFriendsReturningUsernameAndProfilePicById(u.getFriends()))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
                 .orElse(new HashSet<>());
     }

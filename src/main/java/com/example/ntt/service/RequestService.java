@@ -6,6 +6,9 @@ import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.User;
+import com.example.ntt.projections.UserFriendsListWithUsernameAndProfilePicProjection;
+import com.example.ntt.projections.UserReceivedFriendRequestsProjection;
+import com.example.ntt.projections.UserSentFriendRequestsProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +22,18 @@ public class RequestService {
 
     private final MongoService mongoService;
 
-    public Set<User> findUserReceivedFriendRequestsById(UserIdDTO userId) {
+    public Set<UserReceivedFriendRequestsProjection> findUserReceivedFriendRequestsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
                 .map(User::getReceivedFriendRequests)
-                .map(mongoService::findUserFriendsById)
+                .map(mongoService::findUserReceivedFriendRequestById)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
                 .orElse(new HashSet<>());
     }
 
-    public Set<User> findUserSentFriendRequestById(UserIdDTO currentUserId) {
+    public Set<UserSentFriendRequestsProjection> findUserSentFriendRequestById(UserIdDTO currentUserId) {
         return mongoService.findUserById(currentUserId.getId())
                 .map(User::getSentFriendRequests)
-                .map(mongoService::findUserFriendsById)
+                .map(mongoService::findUserSentFriendRequestById)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)))
                 .orElse(new HashSet<>());
     }

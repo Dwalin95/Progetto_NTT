@@ -7,7 +7,7 @@ import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.dto.UsernameOnlyDTO;
 import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.UserFriendsListProjection;
+import com.example.ntt.projections.UserFriendsListWithUsernameAndProfilePicProjection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +30,7 @@ public interface UserApi {
     ResponseEntity<UserFriendsAndRequestReceivedListProjection> getFriendListAndRequestReceived(@RequestBody UsernameOnlyDTO username);
 
     @GetMapping(value = "/friends")
-    ResponseEntity<Set<UserFriendsListProjection>> findUserFriendsById(@RequestBody UserIdDTO userId);
+    ResponseEntity<Set<UserFriendsListWithUsernameAndProfilePicProjection>> findUserFriendsById(@RequestBody UserIdDTO userId);
 
     @GetMapping(value = "/user")
     ResponseEntity<User> findUserByUsername(@RequestBody UsernameOnlyDTO username);

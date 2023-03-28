@@ -7,7 +7,7 @@ import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
 import com.example.ntt.projections.UserContactInfoProjection;
 import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.UserFriendsListProjection;
+import com.example.ntt.projections.UserFriendsListWithUsernameAndProfilePicProjection;
 import com.example.ntt.service.ApplicationService;
 import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
@@ -54,7 +54,7 @@ public class UserController implements UserApi {
     //-- [FINE] Aggiungi commento --//
 
     @Override
-    public ResponseEntity<Set<UserFriendsListProjection>> findUserFriendsById(UserIdDTO userId) {
+    public ResponseEntity<Set<UserFriendsListWithUsernameAndProfilePicProjection>> findUserFriendsById(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findFriendsById(userId));
     }
 

@@ -2,9 +2,7 @@ package com.example.ntt.service;
 
 import com.example.ntt.dto.*;
 import com.example.ntt.model.*;
-import com.example.ntt.projections.UserContactInfoProjection;
-import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.UserFriendsListProjection;
+import com.example.ntt.projections.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +44,7 @@ public class ApplicationService {
         return userService.findUserByUsername(username);
     }
 
-    public Set<UserFriendsListProjection> findFriendsById(UserIdDTO userId){
+    public Set<UserFriendsListWithUsernameAndProfilePicProjection> findFriendsById(UserIdDTO userId){
         return userService.findFriendsById(userId);
     }
 
@@ -96,11 +94,11 @@ public class ApplicationService {
         messageService.sendMessage(messageToSend);
     }
 
-    public Set<User> findUserReceivedFriendRequestsById(UserIdDTO userId){
+    public Set<UserReceivedFriendRequestsProjection> findUserReceivedFriendRequestsById(UserIdDTO userId){
         return requestService.findUserReceivedFriendRequestsById(userId);
     }
 
-    public Set<User> findUserSentFriendRequestById(UserIdDTO currentUserId){
+    public Set<UserSentFriendRequestsProjection> findUserSentFriendRequestById(UserIdDTO currentUserId){
         return requestService.findUserSentFriendRequestById(currentUserId);
     }
 

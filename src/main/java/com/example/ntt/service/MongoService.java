@@ -3,9 +3,7 @@ package com.example.ntt.service;
 import com.example.ntt.dto.EmailGenderOnlyDTO;
 import com.example.ntt.dto.UserIdDTO;
 import com.example.ntt.model.*;
-import com.example.ntt.projections.UserContactInfoProjection;
-import com.example.ntt.projections.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.UserFriendsListProjection;
+import com.example.ntt.projections.*;
 import com.example.ntt.repository.MessageRepository;
 import com.example.ntt.repository.PostRepository;
 import com.example.ntt.repository.UserRepository;
@@ -47,8 +45,14 @@ public class MongoService {
         return userRepository.findByUsername(username);
     }
 
-    public Optional<Set<UserFriendsListProjection>> findUserFriendsById(Set<String> friendsIds){
-        return userRepository.findFriendsById(friendsIds, UserFriendsListProjection.class);
+    public Optional<Set<UserFriendsListWithUsernameAndProfilePicProjection>> findUserFriendsReturningUsernameAndProfilePicById(Set<String> friendsIds){
+        return userRepository.findFriendsById(friendsIds, UserFriendsListWithUsernameAndProfilePicProjection.class);
+    }
+    public Optional<Set<UserReceivedFriendRequestsProjection>> findUserReceivedFriendRequestById(Set<String> friendsIds){
+        return userRepository.findFriendsById(friendsIds, UserReceivedFriendRequestsProjection.class);
+    }
+    public Optional<Set<UserSentFriendRequestsProjection>> findUserSentFriendRequestById(Set<String> friendsIds){
+        return userRepository.findFriendsById(friendsIds, UserSentFriendRequestsProjection.class);
     }
 
     public Set<PostAuthorAndId> findAllFriendsPostsIdsAggregation(Set<String> friendsIds){
