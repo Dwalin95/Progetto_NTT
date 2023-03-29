@@ -10,5 +10,4 @@ public class UserUpdatePasswordDTO {
     String id;
     String oldPassword;
     String newPassword;
-    String confirmPassword;
 }
