@@ -67,7 +67,7 @@ public class MessageService {
         }
     }
 
-    //TODO: valutare se lasciare la logica nel backend o spostarla nel frontend
+    //TODO: TUTTI(?) - valutare se lasciare la logica nel backend o spostarla nel frontend
     private boolean compareDatesForTimeLimit(String currentUserId, String messageId){
         Message messageToCheck = mongoService.findSingleMessage(currentUserId, messageId);
 
@@ -82,7 +82,7 @@ public class MessageService {
         return now.before(dateOfTheMessage);
     }
 
-    public void deleteReceivedMessage(MessageReceivedIdsDTO deleteMessage){ //TODO: vedere con Pier il metodo [passaggio del DTO] - FC
+    public void deleteReceivedMessage(MessageReceivedIdsDTO deleteMessage){ //TODO: FC - vedere con Pier il metodo [passaggio del DTO]
         this.deleteMessageAndSaveUser(deleteMessage.getCurrentUserId(), deleteMessage.getMessageId());
     }
 
@@ -117,7 +117,7 @@ public class MessageService {
         mongoService.saveUser(u);
     }
 
-    //TODO: migliorare il codice - LDB
+    //TODO: LDB - migliorare il codice
     public void sendMessage(MessageToSendIdsAndBodyDTO messageToSend) {
         User messageReceiver = mongoService.findUserById(messageToSend.getFriendId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), messageToSend.getFriendId())));
