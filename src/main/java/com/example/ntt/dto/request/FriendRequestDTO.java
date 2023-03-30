@@ -1,10 +1,10 @@
 package com.example.ntt.dto.request;
 
-import lombok.Data;
-import lombok.Value;
+import lombok.Getter;
 
-@Value
+@Getter
 public class FriendRequestDTO {
+
     private String currentUserId;
     private String friendId;
     private boolean isRequestAccepted;

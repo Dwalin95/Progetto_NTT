@@ -21,7 +21,6 @@ public enum ErrorMsg {
     EMAIL_ALREADY_IN_USE("The email %s is already in use"),
     PASSWORD_NOT_VALID("Password not valid"),
     EMAIL_MUST_CONTAIN_AT("Email must contain @"),
-    //TODO: migliorare il nome dell'errore
     PASSWORD_MUST_RESPECT_RULES("Password must respect rules");
 
     private final String msg;

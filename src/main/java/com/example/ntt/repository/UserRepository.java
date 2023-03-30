@@ -14,7 +14,7 @@ import java.util.Set;
 public interface UserRepository extends MongoRepository<User, String> {
 
     //Test Projection
-    <T> Optional<T> findByUsername(String username, Class<T> type); //TODO: test
+    <T> Optional<T> findByUsername(String username, Class<T> type); //TODO: FC - test
 
     Optional<User> findByEmail(String email);
 

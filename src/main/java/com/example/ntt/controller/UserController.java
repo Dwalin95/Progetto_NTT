@@ -28,24 +28,6 @@ public class UserController implements UserApi {
 
     private final UserConfiguration userConfiguration;
 
-
-    //-- [INIZIO] Interfaccia di proiezione e utilizzo dei DTO --//
-    @Override
-    public ResponseEntity<UserContactInfoProjection> getContactInformation(UsernameOnlyDTO username) {
-        return ResponseEntity.ok(applicationService.getUserContactInfo(username.getUsername()));
-    }
-
-    @Override
-    public ResponseEntity<EmailGenderOnlyDTO> getUserEmailAndGender(UsernameOnlyDTO username) {
-        return ResponseEntity.ok(applicationService.getUserEmailAndGender(username.getUsername()));
-    }
-
-    //TODO: approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
-    @Override
-    public ResponseEntity<UserFriendsAndRequestReceivedListProjection> getFriendListAndRequestReceived(UsernameOnlyDTO username) {
-        return ResponseEntity.ok(applicationService.getFriendsAndRequestReceived(username.getUsername()));
-    }
-
     //-- [FINE] Interfaccia di proiezione e utilizzo dei DTO --//
     //-- [Inizio] Aggiungi commento --//
 
@@ -73,7 +55,6 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(applicationService.friendsCountPerCity(userId));
     }
 
-    //DTO Attributes: id, username, firstName, lastName, email, gender
     @Override
     public ResponseEntity<User> updateUserById(UserInfoWithIdDTO userInfo) {
         return ResponseEntity.ok(applicationService.updateUserById(userInfo));
@@ -91,16 +72,7 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<User> login(UserAuthDTO credentials) {
-
-        URI uri = URI.create("http://localhost:3000");
-        return ResponseEntity.created(uri)
-                .header("Access-Control-Allow-Origin","http://localhost:3000")
-                .body(userConfiguration.checkLogin(credentials));
-       /*
-        return ResponseEntity.ok(userConfiguration.checkLogin(email, password))
-                .getHeaders()
-                .add("Access-Control-Allow-Origin","http://localhost:3000");
-    */
+        return ResponseEntity.ok(userConfiguration.checkLogin(credentials));
     }
 
     @Override
@@ -113,4 +85,24 @@ public class UserController implements UserApi {
         mongoService.deleteUserById(userId);
     }
 
+    /**
+     *
+     * metodi usati per test, vedere possibile utilizzo
+     */
+    //-- [INIZIO] Interfaccia di proiezione e utilizzo dei DTO --//
+    //TODO: FC - approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
+    @Override
+    public ResponseEntity<UserFriendsAndRequestReceivedListProjection> getFriendListAndRequestReceived(UsernameOnlyDTO username) {
+        return ResponseEntity.ok(applicationService.getFriendsAndRequestReceived(username.getUsername()));
+    }
+
+    @Override
+    public ResponseEntity<UserContactInfoProjection> getContactInformation(UsernameOnlyDTO username) {
+        return ResponseEntity.ok(applicationService.getUserContactInfo(username));
+    }
+
+    @Override
+    public ResponseEntity<EmailGenderOnlyDTO> getUserEmailAndGender(UsernameOnlyDTO username) {
+        return ResponseEntity.ok(applicationService.getUserEmailAndGender(username.getUsername()));
+    }
 }

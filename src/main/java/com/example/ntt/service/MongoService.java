@@ -49,16 +49,13 @@ public class MongoService {
     public Optional<Set<UserFriendsListWithUsernameAndProfilePicProjection>> findUserFriendsReturningUsernameAndProfilePicById(Set<String> friendsIds){
         return userRepository.findFriendsById(friendsIds, UserFriendsListWithUsernameAndProfilePicProjection.class);
     }
+
     public Optional<Set<UserReceivedFriendRequestsProjection>> findUserReceivedFriendRequestById(Set<String> friendsIds){
         return userRepository.findFriendsById(friendsIds, UserReceivedFriendRequestsProjection.class);
     }
 
     public Optional<Set<UserSentFriendRequestsProjection>> findUserSentFriendRequestById(Set<String> friendsIds){
         return userRepository.findFriendsById(friendsIds, UserSentFriendRequestsProjection.class);
-    }
-
-    public Set<PostIdAndAuthorUsernameProjection> findAllFriendsPostsIdsAggregation(Set<String> friendsIds){
-        return userRepository.findAllFriendsPostsIds(friendsIds, PostIdAndAuthorUsernameProjection.class);
     }
 
     public List<User> findAllUsers(){
@@ -73,12 +70,8 @@ public class MongoService {
         userRepository.deleteById(userId.getId());
     }
 
-    public void deleteUserByEmail(String email){
-        userRepository.deleteByEmail(email);
-    }
-
-    public Set<UserCountPerCity> countUsersPerCityAggregation(){
-        return userRepository.countUsersPerCity();
+    public Set<PostIdAndAuthorUsernameProjection> findAllFriendsPostsIdsAggregation(Set<String> friendsIds){
+        return userRepository.findAllFriendsPostsIds(friendsIds, PostIdAndAuthorUsernameProjection.class);
     }
 
     public Set<UserCountPerCity> countFriendsPerCityAggregation(Set<String> friendsUsernames){
@@ -113,10 +106,6 @@ public class MongoService {
         return messageRepository.findMessageByTextPerFriendBySide(currentUserId, senderId, receivedId, text);
     }
 
-    public Optional<User> findUserPostAggregation(String postId){
-        return userRepository.findUserPost(postId);
-    }
-
     public Post savePost(Post post){
         return postRepository.save(post);
     }
@@ -129,12 +118,30 @@ public class MongoService {
         postRepository.deleteById(postId);
     }
 
-    //TODO: refuso(?)
-    public Post updatedPostAggregation(String currentUserId, String postId, String title, String body){
-        return postRepository.updatedPost(currentUserId, postId, title, body);
-    }
-
     public List<Post> findAllPostsByArrAggregation(Set<String> postsIds){
         return postRepository.findAllPostsByIdsArr(postsIds);
+    }
+
+    /**
+     * da implementare
+     */
+    public Optional<User> findUserPostAggregation(String postId){
+        return userRepository.findUserPost(postId);
+    }
+
+    /**
+    * non usate
+     */
+
+    public void deleteUserByEmail(String email){
+        userRepository.deleteByEmail(email);
+    }
+
+    public Set<UserCountPerCity> countUsersPerCityAggregation(){
+        return userRepository.countUsersPerCity();
+    }
+
+    public Post updatedPostAggregation(String currentUserId, String postId, String title, String body){
+        return postRepository.updatedPost(currentUserId, postId, title, body);
     }
 }
