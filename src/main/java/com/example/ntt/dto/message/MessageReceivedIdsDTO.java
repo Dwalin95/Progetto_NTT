@@ -1,10 +1,10 @@
 package com.example.ntt.dto.message;
 
-import lombok.Data;
-import lombok.Value;
+import lombok.Getter;
 
-@Value
-public class MessageIdsDTO {
+@Getter
+public class MessageReceivedIdsDTO {
+
     private String currentUserId;
     private String messageId;
 }

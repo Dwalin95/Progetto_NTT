@@ -1,10 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.comment.CommentDTO;
-import com.example.ntt.dto.comment.CommentIdAndPostIdDTO;
-import com.example.ntt.dto.message.MessageIdsDTO;
-import com.example.ntt.dto.message.MessageSentIdsDTO;
-import com.example.ntt.dto.message.MessageToSendIdsAndBodyDTO;
+import com.example.ntt.dto.message.*;
 import com.example.ntt.dto.post.PostDTO;
 import com.example.ntt.dto.post.PostIdAndUserIdDTO;
 import com.example.ntt.dto.request.FriendRequestDTO;
@@ -27,7 +24,7 @@ public class ApplicationService {
     private final PostService postService;
 
     //Projections
-    public UserContactInfoProjection getUserContactInfo(String username) {
+    public UserContactInfoProjection getUserContactInfo(UsernameOnlyDTO username) {
         return userService.getUserContactInfo(username);
     }
     //DTO
@@ -77,19 +74,19 @@ public class ApplicationService {
         return messageService.findMessagesByFriendIds(userIds);
     }
 
-    public List<Message> findMessageByTextGlobal(String currentUserId, String text){
-        return messageService.findMessageByTextGlobal(currentUserId, text);
+    public List<Message> findMessageByTextGlobal(MessageTextAndCurrentUserIdDTO messageByText){
+        return messageService.findMessageByTextGlobal(messageByText);
     }
 
-    public List<Message> findMessageByTextPerFriend(String currentUserId, String friendId, String text){
-        return messageService.findMessageByTextPerFriend(currentUserId, friendId, text);
+    public List<Message> findMessageByTextPerFriend(MessageTextAndCurrentUserAndFriendIdDTO messageByText){
+        return messageService.findMessageByTextPerFriend(messageByText);
     }
 
     public void deleteSentMessage(MessageSentIdsDTO messageSent){
         messageService.deleteSentMessage(messageSent);
     }
 
-    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){
+    public void deleteReceivedMessage(MessageReceivedIdsDTO deleteMessage){
         messageService.deleteReceivedMessage(deleteMessage);
     }
 

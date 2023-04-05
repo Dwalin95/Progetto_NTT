@@ -27,7 +27,7 @@ public class PostService {
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
 
-    public void createPost(PostDTO postDto){ //TODO: completare l'implementazione - FC [Vedere gli Optional nel return]
+    public void createPost(PostDTO postDto){ //TODO: FC - completare l'implementazione - [Vedere gli Optional nel return]
         mongoService.findUserById(postDto.getCurrentUserId())
                 .map(user -> this.addPost(postDto, user))
                 .map(mongoService::saveUser)
@@ -83,7 +83,9 @@ public class PostService {
         Set<String> friends = mongoService.findUserById(userId.getId())
                         .map(User::getFriends)
                         .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
-        Set<String> postsIds = mongoService.findAllFriendsPostsIdsAggregation(friends).stream().map(PostIdAndAuthorUsernameProjection::getPostId).collect(Collectors.toSet());
+        Set<String> postsIds = mongoService.findAllFriendsPostsIdsAggregation(friends).stream()
+                        .map(PostIdAndAuthorUsernameProjection::getPostId)
+                        .collect(Collectors.toSet());
         return mongoService.findAllPostsByArrAggregation(postsIds).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());

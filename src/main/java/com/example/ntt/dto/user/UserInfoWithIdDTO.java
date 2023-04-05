@@ -1,19 +1,20 @@
 package com.example.ntt.dto.user;
 
-import lombok.Value;
+import lombok.Getter;
 
 import java.util.Optional;
 
-@Value
+@Getter
 public class UserInfoWithIdDTO {
-    String id;
-    String username;
-    String firstName;
-    String lastName;
-    String email;
-    String gender;
-    String profilePicUrl;
-    boolean isVisible;
+
+    private String id;
+    private String username;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String gender;
+    private String profilePicUrl;
+    private boolean isVisible;
 
     public Optional<String> getFirstName() {
         return Optional.ofNullable(firstName);

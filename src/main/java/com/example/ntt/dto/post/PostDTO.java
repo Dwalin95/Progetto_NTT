@@ -1,12 +1,10 @@
 package com.example.ntt.dto.post;
 
 import lombok.Getter;
-import lombok.Setter;
-import lombok.Value;
+
 import java.util.Optional;
 
 @Getter
-@Setter
 public class PostDTO {
 
     private String currentUserId;

@@ -22,11 +22,12 @@ public class RequestService {
     private final MongoService mongoService;
 
     public Set<UserReceivedFriendRequestsProjection> findUserReceivedFriendRequestsById(UserIdDTO userId) {
-        return mongoService.findUserById(userId.getId())
+        Set<UserReceivedFriendRequestsProjection> set = mongoService.findUserById(userId.getId())
                 .map(User::getReceivedFriendRequests)
                 .map(mongoService::findUserReceivedFriendRequestById)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
                 .orElse(new HashSet<>());
+        return set;
     }
 
     public Set<UserSentFriendRequestsProjection> findUserSentFriendRequestById(UserIdDTO currentUserId) {
@@ -59,7 +60,7 @@ public class RequestService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), id)));
     }
 
-    //TODO: da ritrasformare perchè l'altro non funzionava - LDB
+    //TODO: LDB - da ritrasformare perchè l'altro non funzionava
     public void handleFriendRequest(FriendRequestDTO friendRequest){
         User user = mongoService.findUserById(friendRequest.getCurrentUserId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), friendRequest.getCurrentUserId())));

@@ -1,8 +1,6 @@
 package com.example.ntt.api;
 
-import com.example.ntt.dto.message.MessageIdsDTO;
-import com.example.ntt.dto.message.MessageSentIdsDTO;
-import com.example.ntt.dto.message.MessageToSendIdsAndBodyDTO;
+import com.example.ntt.dto.message.*;
 import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.model.Message;
@@ -15,31 +13,29 @@ import java.util.Set;
 @RequestMapping("/api/v1")
 public interface MessageApi {
 
-    @GetMapping(value = "/{currentUserId}/chats")
-    ResponseEntity<List<Message>> findMessageByTextGlobal(@PathVariable String currentUserId, @RequestParam String text);
+    @GetMapping(value = "/user/textGlobal")
+    ResponseEntity<List<Message>> findMessageByTextGlobal(@RequestBody MessageTextAndCurrentUserIdDTO messageByText);
 
-    @GetMapping(value = "/{currentUserId}/chats/{friendId}")
-    ResponseEntity<List<Message>> findMessageByTextPerFriend(@PathVariable String currentUserId, @PathVariable String friendId, @RequestParam String text);
+    @GetMapping(value = "/user/textPerChat")
+    ResponseEntity<List<Message>> findMessageByTextPerFriend(@RequestBody MessageTextAndCurrentUserAndFriendIdDTO messageByText);
 
     /**
      * @param userId {id}
      * @return
      */
+    //TODO: FC - deve ritornare immagine profilo e lo username (possibilmente anche l'ultimo messaggio inviato nella chat)
     @GetMapping(value = "/chats")
     ResponseEntity<Set<String>> findAllMessageSenders(@RequestBody UserIdDTO userId);
 
     /**
      * @param userIds {currentUserId, friendId}
-     * @return
+     * @return //il ritorno va bene cosi
      */
     @GetMapping(value = "/friends/messages")
     ResponseEntity<List<Message>> userMessagesByFriendId(CurrentUserIdAndFriendIdDTO userIds);
 
     /**
      * @param messageSent {id, friendId, messageId}
-     * String id,
-     * String friendId,
-     * String messageId
      */
     @PutMapping(value = "/deleteSentMessage")
     void deleteSentMessage(@RequestBody MessageSentIdsDTO messageSent);
@@ -48,19 +44,17 @@ public interface MessageApi {
      * @param messageReceived {currentUserId, messageId}
      */
     @PutMapping(value = "/deleteReceivedMessage")
-    void deleteReceivedMessage(@RequestBody MessageIdsDTO messageReceived); //ex @PathVariable String id, @RequestParam String messageId
+    void deleteReceivedMessage(@RequestBody MessageReceivedIdsDTO messageReceived); //ex @PathVariable String id, @RequestParam String messageId
 
     /**
      * @param userIds {id, friendId}
-     * @param id
-     * @param friendId
      */
-    @PutMapping(value = "/{id}/deleteChat")
+    @PutMapping(value = "/deleteChat")
     void deleteChat(@RequestBody CurrentUserIdAndFriendIdDTO userIds);
 
     /**
      * @param messageToSend {currentUserId, friendId, body}
      */
-    @PostMapping(value = "/{id}/sendMessage/{friendId}")
+    @PostMapping(value = "/sendMessage")
     void sendMessage(@RequestBody MessageToSendIdsAndBodyDTO messageToSend);
 }

@@ -2,10 +2,10 @@ package com.example.ntt.dto.user;
 
 import lombok.*;
 
-@Value
+@Getter
 public class EmailGenderOnlyDTO {
-    String username;
-    String email;
-    String gender;
 
+    private String username;
+    private String email;
+    private String gender;
 }

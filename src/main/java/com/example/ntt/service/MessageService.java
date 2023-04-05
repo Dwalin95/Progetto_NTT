@@ -1,8 +1,6 @@
 package com.example.ntt.service;
 
-import com.example.ntt.dto.message.MessageIdsDTO;
-import com.example.ntt.dto.message.MessageSentIdsDTO;
-import com.example.ntt.dto.message.MessageToSendIdsAndBodyDTO;
+import com.example.ntt.dto.message.*;
 import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
@@ -11,7 +9,6 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.User;
-import com.mongodb.client.MongoClient;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -24,8 +21,6 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final MongoService mongoService;
-    private final MongoClient mongoClient;
-
     public Set<String> findAllMessageSenders(UserIdDTO userId){
         List<Message> messages = mongoService.findUserById(userId.getId())
                 .map(u -> mongoService.findAllMessagesAggregation(u.get_id()))
@@ -37,30 +32,28 @@ public class MessageService {
 
     public List<Message> findMessagesByFriendIds(CurrentUserIdAndFriendIdDTO userIds) {
         List<Message> chat = new ArrayList<>();
-        chat.addAll(mongoService.findChatBySideAggregation(userIds.getCurrentUserId(), userIds.getFriendId(), userIds.getCurrentUserId()));
+        List<Message> friendSide = mongoService.findChatBySideAggregation(userIds.getCurrentUserId(), userIds.getFriendId(), userIds.getCurrentUserId());
+        chat.addAll(friendSide);
         chat.addAll(mongoService.findChatBySideAggregation(userIds.getCurrentUserId(), userIds.getCurrentUserId(), userIds.getFriendId()));
         return chat.stream()
                 .sorted(Comparator.comparing(Message::getTimestamp))
                 .collect(Collectors.toList());
     }
 
-    //TODO: DTO - FC
-    public List<Message> findMessageByTextGlobal(String currentUserId, String text){
-        return mongoService.findUserById(currentUserId)
-                .map(u -> mongoService.findMessageByTextGlobalAggregation(u.get_id(), text))
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)));
+    public List<Message> findMessageByTextGlobal(MessageTextAndCurrentUserIdDTO messageByText){
+        return mongoService.findUserById(messageByText.getCurrentUserId())
+                .map(u -> mongoService.findMessageByTextGlobalAggregation(u.get_id(), messageByText.getText()))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), messageByText.getCurrentUserId())));
     }
 
-    //TODO: DTO - FC
-    public List<Message> findMessageByTextPerFriend(String currentUserId, String friendId, String text){
+    public List<Message> findMessageByTextPerFriend(MessageTextAndCurrentUserAndFriendIdDTO messageByText){
         List<Message> chat = new ArrayList<>();
-        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggregation(currentUserId, currentUserId, friendId, text));
-        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggregation(currentUserId, friendId, currentUserId, text));
+        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggregation(messageByText.getCurrentUserId(), messageByText.getCurrentUserId(), messageByText.getFriendId(), messageByText.getText()));
+        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggregation(messageByText.getCurrentUserId(), messageByText.getFriendId(), messageByText.getCurrentUserId(), messageByText.getText()));
         return chat.stream()
                 .sorted(Comparator.comparing(Message::getTimestamp)).collect(Collectors.toList());
     }
 
-    //TODO: Aggiungi MessageSentIdsDTO messageSent - FC
     public void deleteSentMessage(MessageSentIdsDTO messageSent){
         if(this.compareDatesForTimeLimit(messageSent.getCurrentUserId(), messageSent.getMessageId())) {
             this.deleteMessageAndSaveUser(messageSent.getCurrentUserId(), messageSent.getMessageId());
@@ -71,7 +64,7 @@ public class MessageService {
         }
     }
 
-    //TODO: valutare se lasciare la logica nel backend o spostarla nel frontend
+    //TODO: TUTTI(?) - valutare se lasciare la logica nel backend o spostarla nel frontend
     private boolean compareDatesForTimeLimit(String currentUserId, String messageId){
         Message messageToCheck = mongoService.findSingleMessage(currentUserId, messageId);
 
@@ -81,16 +74,14 @@ public class MessageService {
 
         Date orarioAttuale = new Date();
         Calendar now = Calendar.getInstance();
-        dateOfTheMessage.setTime(orarioAttuale);
+        now.setTime(orarioAttuale);
 
-        return now.after(dateOfTheMessage);
+        return now.before(dateOfTheMessage);
     }
 
-    //TODO: aggiungi DTO MessageIdsDTO deleteMessage - FC
-    public void deleteReceivedMessage(MessageIdsDTO deleteMessage){ //TODO: vedere con Pier il metodo [passaggio del DTO] - FC
+    public void deleteReceivedMessage(MessageReceivedIdsDTO deleteMessage){ //TODO: FC - vedere con Pier il metodo [passaggio del DTO]
         this.deleteMessageAndSaveUser(deleteMessage.getCurrentUserId(), deleteMessage.getMessageId());
     }
-
 
     private void deleteMessageAndSaveUser(String currentUserId, String messageId) {
         mongoService.findUserById(currentUserId)
@@ -105,7 +96,6 @@ public class MessageService {
         return u;
     }
 
-    //TODO: aggiungi CurrentUserIdAndFriendIdDTO userIds - FC
     public void deleteChat(CurrentUserIdAndFriendIdDTO userIds){
         mongoService.findUserById(userIds.getCurrentUserId())
                 .map(u -> this.handleRemoveChat(userIds.getFriendId(), u))
@@ -124,20 +114,20 @@ public class MessageService {
         mongoService.saveUser(u);
     }
 
-    //TODO: controllare - FC
+    //TODO: LDB - migliorare il codice
     public void sendMessage(MessageToSendIdsAndBodyDTO messageToSend) {
         User messageReceiver = mongoService.findUserById(messageToSend.getFriendId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), messageToSend.getFriendId())));
 
         Set<String> friends = messageReceiver.getFriends();
 
-        if(friends.contains(messageToSend.getCurrentUserId())){ //TODO: check from here - FC
+        if(friends.contains(messageToSend.getCurrentUserId())){
 
             Message message = Message.builder()
                     ._id(new ObjectId())
                     .body(messageToSend.getBody())
-                    .receiverId(messageToSend.getFriendId())
                     .senderId(messageToSend.getCurrentUserId())
+                    .receiverId(messageToSend.getFriendId())
                     .timestamp(new Date())
                     .build();
 
@@ -146,7 +136,7 @@ public class MessageService {
                     .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), messageToSend.getCurrentUserId())));
             this.addMessage(message, messageReceiver);
         } else {
-            throw new UnauthorizedException("You can only send messages between friends");
+            throw new UnauthorizedException(ErrorMsg.MUST_BE_FRIENDS_TO_SEND_MESSAGE.getMsg());
         }
     }
 

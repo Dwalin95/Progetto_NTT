@@ -24,6 +24,7 @@ public interface PostApi {
     @PutMapping(value = "/updatePost")
     void updatePost(@RequestBody PostDTO postDTO);
 
+    //TODO: FC - non funziona la projection
     @GetMapping(value = "/friendsPosts")
     ResponseEntity<List<Post>> findAllFriendsPosts(@RequestBody UserIdDTO userId);
 

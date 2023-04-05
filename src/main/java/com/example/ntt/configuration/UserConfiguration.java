@@ -26,7 +26,6 @@ public class UserConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    //TODO: LDB - da testare
     public User checkLogin(UserAuthDTO credentials) {
         return mongoService.findUserByEmail(credentials.getEmail())
                 .filter(u -> this.emailIsPresent(credentials.getEmail()))
@@ -68,7 +67,7 @@ public class UserConfiguration {
     }
 
     public void handleUpdateException(boolean check, RuntimeException exception) {
-        if (check) {
+        if (!check) {
             throw exception;
         }
     }

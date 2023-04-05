@@ -30,7 +30,7 @@ public class User{
     private String gender;
     private String profilePicUrl;
     private boolean isVisible;
-    //TODO: implementare il refresh continuo(?)
+    //TODO: LDB - implementare il refresh continuo(?)
     private boolean isOnline;
     private Set<String> friends = new HashSet<>();
     private Set<String> receivedFriendRequests = new HashSet<>();

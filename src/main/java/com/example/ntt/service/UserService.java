@@ -23,19 +23,16 @@ public class UserService {
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
 
-    //Projection
-    public UserContactInfoProjection getUserContactInfo(String username) {
-        return mongoService.getUserContactInfoByUsernameProjection(username)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username)));
+    public UserContactInfoProjection getUserContactInfo(UsernameOnlyDTO username) {
+        return mongoService.getUserContactInfoByUsernameProjection(username.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username.getUsername())));
     }
 
-    //DTO
     public EmailGenderOnlyDTO getUserEmailAndGender(String username) {
         return mongoService.getUserEmailAndGender(username)
                 .orElseThrow(() -> new ResourceNotFoundException((String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username))));
     }
 
-    //Projection
     public UserFriendsAndRequestReceivedListProjection getFriendsAndRequestReceived(String username) {
         return mongoService.getFriendsAndRequestReceived(username)
                 .orElseThrow(() -> new ResourceNotFoundException((String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username))));
@@ -44,22 +41,13 @@ public class UserService {
     public User updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
         return mongoService.findUserById(newUserPassword.getId())
                 .filter(user -> this.compareInsertedPasswordWithDbPassword(newUserPassword.getOldPassword(), user))
-                .filter(user -> this.checkIfEqual(newUserPassword.getOldPassword(), user))
+                .filter(user -> this.checkIfEqual(newUserPassword.getNewPassword(), user))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), newUserPassword.getId())));
     }
-//                .map(user -> this.compareInsertedPasswordWithDbPassword(newUserPassword.getOldPassword(), user))
-//                .map(user -> this.checkIfEqual(newUserPassword.getOldPassword(), user))
-//                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), newUserPassword.getId())));
-//
-// }
 
-
-    /**
-
-      */
-    private boolean checkIfEqual(String confirmedPassword, User user) {
-        if (!userConfiguration.passwordEncoder().matches(confirmedPassword, user.getPassword())) {
-            user.setPassword(userConfiguration.passwordEncoder().encode(confirmedPassword));
+    private boolean checkIfEqual(String newPassword, User user) {
+        if (!userConfiguration.passwordEncoder().matches(newPassword, user.getPassword())) {
+            user.setPassword(userConfiguration.passwordEncoder().encode(newPassword));
             mongoService.saveUser(user);
             return true;
         } else {
@@ -71,7 +59,6 @@ public class UserService {
      * questo metodo confronta la password inserita dall'utente con quella presente nel db
      */
     private boolean compareInsertedPasswordWithDbPassword(String oldPassword, User user) {
-
         if (userConfiguration.passwordEncoder().matches(oldPassword, user.getPassword())) {
             return true;
         } else {
@@ -103,8 +90,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
 
-    //TODO: Da migliorare, rimessi gli optional
-    public User updateUserById(UserInfoWithIdDTO userInfo) { //TODO: Test update 21.03.2023 - FC
+    public User updateUserById(UserInfoWithIdDTO userInfo) { //Test update 21.03.2023 - FC
         return mongoService.findUserById(userInfo.getId())
                 .map(u -> this.handleException(userInfo, u))
                 .map(u -> this.saveUpdatedUser(userInfo, u))
@@ -122,11 +108,14 @@ public class UserService {
         return u;
     }
 
+    //TODO: LDB - c'è una doppia eccezione per ogni metodo (da risolvere)
     private User handleException(UserInfoWithIdDTO userInfo, User user) {
         userConfiguration.handleUpdateException(userInfo.getProfilePicUrl().isPresent() && !userConfiguration.isImage(userInfo.getProfilePicUrl().get()),
                 new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
+
         userConfiguration.handleUpdateException(userInfo.getUsername().isPresent() && userConfiguration.usernameDoesNotExists(userInfo.getUsername().get()),
                 new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), userInfo.getUsername())));
+
         userConfiguration.handleUpdateException(userInfo.getEmail().isPresent() && userConfiguration.emailDoesNotExists(userInfo.getEmail().get()),
                 new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), userInfo.getEmail())));
         return user;

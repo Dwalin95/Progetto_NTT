@@ -1,10 +1,10 @@
 package com.example.ntt.dto.user;
 
-import lombok.Value;
+import lombok.Getter;
 
-@Value
+@Getter
 public class CurrentUserIdAndFriendIdDTO {
-    String currentUserId;
-    String friendId;
 
+    private String currentUserId;
+    private String friendId;
 }

@@ -12,20 +12,22 @@ import java.util.Set;
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/v1")
 public interface RequestApi {
+
+    //TODO: FC - non funziona la projection
     @GetMapping(value = "/receivedFriendRequests")
     ResponseEntity<Set<UserReceivedFriendRequestsProjection>> findUserReceivedFriendRequestsById(@RequestBody UserIdDTO userId);
 
-
+    //TODO: FC - non funziona la projection
     @GetMapping(value = "/sentFriendRequests")
     ResponseEntity<Set<UserSentFriendRequestsProjection>> findUserSentFriendRequestById(@RequestBody UserIdDTO userId);
 
     @PostMapping(value = "/sendFriendRequest")
-    void sendFriendRequest(@RequestParam CurrentUserIdAndFriendIdDTO userIds);
+    void sendFriendRequest(@RequestBody CurrentUserIdAndFriendIdDTO userIds);
 
     /**
      * @param friendRequest {"currentUserId":<value>, "friendId":<value>, "isRequestAccepted":<value>}
      */
-    @PutMapping(value = "/manageFriendRequest")
-    void handleFriendRequest(@RequestParam FriendRequestDTO friendRequest);
-
+    //TODO: LDB - capire perchè da body il booleano anche se specificato true ritorna false
+    @PutMapping(value = "/handleFriendRequest")
+    void handleFriendRequest(@RequestBody FriendRequestDTO friendRequest);
 }
