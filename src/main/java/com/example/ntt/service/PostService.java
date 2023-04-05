@@ -2,6 +2,7 @@ package com.example.ntt.service;
 
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.comment.CommentDTO;
+import com.example.ntt.dto.comment.CommentIdAndPostIdDTO;
 import com.example.ntt.dto.post.PostDTO;
 import com.example.ntt.dto.post.PostIdAndUserIdDTO;
 import com.example.ntt.dto.user.UserIdDTO;
@@ -105,5 +106,18 @@ public class PostService {
 
         p.getComments().add(comment);
         return p;
+    }
+
+    public void deleteComment(CommentIdAndPostIdDTO commentIdAndPostId) {
+        mongoService.findPostById(commentIdAndPostId.getPostId())
+                .map(post -> this.updateComments(commentIdAndPostId, post))
+                .map(mongoService::savePost)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.POST_NOT_FOUND.getMsg(), commentIdAndPostId.getPostId())));
+    }
+
+    private Post updateComments(CommentIdAndPostIdDTO commentIdAndPostId, Post post) {
+        List<Comment> comments = mongoService.findCommentListWithoutSpecifiedOne(commentIdAndPostId);
+        post.setComments(comments);
+        return post;
     }
 }

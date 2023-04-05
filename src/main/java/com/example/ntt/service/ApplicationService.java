@@ -1,6 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.comment.CommentDTO;
+import com.example.ntt.dto.comment.CommentIdAndPostIdDTO;
 import com.example.ntt.dto.message.MessageIdsDTO;
 import com.example.ntt.dto.message.MessageSentIdsDTO;
 import com.example.ntt.dto.message.MessageToSendIdsAndBodyDTO;
@@ -134,5 +135,9 @@ public class ApplicationService {
 
     public void createComment(CommentDTO commentDTO){
         postService.createComment(commentDTO);
+    }
+
+    public void deleteComment(CommentIdAndPostIdDTO commentIdAndPostId) {
+        postService.deleteComment(commentIdAndPostId);
     }
 }

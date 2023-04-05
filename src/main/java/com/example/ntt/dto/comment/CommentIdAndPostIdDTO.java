@@ -9,4 +9,5 @@ public class CommentIdAndPostIdDTO {
 
     private String commentId;
     private String postId;
+
 }

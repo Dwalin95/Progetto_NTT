@@ -1,6 +1,7 @@
 package com.example.ntt.api;
 
 import com.example.ntt.dto.comment.CommentDTO;
+import com.example.ntt.dto.comment.CommentIdAndPostIdDTO;
 import com.example.ntt.dto.post.PostDTO;
 import com.example.ntt.dto.post.PostIdAndUserIdDTO;
 import com.example.ntt.dto.user.UserIdDTO;
@@ -28,4 +29,7 @@ public interface PostApi {
 
     @DeleteMapping(value = "/removePost")
     void removePost(@RequestBody PostIdAndUserIdDTO postDTO);
+
+    @PutMapping(value = "/deleteComment")
+    void deleteComment(@RequestBody CommentIdAndPostIdDTO commentIdAndPostId);
 }

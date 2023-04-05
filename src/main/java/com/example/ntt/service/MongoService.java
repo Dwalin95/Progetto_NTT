@@ -1,5 +1,6 @@
 package com.example.ntt.service;
 
+import com.example.ntt.dto.comment.CommentIdAndPostIdDTO;
 import com.example.ntt.dto.user.EmailGenderOnlyDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.model.*;
@@ -127,6 +128,10 @@ public class MongoService {
 
     public void deletePost(String postId){
         postRepository.deleteById(postId);
+    }
+
+    public List<Comment> findCommentListWithoutSpecifiedOne(CommentIdAndPostIdDTO commentIdAndPostId) {
+        return postRepository.findCommentListWithoutSpecifiedOne(commentIdAndPostId);
     }
 
     //TODO: refuso(?)

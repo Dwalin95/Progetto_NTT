@@ -2,6 +2,7 @@ package com.example.ntt.controller;
 
 import com.example.ntt.api.PostApi;
 import com.example.ntt.dto.comment.CommentDTO;
+import com.example.ntt.dto.comment.CommentIdAndPostIdDTO;
 import com.example.ntt.dto.post.PostDTO;
 import com.example.ntt.dto.post.PostIdAndUserIdDTO;
 import com.example.ntt.dto.user.UserIdDTO;
@@ -27,6 +28,11 @@ public class PostController implements PostApi {
     @Override
     public void removePost(PostIdAndUserIdDTO postDTO) {
         applicationService.deletePost(postDTO);
+    }
+
+    @Override
+    public void deleteComment(CommentIdAndPostIdDTO commentIdAndPostId) {
+        applicationService.deleteComment(commentIdAndPostId);
     }
 
     @Override

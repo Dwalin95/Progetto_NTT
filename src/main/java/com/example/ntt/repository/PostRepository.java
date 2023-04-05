@@ -23,9 +23,25 @@ public interface PostRepository extends MongoRepository<Post, String> {
     )
     Post updatedPost(String postId, String title, String body, String imageUrl);
 
-    //questa ti serve per fare la delete del messaggio, restituisce una lista di messaggi SENZA quello di cui gli dai l'id. I commenti farei che si possono solo cancellare e non modificare quindi non c'è bisogno dell'update
+    //questa ti serve per fare la delete del messaggio,
+    //restituisce una lista di messaggi SENZA quello di cui gli dai l'id.
+    //I commenti farei che si possono solo cancellare e non modificare quindi non c'è bisogno dell'update
+    //Restituisce la lista di commenti senza il commento da eliminare.
     @Aggregation(
-            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$unwind: {path: \"$comments\"}}", "{$project: {_id: \"$comments._id\", body: \"$comments.body\", author: \"$comments.author\", timestamp: \"$comments.timestamp\"}}",  "{$match: {_id: {$ne: ObjectId(?1)}}}"}
+            pipeline = {
+                    "{$match: " +
+                    "{_id: ObjectId(?0)}}",
+                    "{$unwind: " +
+                            "{path: \"$comments\"}}",
+                    "{$project: " +
+                            "{_id: \"$comments._id\", " +
+                            "body: \"$comments.body\", " +
+                            "author: \"$comments.author\", " +
+                            "timestamp: \"$comments.timestamp\"}}",
+                    "{$match: " +
+                            "{_id: " +
+                            "{$ne: ObjectId(?1)}}}"
+            }
     )
     List<Comment> findCommentListWithoutSpecifiedOne(CommentIdAndPostIdDTO commentIdAndPostId);
 }
