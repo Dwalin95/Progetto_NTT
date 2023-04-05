@@ -1,6 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.comment.CommentDTO;
+import com.example.ntt.dto.comment.CommentIdAndPostIdDTO;
 import com.example.ntt.dto.message.*;
 import com.example.ntt.dto.post.PostDTO;
 import com.example.ntt.dto.post.PostIdAndUserIdDTO;

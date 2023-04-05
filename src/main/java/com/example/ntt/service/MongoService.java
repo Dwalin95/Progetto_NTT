@@ -123,10 +123,10 @@ public class MongoService {
         return postRepository.findCommentListWithoutSpecifiedOne(commentIdAndPostId);
     }
 
-    //TODO: refuso(?)
-    public Post updatedPostAggregation(String currentUserId, String postId, String title, String body){
-        return postRepository.updatedPost(currentUserId, postId, title, body);
-    }
+    //TODO: refuso(?) //TODO: FC - nel merge non mi ha dato nulla, post merge questo metodo mi dà errore. Push del 05.04.2023
+//    public Post updatedPostAggregation(String currentUserId, String postId, String title, String body){
+//        return postRepository.updatedPost(currentUserId, postId, title, body);
+//    }
 
     public List<Post> findAllPostsByArrAggregation(Set<String> postsIds){
         return postRepository.findAllPostsByIdsArr(postsIds);
