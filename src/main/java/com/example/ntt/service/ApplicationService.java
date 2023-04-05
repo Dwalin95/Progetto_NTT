@@ -24,20 +24,6 @@ public class ApplicationService {
     private final RequestService requestService;
     private final PostService postService;
 
-    //Projections
-    public UserContactInfoProjection getUserContactInfo(UsernameOnlyDTO username) {
-        return userService.getUserContactInfo(username);
-    }
-    //DTO
-    public EmailGenderOnlyDTO getUserEmailAndGender(String username) {
-        return userService.getUserEmailAndGender(username);
-    }
-
-    //Projection
-    public UserFriendsAndRequestReceivedListProjection getFriendsAndRequestReceived(String username) {
-        return userService.getFriendsAndRequestReceived(username);
-    }
-
     public User updatePasswordById(UserUpdatePasswordDTO newUserPassword){
         return userService.updatePasswordById(newUserPassword);
     }
@@ -50,7 +36,7 @@ public class ApplicationService {
         return userService.findUserByUsername(username);
     }
 
-    public Set<UserFriendsListWithUsernameAndProfilePicProjection> findFriendsById(UserIdDTO userId){
+    public Set<IUsernamePic> findFriendsById(UserIdDTO userId){
         return userService.findFriendsById(userId);
     }
 
@@ -99,11 +85,11 @@ public class ApplicationService {
         messageService.sendMessage(messageToSend);
     }
 
-    public Set<UserReceivedFriendRequestsProjection> findUserReceivedFriendRequestsById(UserIdDTO userId){
+    public Set<IUsernamePic> findUserReceivedFriendRequestsById(UserIdDTO userId){
         return requestService.findUserReceivedFriendRequestsById(userId);
     }
 
-    public Set<UserSentFriendRequestsProjection> findUserSentFriendRequestById(UserIdDTO currentUserId){
+    public Set<IUsernamePic> findUserSentFriendRequestById(UserIdDTO currentUserId){
         return requestService.findUserSentFriendRequestById(currentUserId);
     }
 

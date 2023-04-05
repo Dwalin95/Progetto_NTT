@@ -31,11 +31,6 @@ public class PostController implements PostApi {
     }
 
     @Override
-    public void deleteComment(CommentIdAndPostIdDTO commentIdAndPostId) {
-        applicationService.deleteComment(commentIdAndPostId);
-    }
-
-    @Override
     public void updatePost(PostDTO postDTO) {
         applicationService.updatePost(postDTO);
     }
@@ -49,4 +44,10 @@ public class PostController implements PostApi {
     public void createComment(CommentDTO commentDTO){
         applicationService.createComment(commentDTO);
     }
+
+    @Override
+    public void deleteComment(CommentIdAndPostIdDTO commentIdAndPostId) {
+        applicationService.deleteComment(commentIdAndPostId);
+    }
+
 }

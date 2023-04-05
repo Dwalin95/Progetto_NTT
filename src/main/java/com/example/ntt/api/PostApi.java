@@ -18,18 +18,18 @@ public interface PostApi {
     @PostMapping(value = "/post")
     void createPost(@RequestBody PostDTO post);
 
-    @PostMapping(value = "/comment")
-    void createComment(@RequestBody CommentDTO commentDTO);
-
+    //TODO: LDB - implementare il flag "modificato"
     @PutMapping(value = "/updatePost")
     void updatePost(@RequestBody PostDTO postDTO);
 
-    //TODO: FC - non funziona la projection
     @GetMapping(value = "/friendsPosts")
     ResponseEntity<List<Post>> findAllFriendsPosts(@RequestBody UserIdDTO userId);
 
     @DeleteMapping(value = "/removePost")
     void removePost(@RequestBody PostIdAndUserIdDTO postDTO);
+
+    @PostMapping(value = "/comment")
+    void createComment(@RequestBody CommentDTO commentDTO);
 
     @PutMapping(value = "/deleteComment")
     void deleteComment(@RequestBody CommentIdAndPostIdDTO commentIdAndPostId);

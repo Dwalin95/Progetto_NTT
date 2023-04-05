@@ -1,6 +1,6 @@
 package com.example.ntt.projections.post;
 
-public interface PostIdAndAuthorUsernameProjection {
+public interface IPostIdAuthor {
 
     String getPostId();
     String getAuthorUsername();

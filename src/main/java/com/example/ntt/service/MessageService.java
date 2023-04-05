@@ -23,7 +23,7 @@ public class MessageService {
     private final MongoService mongoService;
     public Set<String> findAllMessageSenders(UserIdDTO userId){
         List<Message> messages = mongoService.findUserById(userId.getId())
-                .map(u -> mongoService.findAllMessagesAggregation(u.get_id()))
+                .map(u -> mongoService.findAllMessagesAggr(u.get_id()))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
         return messages.stream()
                 .map(Message::getSenderId)
@@ -32,9 +32,9 @@ public class MessageService {
 
     public List<Message> findMessagesByFriendIds(CurrentUserIdAndFriendIdDTO userIds) {
         List<Message> chat = new ArrayList<>();
-        List<Message> friendSide = mongoService.findChatBySideAggregation(userIds.getCurrentUserId(), userIds.getFriendId(), userIds.getCurrentUserId());
+        List<Message> friendSide = mongoService.findChatBySideAggr(userIds.getCurrentUserId(), userIds.getFriendId(), userIds.getCurrentUserId());
         chat.addAll(friendSide);
-        chat.addAll(mongoService.findChatBySideAggregation(userIds.getCurrentUserId(), userIds.getCurrentUserId(), userIds.getFriendId()));
+        chat.addAll(mongoService.findChatBySideAggr(userIds.getCurrentUserId(), userIds.getCurrentUserId(), userIds.getFriendId()));
         return chat.stream()
                 .sorted(Comparator.comparing(Message::getTimestamp))
                 .collect(Collectors.toList());
@@ -42,14 +42,14 @@ public class MessageService {
 
     public List<Message> findMessageByTextGlobal(MessageTextAndCurrentUserIdDTO messageByText){
         return mongoService.findUserById(messageByText.getCurrentUserId())
-                .map(u -> mongoService.findMessageByTextGlobalAggregation(u.get_id(), messageByText.getText()))
+                .map(u -> mongoService.findMessageByTextGlobalAggr(u.get_id(), messageByText.getText()))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), messageByText.getCurrentUserId())));
     }
 
     public List<Message> findMessageByTextPerFriend(MessageTextAndCurrentUserAndFriendIdDTO messageByText){
         List<Message> chat = new ArrayList<>();
-        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggregation(messageByText.getCurrentUserId(), messageByText.getCurrentUserId(), messageByText.getFriendId(), messageByText.getText()));
-        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggregation(messageByText.getCurrentUserId(), messageByText.getFriendId(), messageByText.getCurrentUserId(), messageByText.getText()));
+        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggr(messageByText.getCurrentUserId(), messageByText.getCurrentUserId(), messageByText.getFriendId(), messageByText.getText()));
+        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggr(messageByText.getCurrentUserId(), messageByText.getFriendId(), messageByText.getCurrentUserId(), messageByText.getText()));
         return chat.stream()
                 .sorted(Comparator.comparing(Message::getTimestamp)).collect(Collectors.toList());
     }

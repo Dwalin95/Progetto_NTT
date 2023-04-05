@@ -3,8 +3,7 @@ import com.example.ntt.api.RequestApi;
 import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
 import com.example.ntt.dto.request.FriendRequestDTO;
 import com.example.ntt.dto.user.UserIdDTO;
-import com.example.ntt.projections.user.UserReceivedFriendRequestsProjection;
-import com.example.ntt.projections.user.UserSentFriendRequestsProjection;
+import com.example.ntt.projections.user.IUsernamePic;
 import com.example.ntt.service.ApplicationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +18,12 @@ public class RequestController implements RequestApi {
     private final ApplicationService applicationService;
 
     @Override
-    public ResponseEntity<Set<UserReceivedFriendRequestsProjection>> findUserReceivedFriendRequestsById(UserIdDTO userId) {
+    public ResponseEntity<Set<IUsernamePic>> findUserReceivedFriendRequestsById(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findUserReceivedFriendRequestsById(userId));
     }
 
     @Override
-    public ResponseEntity<Set<UserSentFriendRequestsProjection>> findUserSentFriendRequestById(UserIdDTO userId) {
+    public ResponseEntity<Set<IUsernamePic>> findUserSentFriendRequestById(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findUserSentFriendRequestById(userId));
     }
 

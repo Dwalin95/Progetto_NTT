@@ -6,12 +6,10 @@ import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.User;
-import com.example.ntt.projections.user.UserReceivedFriendRequestsProjection;
-import com.example.ntt.projections.user.UserSentFriendRequestsProjection;
+import com.example.ntt.projections.user.IUsernamePic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
@@ -21,21 +19,21 @@ public class RequestService {
 
     private final MongoService mongoService;
 
-    public Set<UserReceivedFriendRequestsProjection> findUserReceivedFriendRequestsById(UserIdDTO userId) {
-        Set<UserReceivedFriendRequestsProjection> set = mongoService.findUserById(userId.getId())
+    //TODO: cambiare eccezioni
+    public Set<IUsernamePic> findUserReceivedFriendRequestsById(UserIdDTO userId) {
+        return mongoService.findUserById(userId.getId())
                 .map(User::getReceivedFriendRequests)
-                .map(mongoService::findUserReceivedFriendRequestById)
+                .map(mongoService::findUserFriendsUsernamePic)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
-                .orElse(new HashSet<>());
-        return set;
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
 
-    public Set<UserSentFriendRequestsProjection> findUserSentFriendRequestById(UserIdDTO currentUserId) {
+    public Set<IUsernamePic> findUserSentFriendRequestById(UserIdDTO currentUserId) {
         return mongoService.findUserById(currentUserId.getId())
                 .map(User::getSentFriendRequests)
-                .map(mongoService::findUserSentFriendRequestById)
+                .map(mongoService::findUserFriendsUsernamePic)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)))
-                .orElse(new HashSet<>());
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
 
     public void sendFriendRequest(CurrentUserIdAndFriendIdDTO userIds){

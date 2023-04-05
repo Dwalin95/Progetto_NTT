@@ -5,16 +5,13 @@ import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.user.*;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
-import com.example.ntt.projections.user.UserContactInfoProjection;
-import com.example.ntt.projections.user.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.user.UserFriendsListWithUsernameAndProfilePicProjection;
+import com.example.ntt.projections.user.IUsernamePic;
 import com.example.ntt.service.ApplicationService;
 import com.example.ntt.service.MongoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +33,7 @@ public class UserController implements UserApi {
     //-- [FINE] Aggiungi commento --//
 
     @Override
-    public ResponseEntity<Set<UserFriendsListWithUsernameAndProfilePicProjection>> findUserFriendsById(UserIdDTO userId) {
+    public ResponseEntity<Set<IUsernamePic>> findUserFriendsById(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findFriendsById(userId));
     }
 
@@ -85,24 +82,4 @@ public class UserController implements UserApi {
         mongoService.deleteUserById(userId);
     }
 
-    /**
-     *
-     * metodi usati per test, vedere possibile utilizzo
-     */
-    //-- [INIZIO] Interfaccia di proiezione e utilizzo dei DTO --//
-    //TODO: FC - approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
-    @Override
-    public ResponseEntity<UserFriendsAndRequestReceivedListProjection> getFriendListAndRequestReceived(UsernameOnlyDTO username) {
-        return ResponseEntity.ok(applicationService.getFriendsAndRequestReceived(username.getUsername()));
-    }
-
-    @Override
-    public ResponseEntity<UserContactInfoProjection> getContactInformation(UsernameOnlyDTO username) {
-        return ResponseEntity.ok(applicationService.getUserContactInfo(username));
-    }
-
-    @Override
-    public ResponseEntity<EmailGenderOnlyDTO> getUserEmailAndGender(UsernameOnlyDTO username) {
-        return ResponseEntity.ok(applicationService.getUserEmailAndGender(username.getUsername()));
-    }
 }

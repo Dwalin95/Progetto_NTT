@@ -3,10 +3,7 @@ package com.example.ntt.api;
 import com.example.ntt.dto.user.*;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
-import com.example.ntt.projections.user.UserContactInfoProjection;
-import com.example.ntt.projections.user.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.user.UserFriendsListWithUsernameAndProfilePicProjection;
-import com.sun.xml.bind.v2.TODO;
+import com.example.ntt.projections.user.IUsernamePic;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +14,8 @@ import java.util.Set;
 @RequestMapping("/api/v1")
 public interface UserApi {
 
-    //TODO: FC - non funziona la projection
     @GetMapping(value = "/friends")
-    ResponseEntity<Set<UserFriendsListWithUsernameAndProfilePicProjection>> findUserFriendsById(@RequestBody UserIdDTO userId);
+    ResponseEntity<Set<IUsernamePic>> findUserFriendsById(@RequestBody UserIdDTO userId);
 
     @PutMapping(value = "/password") // ex {id}/updatePassword
     ResponseEntity<User> updatePasswordById(@RequestBody UserUpdatePasswordDTO newUserPassword); //oldPassword, newPassword, confirmPassword
@@ -52,18 +48,4 @@ public interface UserApi {
     @GetMapping(value = "/user")
     ResponseEntity<User> findUserByUsername(@RequestBody UsernameOnlyDTO username);
 
-    /**
-     *
-     * metodi usati per test, vedere possibile utilizzo
-     */
-    //TODO: FC - approfondire le consocenze in merito ai DTO e alle Projection, vedere se il codice è ottimizzato
-    //-- [INIZIO] Interfaccia di proiezione e utilizzo dei DTO --//
-    @GetMapping(value = "/contactInfo")
-    ResponseEntity<UserContactInfoProjection> getContactInformation(@RequestBody UsernameOnlyDTO username);
-
-    @GetMapping(value = "/userEmailAndGender")
-    ResponseEntity<EmailGenderOnlyDTO> getUserEmailAndGender(@RequestBody UsernameOnlyDTO username);
-
-    @GetMapping(value = "/friendsListAndRequest")
-    ResponseEntity<UserFriendsAndRequestReceivedListProjection> getFriendListAndRequestReceived(@RequestBody UsernameOnlyDTO username);
 }

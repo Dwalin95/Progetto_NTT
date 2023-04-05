@@ -8,9 +8,7 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
 import com.example.ntt.model.UserCountPerCity;
-import com.example.ntt.projections.user.UserContactInfoProjection;
-import com.example.ntt.projections.user.UserFriendsAndRequestReceivedListProjection;
-import com.example.ntt.projections.user.UserFriendsListWithUsernameAndProfilePicProjection;
+import com.example.ntt.projections.user.IUsernamePic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,18 +21,8 @@ public class UserService {
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
 
-    public UserContactInfoProjection getUserContactInfo(UsernameOnlyDTO username) {
-        return mongoService.getUserContactInfoByUsernameProjection(username.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username.getUsername())));
-    }
-
     public EmailGenderOnlyDTO getUserEmailAndGender(String username) {
         return mongoService.getUserEmailAndGender(username)
-                .orElseThrow(() -> new ResourceNotFoundException((String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username))));
-    }
-
-    public UserFriendsAndRequestReceivedListProjection getFriendsAndRequestReceived(String username) {
-        return mongoService.getFriendsAndRequestReceived(username)
                 .orElseThrow(() -> new ResourceNotFoundException((String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username))));
     }
 
@@ -72,21 +60,28 @@ public class UserService {
     }
 
     public User findUserByUsername(UsernameOnlyDTO username) {
-        return mongoService.findUserByUsername(username.getUsername())
+        User user = mongoService.findUserByUsername(username.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username.getUsername())));
+        if(user.isVisible() == true){
+            //TODO: fare projection con le informazione del profilo
+            return user;
+        } else {
+            //TODO: fare projection con solo username e profilePic
+            return user;
+        }
     }
 
-    public Set<UserFriendsListWithUsernameAndProfilePicProjection> findFriendsById(UserIdDTO userId) {
+    public Set<IUsernamePic> findFriendsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
-                .map(u -> mongoService.findUserFriendsReturningUsernameAndProfilePicById(u.getFriends()))
+                .map(u -> mongoService.findUserFriendsUsernamePic(u.getFriends()))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
-                .orElse(new HashSet<>());
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
 
     public Set<UserCountPerCity> friendsCountPerCity(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
                 .map(User::getFriends)
-                .map(mongoService::countFriendsPerCityAggregation)
+                .map(mongoService::countFriendsPerCityAggr)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
 

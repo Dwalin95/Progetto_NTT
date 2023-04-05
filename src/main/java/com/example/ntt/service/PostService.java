@@ -12,7 +12,7 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Comment;
 import com.example.ntt.model.Post;
 import com.example.ntt.model.User;
-import com.example.ntt.projections.post.PostIdAndAuthorUsernameProjection;
+import com.example.ntt.projections.post.IPostIdAuthor;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -79,14 +79,15 @@ public class PostService {
         return p;
     }
 
+    //TODO: LDB - non funge
     public List<Post> findAllFriendsPosts(UserIdDTO userId){
         Set<String> friends = mongoService.findUserById(userId.getId())
                         .map(User::getFriends)
                         .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
-        Set<String> postsIds = mongoService.findAllFriendsPostsIdsAggregation(friends).stream()
-                        .map(PostIdAndAuthorUsernameProjection::getPostId)
+        Set<String> postsIds = mongoService.findAllFriendsPostsIdsAggr(friends).stream()
+                        .map(IPostIdAuthor::getPostId)
                         .collect(Collectors.toSet());
-        return mongoService.findAllPostsByArrAggregation(postsIds).stream()
+        return mongoService.findAllPostsByArrAggr(postsIds).stream()
                         .sorted(Comparator.comparing(Post::getTimestamp))
                         .collect(Collectors.toList());
     }
@@ -118,7 +119,7 @@ public class PostService {
     }
 
     private Post updateComments(CommentIdAndPostIdDTO commentIdAndPostId, Post post) {
-        List<Comment> comments = mongoService.findCommentListWithoutSpecifiedOne(commentIdAndPostId);
+        List<Comment> comments = mongoService.findCommentListWithoutSpecifiedOneAggr(commentIdAndPostId.getPostId(),  commentIdAndPostId.getCommentId());
         post.setComments(comments);
         return post;
     }
