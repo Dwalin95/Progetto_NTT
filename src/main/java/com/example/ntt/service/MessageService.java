@@ -9,7 +9,6 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.User;
-import com.mongodb.client.MongoClient;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -22,8 +21,6 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final MongoService mongoService;
-    private final MongoClient mongoClient;
-
     public Set<String> findAllMessageSenders(UserIdDTO userId){
         List<Message> messages = mongoService.findUserById(userId.getId())
                 .map(u -> mongoService.findAllMessagesAggregation(u.get_id()))
@@ -139,7 +136,7 @@ public class MessageService {
                     .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), messageToSend.getCurrentUserId())));
             this.addMessage(message, messageReceiver);
         } else {
-            throw new UnauthorizedException("You can only send messages between friends");
+            throw new UnauthorizedException(ErrorMsg.MUST_BE_FRIENDS_TO_SEND_MESSAGE.getMsg());
         }
     }
 

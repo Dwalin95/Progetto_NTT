@@ -21,6 +21,7 @@ public enum ErrorMsg {
     EMAIL_ALREADY_IN_USE("The email %s is already in use"),
     PASSWORD_NOT_VALID("Password not valid"),
     EMAIL_MUST_CONTAIN_AT("Email must contain @"),
+    MUST_BE_FRIENDS_TO_SEND_MESSAGE("You can only send messages between friends"),
     PASSWORD_MUST_RESPECT_RULES("Password must respect rules");
 
     private final String msg;
