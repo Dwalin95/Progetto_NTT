@@ -16,6 +16,7 @@ public class ApiExceptionHandler {
                 ex.getMessage(),
                 "Resource not found");
     }
+
     @ExceptionHandler(value = UnauthorizedException.class)
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public ErrorMessage unauthorizedException(UnauthorizedException ex){

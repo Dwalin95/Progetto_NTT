@@ -23,7 +23,7 @@ public class User{
     @Indexed(unique = true)
     private String username;
     @Indexed(unique = true)
-    private String email;
+    private String email = this.getEmail() == null ? null : this.getEmail().toLowerCase();
     private String firstName;
     private String lastName;
     private String password;
@@ -38,4 +38,5 @@ public class User{
     private Set<String> postsIds = new HashSet<>();
     private List<Message> messages = new ArrayList<>();
     private Address address;
+
 }

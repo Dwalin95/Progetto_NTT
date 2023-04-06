@@ -25,13 +25,6 @@ public class UserController implements UserApi {
 
     private final UserConfiguration userConfiguration;
 
-    //-- [FINE] Interfaccia di proiezione e utilizzo dei DTO --//
-    //-- [Inizio] Aggiungi commento --//
-
-    //    @PostMapping(value="/{id}")
-
-    //-- [FINE] Aggiungi commento --//
-
     @Override
     public ResponseEntity<Set<IUsernamePic>> findUserFriendsById(UserIdDTO userId) {
         return ResponseEntity.ok(applicationService.findFriendsById(userId));
@@ -53,12 +46,12 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<User> updateUserById(UserInfoWithIdDTO userInfo) {
-        return ResponseEntity.ok(applicationService.updateUserById(userInfo));
+    public void updateUserById(UserInfoWithIdDTO userInfo) {
+        applicationService.updateUserById(userInfo);
     }
 
     @Override
-    public void removeFriend(CurrentUserIdAndFriendIdDTO userIds) {
+    public void removeFriend(CurrentUserFriendIdDTO userIds) {
         applicationService.removeFriend(userIds);
     }
 

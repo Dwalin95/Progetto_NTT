@@ -18,7 +18,6 @@ public interface PostApi {
     @PostMapping(value = "/post")
     void createPost(@RequestBody PostDTO post);
 
-    //TODO: LDB - implementare il flag "modificato"
     @PutMapping(value = "/updatePost")
     void updatePost(@RequestBody PostDTO postDTO);
 

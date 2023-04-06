@@ -8,6 +8,7 @@ import com.example.ntt.dto.post.PostIdAndUserIdDTO;
 import com.example.ntt.dto.request.FriendRequestDTO;
 import com.example.ntt.dto.user.*;
 import com.example.ntt.model.*;
+import com.example.ntt.projections.IUsernamePicLastMsg;
 import com.example.ntt.projections.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,20 +45,20 @@ public class ApplicationService {
         return userService.friendsCountPerCity(userId);
     }
 
-    public User updateUserById(UserInfoWithIdDTO userInfo){
-        return userService.updateUserById(userInfo);
+    public void updateUserById(UserInfoWithIdDTO userInfo){
+        userService.updateUserById(userInfo);
     }
 
 
-    public void removeFriend(CurrentUserIdAndFriendIdDTO userIds){
+    public void removeFriend(CurrentUserFriendIdDTO userIds){
         userService.removeFriend(userIds);
     }
 
-    public Set<String> findAllMessageSenders(UserIdDTO userId){
+    public Set<IUsernamePicLastMsg> findAllMessageSenders(UserIdDTO userId){
         return messageService.findAllMessageSenders(userId);
     }
 
-    public List<Message> findMessagesByFriendIds(CurrentUserIdAndFriendIdDTO userIds){
+    public List<Message> findMessagesByFriendIds(CurrentUserFriendIdDTO userIds){
         return messageService.findMessagesByFriendIds(userIds);
     }
 
@@ -77,7 +78,7 @@ public class ApplicationService {
         messageService.deleteReceivedMessage(deleteMessage);
     }
 
-    public void deleteChat(CurrentUserIdAndFriendIdDTO userIds){
+    public void deleteChat(CurrentUserFriendIdDTO userIds){
         messageService.deleteChat(userIds);
     }
 
@@ -93,7 +94,7 @@ public class ApplicationService {
         return requestService.findUserSentFriendRequestById(currentUserId);
     }
 
-    public void sendFriendRequest(CurrentUserIdAndFriendIdDTO userIds){
+    public void sendFriendRequest(CurrentUserFriendIdDTO userIds){
         requestService.sendFriendRequest(userIds);
     }
 

@@ -66,12 +66,6 @@ public class UserConfiguration {
         }
     }
 
-    public void handleUpdateException(boolean check, RuntimeException exception) {
-        if (!check) {
-            throw exception;
-        }
-    }
-
     public boolean emailDoesNotExists(String email) {
         if(mongoService.findUserByEmail(email).isPresent()){
             throw new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), email));
@@ -110,7 +104,7 @@ public class UserConfiguration {
     }
 
 
-    private boolean validateEmail(String email) {
+    public boolean validateEmail(String email) {
         if(email.contains("@")){
             return true;
         } else {

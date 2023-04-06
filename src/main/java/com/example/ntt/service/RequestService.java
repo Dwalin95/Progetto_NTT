@@ -1,6 +1,6 @@
 package com.example.ntt.service;
 
-import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.user.CurrentUserFriendIdDTO;
 import com.example.ntt.dto.request.FriendRequestDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
@@ -36,7 +36,7 @@ public class RequestService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
 
-    public void sendFriendRequest(CurrentUserIdAndFriendIdDTO userIds){
+    public void sendFriendRequest(CurrentUserFriendIdDTO userIds){
         this.handleRequest(userIds.getFriendId(), user -> this.addReceivedFriendRequestToFriendUser(userIds.getCurrentUserId(), user));
         this.handleRequest(userIds.getCurrentUserId(), user -> this.addFriendRequestToCurrentUser(userIds.getFriendId(), user));
     }

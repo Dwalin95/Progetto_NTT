@@ -1,7 +1,7 @@
 package com.example.ntt.service;
 
 import com.example.ntt.dto.message.*;
-import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.user.CurrentUserFriendIdDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
 import com.example.ntt.exceptionHandler.PreconditionFailedException;
@@ -9,6 +9,7 @@ import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.Message;
 import com.example.ntt.model.User;
+import com.example.ntt.projections.IUsernamePicLastMsg;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
@@ -21,23 +22,26 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final MongoService mongoService;
-    public Set<String> findAllMessageSenders(UserIdDTO userId){
+
+    //TODO: LDB - vedere il caso in cui tu hai inviato un messaggio ma non hai avuto risposta, aggiungere l'ultimo messaggio della chat
+    public Set<IUsernamePicLastMsg> findAllMessageSenders(UserIdDTO userId){
         List<Message> messages = mongoService.findUserById(userId.getId())
                 .map(u -> mongoService.findAllMessagesAggr(u.get_id()))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())));
-        return messages.stream()
+        Set<String> senders = messages.stream()
                 .map(Message::getSenderId)
                 .collect(Collectors.toSet());
+        return mongoService.findUserFriendsUsernamePicLastMsg(senders)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_MESSAGES_FOUND.getMsg()));
     }
 
-    public List<Message> findMessagesByFriendIds(CurrentUserIdAndFriendIdDTO userIds) {
-        List<Message> chat = new ArrayList<>();
-        List<Message> friendSide = mongoService.findChatBySideAggr(userIds.getCurrentUserId(), userIds.getFriendId(), userIds.getCurrentUserId());
-        chat.addAll(friendSide);
-        chat.addAll(mongoService.findChatBySideAggr(userIds.getCurrentUserId(), userIds.getCurrentUserId(), userIds.getFriendId()));
-        return chat.stream()
-                .sorted(Comparator.comparing(Message::getTimestamp))
-                .collect(Collectors.toList());
+    public List<Message> findMessagesByFriendIds(CurrentUserFriendIdDTO userIds) {
+        return mongoService.findChatAggr(userIds.getCurrentUserId(),
+                userIds.getCurrentUserId(),
+                userIds.getFriendId(),
+                userIds.getCurrentUserId(),
+                userIds.getFriendId()).stream()
+                .sorted(Comparator.comparing(Message::getTimestamp)).toList();
     }
 
     public List<Message> findMessageByTextGlobal(MessageTextAndCurrentUserIdDTO messageByText){
@@ -47,11 +51,14 @@ public class MessageService {
     }
 
     public List<Message> findMessageByTextPerFriend(MessageTextAndCurrentUserAndFriendIdDTO messageByText){
-        List<Message> chat = new ArrayList<>();
-        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggr(messageByText.getCurrentUserId(), messageByText.getCurrentUserId(), messageByText.getFriendId(), messageByText.getText()));
-        chat.addAll(mongoService.findMessageByTextPerFriendBySideAggr(messageByText.getCurrentUserId(), messageByText.getFriendId(), messageByText.getCurrentUserId(), messageByText.getText()));
-        return chat.stream()
-                .sorted(Comparator.comparing(Message::getTimestamp)).collect(Collectors.toList());
+        return mongoService.findMessageByTextPerFriendAggr(messageByText.getCurrentUserId(),
+                        messageByText.getCurrentUserId(),
+                        messageByText.getFriendId(),
+                        messageByText.getCurrentUserId(),
+                        messageByText.getFriendId(),
+                        messageByText.getText()).stream()
+                        .sorted(Comparator.comparing(Message::getTimestamp))
+                        .toList();
     }
 
     public void deleteSentMessage(MessageSentIdsDTO messageSent){
@@ -79,7 +86,7 @@ public class MessageService {
         return now.before(dateOfTheMessage);
     }
 
-    public void deleteReceivedMessage(MessageReceivedIdsDTO deleteMessage){ //TODO: FC - vedere con Pier il metodo [passaggio del DTO]
+    public void deleteReceivedMessage(MessageReceivedIdsDTO deleteMessage){
         this.deleteMessageAndSaveUser(deleteMessage.getCurrentUserId(), deleteMessage.getMessageId());
     }
 
@@ -96,7 +103,7 @@ public class MessageService {
         return u;
     }
 
-    public void deleteChat(CurrentUserIdAndFriendIdDTO userIds){
+    public void deleteChat(CurrentUserFriendIdDTO userIds){
         mongoService.findUserById(userIds.getCurrentUserId())
                 .map(u -> this.handleRemoveChat(userIds.getFriendId(), u))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userIds.getCurrentUserId())));

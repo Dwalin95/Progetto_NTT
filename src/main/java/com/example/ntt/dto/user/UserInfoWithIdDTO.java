@@ -41,6 +41,6 @@ public class UserInfoWithIdDTO {
     }
 
     public Optional<Boolean> isVisible() {
-        return Optional.of(isVisible);
+        return Optional.ofNullable(isVisible);
     }
 }

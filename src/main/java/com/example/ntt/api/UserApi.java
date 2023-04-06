@@ -23,20 +23,20 @@ public interface UserApi {
     @GetMapping(value = "/friendsPerCity")
     ResponseEntity<Set<UserCountPerCity>> friendsCountPerCity(@RequestBody UserIdDTO userId);
 
-    @PutMapping(produces="application/json", value = "/user") //Put = "update" -> /user
-    ResponseEntity<User> updateUserById(@RequestBody UserInfoWithIdDTO userInfo);
+    @PutMapping(value = "/user")
+    void updateUserById(@RequestBody UserInfoWithIdDTO userInfo);
 
     @PutMapping(value = "/friend")
-    void removeFriend(@RequestBody CurrentUserIdAndFriendIdDTO userIds);
+    void removeFriend(@RequestBody CurrentUserFriendIdDTO userIds);
 
     //TODO: LDB - non funge WHYYYY
     @GetMapping(value = "/users")
     ResponseEntity<List<User>> findAllUsers();
 
-    @PostMapping(value = "/signin") //TODO: FC - cambiare l'endpoint in user/signin?
+    @PostMapping(value = "/signin")
     ResponseEntity<User> login(@RequestBody UserAuthDTO credentials);
 
-    @PostMapping(value = "/signup") //TODO: FC - cambiare l'endpoint in user/signup?
+    @PostMapping(value = "/signup")
     void createUser(@RequestBody User user);
 
     @DeleteMapping(value = "/user/delete")

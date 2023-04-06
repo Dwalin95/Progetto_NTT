@@ -1,6 +1,6 @@
 package com.example.ntt.controller;
 import com.example.ntt.api.RequestApi;
-import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.user.CurrentUserFriendIdDTO;
 import com.example.ntt.dto.request.FriendRequestDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.projections.user.IUsernamePic;
@@ -28,7 +28,7 @@ public class RequestController implements RequestApi {
     }
 
     @Override
-    public void sendFriendRequest(CurrentUserIdAndFriendIdDTO userIds) {
+    public void sendFriendRequest(CurrentUserFriendIdDTO userIds) {
         applicationService.sendFriendRequest(userIds);
     }
 

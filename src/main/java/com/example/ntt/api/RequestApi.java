@@ -1,6 +1,6 @@
 package com.example.ntt.api;
 
-import com.example.ntt.dto.user.CurrentUserIdAndFriendIdDTO;
+import com.example.ntt.dto.user.CurrentUserFriendIdDTO;
 import com.example.ntt.dto.request.FriendRequestDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.projections.user.IUsernamePic;
@@ -19,12 +19,10 @@ public interface RequestApi {
     ResponseEntity<Set<IUsernamePic>> findUserSentFriendRequestById(@RequestBody UserIdDTO userId);
 
     @PostMapping(value = "/sendFriendRequest")
-    void sendFriendRequest(@RequestBody CurrentUserIdAndFriendIdDTO userIds);
+    void sendFriendRequest(@RequestBody CurrentUserFriendIdDTO userIds);
 
-    /**
-     * @param friendRequest {"currentUserId":<value>, "friendId":<value>, "isRequestAccepted":<value>}
-     */
-    //TODO: LDB - capire perchè da body il booleano anche se specificato true ritorna false
+
+    //TODO: LDB - capire perchè da requestBody il booleano anche se specificato true ritorna false
     @PutMapping(value = "/handleFriendRequest")
     void handleFriendRequest(@RequestBody FriendRequestDTO friendRequest);
 }

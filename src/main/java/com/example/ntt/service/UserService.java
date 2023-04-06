@@ -3,7 +3,6 @@ package com.example.ntt.service;
 import com.example.ntt.configuration.UserConfiguration;
 import com.example.ntt.dto.user.*;
 import com.example.ntt.enums.ErrorMsg;
-import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.exceptionHandler.UnauthorizedException;
 import com.example.ntt.model.User;
@@ -20,11 +19,6 @@ public class UserService {
 
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
-
-    public EmailGenderOnlyDTO getUserEmailAndGender(String username) {
-        return mongoService.getUserEmailAndGender(username)
-                .orElseThrow(() -> new ResourceNotFoundException((String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), username))));
-    }
 
     public User updatePasswordById(UserUpdatePasswordDTO newUserPassword) {
         return mongoService.findUserById(newUserPassword.getId())
@@ -43,9 +37,6 @@ public class UserService {
         }
     }
 
-    /**
-     * questo metodo confronta la password inserita dall'utente con quella presente nel db
-     */
     private boolean compareInsertedPasswordWithDbPassword(String oldPassword, User user) {
         if (userConfiguration.passwordEncoder().matches(oldPassword, user.getPassword())) {
             return true;
@@ -85,38 +76,33 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
     }
 
-    public User updateUserById(UserInfoWithIdDTO userInfo) { //Test update 21.03.2023 - FC
-        return mongoService.findUserById(userInfo.getId())
-                .map(u -> this.handleException(userInfo, u))
+    public void updateUserById(UserInfoWithIdDTO userInfo) {
+        mongoService.findUserById(userInfo.getId())
                 .map(u -> this.saveUpdatedUser(userInfo, u))
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userInfo.getId())));
     }
 
-    private User saveUpdatedUser(UserInfoWithIdDTO userInfo, User u) {
-        mongoService.saveUser(u.withFirstName(userInfo.getFirstName().orElse(u.getFirstName()))
-                .withUsername(userInfo.getUsername().orElse(u.getUsername()))
-                .withLastName(userInfo.getLastName().orElse(u.getLastName()))
-                .withEmail(userInfo.getEmail().orElse(u.getEmail()))
-                .withGender(userInfo.getGender().orElse(u.getGender()))
-                .withProfilePicUrl(userInfo.getProfilePicUrl().orElse(u.getProfilePicUrl()))
-                .withVisible(userInfo.isVisible().orElse(u.isVisible())));
-        return u;
-    }
+    private User saveUpdatedUser(UserInfoWithIdDTO userInfo, User user) {
+        Optional.of(user)
+                .map(u -> userInfo.getProfilePicUrl().isPresent() &&
+                            userConfiguration.isImage(userInfo.getProfilePicUrl().get()))
+                .map(u -> userInfo.getUsername().isPresent() &&
+                            userConfiguration.usernameDoesNotExists(userInfo.getUsername().get()))
+                .map(u -> userInfo.getEmail().isPresent() &&
+                            userConfiguration.emailDoesNotExists(userInfo.getEmail().get()) &&
+                            userConfiguration.validateEmail(userInfo.getEmail().get()));
 
-    //TODO: LDB - c'è una doppia eccezione per ogni metodo (da risolvere)
-    private User handleException(UserInfoWithIdDTO userInfo, User user) {
-        userConfiguration.handleUpdateException(userInfo.getProfilePicUrl().isPresent() && !userConfiguration.isImage(userInfo.getProfilePicUrl().get()),
-                new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
-
-        userConfiguration.handleUpdateException(userInfo.getUsername().isPresent() && userConfiguration.usernameDoesNotExists(userInfo.getUsername().get()),
-                new PreconditionFailedException(String.format(ErrorMsg.USERNAME_ALREADY_IN_USE.getMsg(), userInfo.getUsername())));
-
-        userConfiguration.handleUpdateException(userInfo.getEmail().isPresent() && userConfiguration.emailDoesNotExists(userInfo.getEmail().get()),
-                new PreconditionFailedException(String.format(ErrorMsg.EMAIL_ALREADY_IN_USE.getMsg(), userInfo.getEmail())));
+        mongoService.saveUser(user.withFirstName(userInfo.getFirstName().orElse(user.getFirstName()))
+                .withUsername(userInfo.getUsername().orElse(user.getUsername()))
+                .withLastName(userInfo.getLastName().orElse(user.getLastName()))
+                .withEmail(userInfo.getEmail().orElse(user.getEmail()))
+                .withGender(userInfo.getGender().orElse(user.getGender()))
+                .withProfilePicUrl(userInfo.getProfilePicUrl().orElse(user.getProfilePicUrl()))
+                .withVisible(userInfo.isVisible().orElse(user.isVisible())));
         return user;
     }
 
-    public void removeFriend(CurrentUserIdAndFriendIdDTO userIds) {
+    public void removeFriend(CurrentUserFriendIdDTO userIds) {
         this.handleRemoveFriend(userIds.getCurrentUserId(), userIds.getFriendId());
         this.handleRemoveFriend(userIds.getFriendId(), userIds.getCurrentUserId());
     }

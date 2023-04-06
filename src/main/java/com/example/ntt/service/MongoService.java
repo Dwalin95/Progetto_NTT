@@ -3,6 +3,7 @@ package com.example.ntt.service;
 import com.example.ntt.dto.user.EmailGenderOnlyDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.model.*;
+import com.example.ntt.projections.IUsernamePicLastMsg;
 import com.example.ntt.projections.post.IPostIdAuthor;
 import com.example.ntt.projections.user.*;
 import com.example.ntt.repository.MessageRepository;
@@ -43,6 +44,10 @@ public class MongoService {
         return userRepository.findFriendsById(friendsIds, IUsernamePic.class);
     }
 
+    public Optional<Set<IUsernamePicLastMsg>> findUserFriendsUsernamePicLastMsg(Set<String> friendsIds){
+        return userRepository.findFriendsById(friendsIds, IUsernamePicLastMsg.class);
+    }
+
     public List<User> findAllUsers(){
         return userRepository.findAll();
     }
@@ -75,8 +80,8 @@ public class MongoService {
         return messageRepository.findMessagesWithoutSpecifiedInteraction(currentUserId, senderId, receiverId);
     }
 
-    public List<Message> findChatBySideAggr(String currentUserId, String senderId, String receiverId){
-        return messageRepository.findChatBySide(currentUserId, senderId, receiverId);
+    public List<Message> findChatAggr(String currentUserId, String currentUserSenderId, String friendSenderId, String currentUserReceiverId, String friendReceiverId){
+        return messageRepository.findChat(currentUserId, currentUserSenderId, friendSenderId, currentUserReceiverId, friendReceiverId);
     }
 
     public List<Message> findAllMessagesAggr(String id){
@@ -87,8 +92,8 @@ public class MongoService {
         return messageRepository.findMessageByTextGlobal(currentUserId, text);
     }
 
-    public List<Message> findMessageByTextPerFriendBySideAggr(String currentUserId, String senderId, String receivedId, String text){
-        return messageRepository.findMessageByTextPerFriendBySide(currentUserId, senderId, receivedId, text);
+    public List<Message> findMessageByTextPerFriendAggr(String currentUserId, String currentUserSenderId, String friendSenderId, String currentUserReceiverId, String friendReceiverId, String text){
+        return messageRepository.findMessageByTextPerFriend(currentUserId, currentUserSenderId, friendSenderId, currentUserReceiverId, friendReceiverId, text);
     }
 
     public Post savePost(Post post){
@@ -107,11 +112,6 @@ public class MongoService {
         return postRepository.findCommentListWithoutSpecifiedOne(postId, commentId);
     }
 
-    //TODO: refuso(?) //TODO: FC - nel merge non mi ha dato nulla, post merge questo metodo mi dà errore. Push del 05.04.2023
-//    public Post updatedPostAggregation(String currentUserId, String postId, String title, String body){
-//        return postRepository.updatedPost(currentUserId, postId, title, body);
-//    }
-
     public List<Post> findAllPostsByArrAggr(Set<String> postsIds){
         return postRepository.findAllPostsByIdsArr(postsIds);
     }
@@ -126,16 +126,11 @@ public class MongoService {
     /**
     * non usate
      */
-
     public void deleteUserByEmail(String email){
         userRepository.deleteByEmail(email);
     }
 
     public Set<UserCountPerCity> countUsersPerCityAggregation(){
         return userRepository.countUsersPerCity();
-    }
-
-    public Post updatedPostAggregation(String currentUserId, String postId, String title, String body){
-        return postRepository.updatedPost(currentUserId, postId, title, body);
     }
 }

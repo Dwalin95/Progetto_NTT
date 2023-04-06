@@ -22,11 +22,4 @@ public interface PostRepository extends MongoRepository<Post, String> {
     )
     List<Comment> findCommentListWithoutSpecifiedOne(String postId, String commentId);
 
-    /**
-     * da implementare //TODO: FC - in fase di merge mi ha duplicato questo metodo, per qualsiasi errore fai riferimento al push del 05.04.2023
-     */
-    @Aggregation(
-            pipeline = {"{$match: {_id: ObjectId(?0)}}", "{$set: {title: ?1, body: ?2, imageUrl: ?3, modified: true}}"}
-    )
-    Post updatedPost(String postId, String title, String body, String imageUrl);
 }

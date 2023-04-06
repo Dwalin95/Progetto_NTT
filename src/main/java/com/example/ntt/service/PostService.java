@@ -7,7 +7,6 @@ import com.example.ntt.dto.post.PostDTO;
 import com.example.ntt.dto.post.PostIdAndUserIdDTO;
 import com.example.ntt.dto.user.UserIdDTO;
 import com.example.ntt.enums.ErrorMsg;
-import com.example.ntt.exceptionHandler.PreconditionFailedException;
 import com.example.ntt.exceptionHandler.ResourceNotFoundException;
 import com.example.ntt.model.Comment;
 import com.example.ntt.model.Post;
@@ -27,7 +26,7 @@ public class PostService {
     private final MongoService mongoService;
     private final UserConfiguration userConfiguration;
 
-    public void createPost(PostDTO postDto){ //TODO: FC - completare l'implementazione - [Vedere gli Optional nel return]
+    public void createPost(PostDTO postDto){
         mongoService.findUserById(postDto.getCurrentUserId())
                 .map(user -> this.addPost(postDto, user))
                 .map(mongoService::saveUser)
@@ -35,9 +34,6 @@ public class PostService {
     }
 
     private User addPost(PostDTO postDto, User user) {
-        userConfiguration.handleUpdateException(postDto.getImageUrl().isPresent() && !userConfiguration.isImage(postDto.getImageUrl().get()),
-                new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
-
         Post post = Post.builder()
                 .title(postDto.getTitle().get())
                 .body(postDto.getBody().get())
@@ -45,9 +41,30 @@ public class PostService {
                 .imageUrl(postDto.getImageUrl().get())
                 .comments(new ArrayList<>())
                 .build();
+
+        Optional.of(post)
+                .filter(p -> postDto.getImageUrl().isPresent() && !userConfiguration.isImage(postDto.getImageUrl().get()));
+
         mongoService.savePost(post);
         user.getPostsIds().add(post.get_id());
         return user;
+    }
+
+    public void updatePost(PostDTO postDTO){
+        mongoService.findPostById(postDTO.getPostId())
+                .map(p -> this.handleUpdatePost(postDTO, p))
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.POST_NOT_FOUND.getMsg()));
+    }
+
+    private Post handleUpdatePost(PostDTO postDto, Post p){
+        Optional.of(p)
+                .filter(post -> postDto.getImageUrl().isPresent() && !userConfiguration.isImage(postDto.getImageUrl().get()));
+
+        mongoService.savePost(p.withBody(postDto.getBody().orElse(p.getBody()))
+                .withTitle(postDto.getTitle().orElse(p.getTitle()))
+                .withImageUrl(postDto.getImageUrl().orElse(p.getImageUrl()))
+                .withModified(true));
+        return p;
     }
 
     public void deletePost(PostIdAndUserIdDTO postDto){
@@ -61,22 +78,6 @@ public class PostService {
         user.getPostsIds().remove(postId);
         mongoService.deletePost(postId);
         return user;
-    }
-
-    public void updatePost(PostDTO postDTO){
-        mongoService.findPostById(postDTO.getPostId())
-                .map(p -> this.saveUpdatedPost(postDTO, p))
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.POST_NOT_FOUND.getMsg()));
-    }
-
-    private Post saveUpdatedPost(PostDTO postDto, Post p){
-        userConfiguration.handleUpdateException(postDto.getImageUrl().isPresent() && !userConfiguration.isImage(postDto.getImageUrl().get()),
-                new PreconditionFailedException(ErrorMsg.URL_IS_NOT_IMG.getMsg()));
-
-        mongoService.savePost(p.withBody(postDto.getBody().orElse(p.getBody()))
-                                .withTitle(postDto.getTitle().orElse(p.getTitle()))
-                .withImageUrl(postDto.getImageUrl().orElse(p.getImageUrl())));
-        return p;
     }
 
     //TODO: LDB - non funge
@@ -115,11 +116,11 @@ public class PostService {
         mongoService.findPostById(commentIdAndPostId.getPostId())
                 .map(post -> this.updateComments(commentIdAndPostId, post))
                 .map(mongoService::savePost)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.POST_NOT_FOUND.getMsg(), commentIdAndPostId.getPostId())));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.COMMENT_NOT_FOUND.getMsg()));
     }
 
     private Post updateComments(CommentIdAndPostIdDTO commentIdAndPostId, Post post) {
-        List<Comment> comments = mongoService.findCommentListWithoutSpecifiedOneAggr(commentIdAndPostId.getPostId(),  commentIdAndPostId.getCommentId());
+        List<Comment> comments = mongoService.findCommentListWithoutSpecifiedOneAggr(commentIdAndPostId.getPostId(), commentIdAndPostId.getCommentId());
         post.setComments(comments);
         return post;
     }
