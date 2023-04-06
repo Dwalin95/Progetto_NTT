@@ -19,13 +19,12 @@ public class RequestService {
 
     private final MongoService mongoService;
 
-    //TODO: cambiare eccezioni
     public Set<IUsernamePic> findUserReceivedFriendRequestsById(UserIdDTO userId) {
         return mongoService.findUserById(userId.getId())
                 .map(User::getReceivedFriendRequests)
                 .map(mongoService::findUserFriendsUsernamePic)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), userId.getId())))
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_RECEIVED_REQUESTS_FOUND.getMsg()));
     }
 
     public Set<IUsernamePic> findUserSentFriendRequestById(UserIdDTO currentUserId) {
@@ -33,7 +32,7 @@ public class RequestService {
                 .map(User::getSentFriendRequests)
                 .map(mongoService::findUserFriendsUsernamePic)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMsg.USER_NOT_FOUND_ERROR_MSG.getMsg(), currentUserId)))
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_FRIENDS_FOUND.getMsg()));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMsg.NO_SENT_REQUESTS_FOUND.getMsg()));
     }
 
     public void sendFriendRequest(CurrentUserFriendIdDTO userIds){

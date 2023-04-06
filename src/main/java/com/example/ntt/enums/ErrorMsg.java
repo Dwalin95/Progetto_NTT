@@ -13,6 +13,8 @@ public enum ErrorMsg {
     COMMENT_NOT_FOUND("Comment not found"),
     NO_FRIENDS_FOUND("No friends found"),
     NO_MESSAGES_FOUND("No messages found"),
+    NO_SENT_REQUESTS_FOUND("No sent requests found"),
+    NO_RECEIVED_REQUESTS_FOUND("No received requests found"),
     DELETE_MESSAGE_TIMEOUT("Messages sent more than an hour ago cannot be deleted for both users, it was deleted only for you"),
     NEW_PWS_EQUAL_TO_OLD_PSW("New password can't be equal to the old password"),
     NO_MATCH_OLD_PSW("Entered characters do not match the old password"),
