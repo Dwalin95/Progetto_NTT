@@ -25,7 +25,7 @@ public class MongoService {
     private final PostRepository postRepository;
 
     public Optional<User> findUserById(String id){
-        return userRepository.findById(id);
+        return this.userRepository.findById(id);
     }
 
     public Optional<EmailGenderOnlyDTO> getUserEmailAndGender(String username) {
